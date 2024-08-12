@@ -1,4 +1,4 @@
-# ubq微信小程序
+# 微信小程序
 
 基于[taro react](https://taro-docs.jd.com/docs/)开发
 
