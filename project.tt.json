@@ -1,0 +1,9 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "ubq mini",
+  "appid": "wxe1b71e689b30e39a",
+  "setting": {
+    "es6": false,
+    "minified": false
+  }
+}

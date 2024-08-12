@@ -1,0 +1,16 @@
+@layer components {
+
+  .transition-all-250s {
+    @apply transition-all duration-[250ms];
+  }
+
+  .flex-center {
+    @apply flex justify-center items-center content-center;
+  }
+
+  .flex-col-center {
+    @apply flex flex-col justify-center items-center content-center;
+  }
+
+}
+

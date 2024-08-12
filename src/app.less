@@ -1,0 +1,24 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+page {
+  height: 100%;
+}
+
+.blur {
+  backdrop-filter: blur(20px);
+}
+
+button::after {
+  content: '';
+  display: none;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent; /* 设置左边为透明边框 */
+  border-right: 6px solid transparent; /* 设置右边为透明边框 */
+  border-bottom: 6px solid #F6F6F8; /* 设置底部为实心边框，这里示例为红色 */
+}
