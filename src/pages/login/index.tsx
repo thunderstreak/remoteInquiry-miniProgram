@@ -6,7 +6,8 @@ import {
   Dialog,
   Form,
   Input,
-  Overlay
+  Overlay,
+  WaterMark
 } from '@nutui/nutui-react-taro'
 import { lightTheme } from '@/config'
 import { LoginState } from '@/pages/login/type'
@@ -75,6 +76,7 @@ export default function Index() {
   }, [state.successShow, timeLeft])
   return (
     <ConfigProvider theme={lightTheme}>
+      <WaterMark fullPage content="nutui" />
       <View className="h-full flex flex-col justify-between bg-color">
         <View className="flex-shrink-0">
           <NavHeader title="千名千探" />
