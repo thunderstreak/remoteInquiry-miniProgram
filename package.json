@@ -65,6 +65,7 @@
     "@tarojs/runtime": "3.6.30",
     "@tarojs/shared": "3.6.30",
     "@tarojs/taro": "3.6.30",
+    "@xylink/xy-mp-sdk": "^3.11.0",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",

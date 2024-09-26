@@ -7,9 +7,14 @@ const config: IConfig = {
 }
 
 /*
-* A00006: 链接失效
-* */
+ * A00006: 链接失效
+ * */
 export const filterCodes: string[] = ['']
 
-export default config
+export const lightTheme = {
+  nutuiColorPrimary: '#3777E1',
+  nutuiColorPrimaryStop1: '#3777E1',
+  nutuiColorPrimaryStop2: '#3777E1'
+}
 
+export default config

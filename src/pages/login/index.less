@@ -1,4 +1,54 @@
 page {
-  background: #fff;
-}
 
+  .bg-user {
+    background: url("../../assets/img/icon_user.png") no-repeat center;
+    background-size: 20px 20px;
+  }
+
+  .bg-id {
+    background: url("../../assets/img/icon_id.png") no-repeat center;
+    background-size: 20px 20px;
+  }
+
+  .bg-play {
+    background: url("../../assets/img/icon_play.png") no-repeat center;
+    background-size: 20px 20px;
+  }
+
+  .bg-waring {
+    background: url("../../assets/img/icon_waring.png") no-repeat center;
+    background-size: 20px 20px;
+  }
+
+  .bg-color {
+    background: linear-gradient(180deg, #2766CF 0%, #89B5FF 100%);
+  }
+
+  .bg-form-color {
+    background: linear-gradient(180deg, #D0E2FF 0%, #FFFFFF 100%);
+  }
+
+  .nut-form-item-body-tips {
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+  }
+
+  .nut-cell-group-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .nut-cell {
+      &:last-child {
+        padding: 0;
+        margin-top: 16px;
+      }
+    }
+  }
+
+  //--nutui-cell-group-wrap-margin: 30px 0;
+  --nutui-cell-group-background-color: rgba(255, 255, 255, 0);
+  //--nutui-cell-background-color: rgba(255, 255, 255, 0);
+  --nutui-form-item-label-width: 0px;
+}

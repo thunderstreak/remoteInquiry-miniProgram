@@ -41,7 +41,7 @@ const setData = <T = RequestParams>(
 /*
  * 设置基本信息
  * */
-const setConfig = <T>(data: T[], type: Method) => {
+const setConfig = <T = any>(data: T[], type: Method) => {
   const [params, ...other] = data
   const { headers = {}, config = {} } = handleArrayToObject(other)
   const result = { headers, ...config }

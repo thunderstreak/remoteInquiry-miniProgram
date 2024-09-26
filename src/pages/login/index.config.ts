@@ -1,4 +1,4 @@
 export default definePageConfig({
-  navigationBarTitleText: '登录',
+  navigationBarTitleText: '千名千探',
   navigationStyle: 'custom'
 })
