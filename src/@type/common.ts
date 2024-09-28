@@ -4,20 +4,17 @@ export interface Page {
 }
 
 export interface ResponsePage extends Page {
-  totalPages: number
-  totalRecords: number
+  totalPages: number;
+  totalRecords: number;
 }
 
 export interface ResponseBase<T> {
-  errorCode: string
-  errorMsg: null | string
-  success: boolean
-  sysTime: number
-  data?: T
+  code: number;
+  message: null | string;
+  data?: T;
 }
 
-export interface ResponseList<T> extends ResponsePage, ResponseBase<T[]> {
-}
+export interface ResponseList<T> extends ResponsePage, ResponseBase<T[]> {}
 
 export type ResponseData<T = undefined> = ResponseBase<T>;
 

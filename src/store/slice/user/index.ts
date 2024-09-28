@@ -3,12 +3,14 @@ import type { UserState } from '@/store/slice/user/type'
 import { RootState } from '@/store'
 
 const createInitialState = (): UserState => ({
-  userId: '',
-  nickName: '',
-  avatar: '',
-  userMobile: '',
-  sex: '',
-  verifyAuth: false
+  id: '',
+  tenantCode: '',
+  orgCode: '',
+  userName: '',
+  roomCode: '',
+  roomPassword: '',
+  isExpire: false,
+  token: ''
 })
 export const userSlice = createSlice({
   name: 'user',

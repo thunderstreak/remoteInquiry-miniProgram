@@ -9,10 +9,10 @@ const config: IConfig = {
 /*
  * A00006: 链接失效
  * */
-export const filterCodes: string[] = ['']
+export const filterCodes: number[] = []
 
 export const lightTheme = {
-  nutuiColorPrimary: '#3777E1',
+  // nutuiColorPrimary: '#3777E1'
   nutuiColorPrimaryStop1: '#3777E1',
   nutuiColorPrimaryStop2: '#3777E1'
 }

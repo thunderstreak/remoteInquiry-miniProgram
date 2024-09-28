@@ -170,34 +170,19 @@ export interface ActivityTickets {
   totalStock: number;
 }
 
-export interface LoginInfo {
-  avatar?: string;
-  domainName?: string;
-  fuYouWalletStatus?: number;
-  realNameAuth?: boolean;
-  registTime?: number;
-  source?: string;
+export interface Login {
+  id: string;
+  tenantCode: string;
+  orgCode: string;
+  userName: string;
+  roomCode: string;
+  roomPassword: string;
+  isExpire: boolean;
   token: string;
-  userId?: string;
+  refreshToken: string | null;
 }
 
-export interface UserInfo {
-  /**
-   * 用户id,昵称,头像,手机号
-   */
-  userId: string;
-  nickName: string;
-  avatar: string;
-  userMobile: string;
-  /**
-   * 用户性别 M(男) or F(女)
-   */
-  sex: string;
-  /**
-   * 是否核销员 是:true， 否:false
-   */
-  verifyAuth: boolean;
-}
+export interface UserInfo extends Login {}
 
 export interface ListBanners {
   id: number;

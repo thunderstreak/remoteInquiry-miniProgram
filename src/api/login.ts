@@ -8,8 +8,8 @@ class LoginApi {
   /*
    * 微信快速登录
    * */
-  login = wrapperPost<Req.Login, Com.ResponseData<Res.LoginInfo>>(
-    '/api/opuser/wxMiniLogin'
+  login = wrapperPost<Req.Login, Com.ResponseData<Res.Login>>(
+    '/api/v1/user/login'
   )
 }
 

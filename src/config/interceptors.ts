@@ -1,26 +1,31 @@
 import type { ResponseData, ResponseList } from '@/@type/common'
-import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import type {
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig
+} from 'axios'
 import Taro from '@tarojs/taro'
 import { filterCodes } from '@/config/index'
+import { userActions } from '@/store/slice/user'
 
 type Interceptors = ResponseData | ResponseList<undefined>;
-
 const handleResponseData = async (response: AxiosResponse) => {
   const { data } = response
-  const { errorCode, errorMsg, success } = data as Interceptors
-  switch (errorCode) {
-    case '010000': // 登录失效
+  const { code, message } = data as Interceptors
+  switch (code) {
+    case 4200: // 登录失效
+      userActions.removeUserInfo()
       Taro.clearStorageSync()
       await Taro.navigateTo({ url: '/pages/login/index' })
       break
   }
   // 过滤特定错误类型
-  if (filterCodes.includes(errorCode)) {
+  if (filterCodes.includes(code)) {
     return Promise.reject(data)
   }
   // 错误提示
-  if (!success && errorCode && errorMsg) {
-    await Taro.showToast({ title: errorMsg, icon: 'none', duration: 3000 })
+  if (code !== 200 && message) {
+    await Taro.showToast({ title: message, icon: 'none', duration: 3000 })
     return Promise.reject(data)
   }
   return Promise.resolve(data)
@@ -34,7 +39,8 @@ export const requestConfigInterceptors = (
   if (token) {
     config.headers.token = token
   }
-  config.headers.requestChannel = config.headers.requestChannel || 'ubq_applets'
+  config.headers.tenantCode = 'ZY001'
+  config.headers.orgCode = 'Z01'
 
   return config
 }

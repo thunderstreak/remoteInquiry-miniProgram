@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Taro from '@tarojs/taro'
 import { Image, ScrollView, Text, View } from '@tarojs/components'
 import {
   Button,
@@ -9,14 +10,18 @@ import {
   Overlay,
   WaterMark
 } from '@nutui/nutui-react-taro'
+import { useDispatch } from 'react-redux'
+import { userActions } from '@/store/slice/user'
+import Login from '@/api/login'
 import { lightTheme } from '@/config'
-import { LoginState } from '@/pages/login/type'
+import { FormData, LoginState } from '@/pages/login/type'
 import NavHeader from '@/components/NavHeader'
 import Video from './component/Video/index'
 import './index.less'
 
-const createFormData = () => ({ username: '', idcard: '' })
+const createFormData = (): FormData => ({ userName: '', cardNo: '' })
 export default function Index() {
+  const dispatch = useDispatch()
   const [timeLeft, setTimeLeft] = useState(8)
   const [formInstance] = Form.useForm()
   const [form, setForm] = useState(createFormData())
@@ -28,7 +33,7 @@ export default function Index() {
   })
 
   const disabled = useMemo(
-    () => form.username === '' || form.idcard === '',
+    () => form.userName === '' || form.cardNo === '',
     [form]
   )
 
@@ -56,9 +61,21 @@ export default function Index() {
     })
   }, [])
 
-  const handleSubmitSucceed = useCallback((value) => {
-    console.log(value)
-  }, [])
+  const handleSubmitSucceed = useCallback(
+    (value: FormData) => {
+      Login.login(value).then((res) => {
+        const { data } = res
+        if (data) {
+          const { token } = data
+          Taro.setStorageSync('TOKEN', token)
+          dispatch(userActions.setUserInfo(data))
+          setState((v) => ({ ...v, successShow: true }))
+          Taro.navigateTo({ url: '/pages/home' })
+        }
+      })
+    },
+    [dispatch]
+  )
 
   const handleSubmitFailed = useCallback((error) => {
     console.log(error)
@@ -71,7 +88,8 @@ export default function Index() {
       }, 1000)
       return () => clearInterval(intervalId)
     } else {
-      console.log(1)
+      console.log('success')
+      // Taro.navigateTo({ url: '/pages/home/index' })
     }
   }, [state.successShow, timeLeft])
   return (
@@ -83,7 +101,10 @@ export default function Index() {
           <View className="pt-[37px] font-bold text-[20px] text-center text-white">
             远程云取证系统
           </View>
-          <Image src="" className="w-[315px] h-[219px] block mx-auto my-3" />
+          <Image
+            src="https://ts1.cn.mm.bing.net/th?id=OIP-C.Xz0mBQM__1Qz7chc_25joQHaEL&w=80&h=80&c=1&vt=10&bgcl=e7c92e&r=0&o=6&pid=5.1"
+            className="w-[315px] h-[219px] block mx-auto my-3"
+          />
           <View className="flex-center text-[14px] font-medium pb-[38px] text-white">
             随时随地 · 安全高效
           </View>
@@ -91,7 +112,10 @@ export default function Index() {
         <View className="flex-1 rounded-t-xl px-6 bg-form-color">
           <View className="flex items-center justify-between py-5">
             <View className="flex items-center gap-2">
-              <Image src="" className="block w-6 h-6" />
+              <Image
+                src="https://ts1.cn.mm.bing.net/th?id=OIP-C.Xz0mBQM__1Qz7chc_25joQHaEL&w=80&h=80&c=1&vt=10&bgcl=e7c92e&r=0&o=6&pid=5.1"
+                className="block w-6 h-6"
+              />
               <Text className="text-[16px] font-medium">请先进行身份核验</Text>
             </View>
             <View
@@ -123,7 +147,7 @@ export default function Index() {
           >
             <Form.Item
               label={<View className="w-5 h-5 block rounded bg-user" />}
-              name="username"
+              name="userName"
               rules={[
                 { min: 2, message: '不能少于2个字' },
                 { message: '请输入姓名' }
@@ -133,13 +157,13 @@ export default function Index() {
                 className="nut-input-text"
                 placeholder="请输入姓名"
                 type="text"
-                value={form.username}
-                onChange={(value) => handleSetFromValue(value, 'username')}
+                value={form.userName}
+                onChange={(value) => handleSetFromValue(value, 'userName')}
               />
             </Form.Item>
             <Form.Item
               label={<View className="w-5 h-5 block rounded bg-id" />}
-              name="idcard"
+              name="cardNo"
               rules={[
                 { len: 18, message: '请输入18位证件号' },
                 { message: '请输入证件号码' }
@@ -149,14 +173,14 @@ export default function Index() {
                 className="nut-input-text"
                 placeholder="请输入证件号码"
                 type="idcard"
-                value={form.idcard}
-                onChange={(value) => handleSetFromValue(value, 'idcard')}
+                value={form.cardNo}
+                onChange={(value) => handleSetFromValue(value, 'cardNo')}
               />
             </Form.Item>
           </Form>
           <View
             className="flex justify-center items-center gap-1 py-[34px]"
-            onClick={() => handleSetDialog(true, 'videoShow')}
+            onClick={() => handleSetDialog(true, 'successShow')}
           >
             <View className="w-5 h-5 bg-play" />
             <Text className="text-[12px] text-[#999999]">使用教程</Text>
