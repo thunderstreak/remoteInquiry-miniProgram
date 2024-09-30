@@ -12,14 +12,19 @@ import {
 } from '@nutui/nutui-react-taro'
 import { useDispatch } from 'react-redux'
 import { userActions } from '@/store/slice/user'
+import XYRTC from '@xylink/xy-mp-sdk'
 import Login from '@/api/login'
-import { lightTheme } from '@/config'
+import config, { lightTheme } from '@/config'
 import { FormData, LoginState } from '@/pages/login/type'
 import NavHeader from '@/components/NavHeader'
 import Video from './component/Video/index'
+import * as Res from '@/@type/response'
 import './index.less'
 
-const createFormData = (): FormData => ({ userName: '', cardNo: '' })
+const createFormData = (): FormData => ({
+  userName: '余嘉禾',
+  cardNo: '11111'
+})
 export default function Index() {
   const dispatch = useDispatch()
   const [timeLeft, setTimeLeft] = useState(8)
@@ -61,25 +66,77 @@ export default function Index() {
     })
   }, [])
 
+  const handleNavigateTo = useCallback(() => {
+    handleSetDialog(false, 'successShow')
+    const number = '9042180858'
+    const password = '788311'
+    const name = 'test'
+    Taro.navigateTo({
+      url: `/pages/meeting/index?displayName=${name}&password=${password}&number=${number}&videoMute=${false}&audioMute=${false}`
+    })
+  }, [handleSetDialog])
+
+  const handleCallNumber = useCallback(
+    async (userInfo: Res.Login) => {
+      const XYClient = XYRTC.createClient({
+        report: true,
+        extId: config.DEFAULT_EXTID,
+        appId: config.DEFAULT_APPID
+      })
+      const response = await XYClient.loginExternalAccount({
+        extUserId: userInfo.id,
+        displayName: userInfo.userName
+      })
+      const { code, data = {} } = response || {}
+      // 状态是200时，初始化登录成功
+      if (code === 200 || code === 'XYSDK:980200') {
+        const cn = data.callNumber
+        console.log(cn)
+        XYClient.showToast('登录成功')
+        handleNavigateTo()
+      } else {
+        XYClient.showToast('登录失败，请稍后重试')
+      }
+    },
+    [handleNavigateTo]
+  )
+
   const handleSubmitSucceed = useCallback(
     (value: FormData) => {
-      Login.login(value).then((res) => {
+      Login.login(value).then(async (res) => {
         const { data } = res
         if (data) {
           const { token } = data
           Taro.setStorageSync('TOKEN', token)
           dispatch(userActions.setUserInfo(data))
           setState((v) => ({ ...v, successShow: true }))
-          Taro.navigateTo({ url: '/pages/home' })
+          handleCallNumber(data)
         }
       })
     },
-    [dispatch]
+    [dispatch, handleCallNumber]
   )
 
   const handleSubmitFailed = useCallback((error) => {
     console.log(error)
   }, [])
+
+  const handleSetting = useCallback(async () => {
+    const setting = await Taro.getSetting()
+    if (!setting.authSetting['scope.record']) {
+      await Taro.authorize({ scope: 'scope.record' })
+    }
+    if (!setting.authSetting['scope.userLocation']) {
+      await Taro.authorize({ scope: 'scope.userLocation' })
+    }
+    if (!setting.authSetting['scope.camera']) {
+      await Taro.authorize({ scope: 'scope.camera' })
+    }
+  }, [])
+
+  useEffect(() => {
+    handleSetting().catch(console.log)
+  }, [handleSetting])
 
   useEffect(() => {
     if (timeLeft > 0 && state.successShow) {
@@ -165,7 +222,7 @@ export default function Index() {
               label={<View className="w-5 h-5 block rounded bg-id" />}
               name="cardNo"
               rules={[
-                { len: 18, message: '请输入18位证件号' },
+                // { len: 18, message: '请输入18位证件号' },
                 { message: '请输入证件号码' }
               ]}
             >
@@ -196,7 +253,7 @@ export default function Index() {
           }
           visible={state.successShow}
           hideCancelButton
-          onConfirm={() => handleSetDialog(false, 'successShow')}
+          onConfirm={handleNavigateTo}
           confirmText={<View>继续({timeLeft ?? ''}s)</View>}
         >
           <ScrollView scrollY style={{ height: '300px' }}>

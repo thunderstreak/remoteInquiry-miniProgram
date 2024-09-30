@@ -1,0 +1,137 @@
+<view class="{{ show }}">
+	<view class="xy__layout-container" style="{{ onholdStyle }}">
+		<view
+		 wx:for="{{newLayout}}"
+		 wx:for-index="i"
+		 wx:for-item="item"
+		 wx:key="id"
+		>
+			<!-- 本地 -->
+			<view
+			 wx:if="{{ item.isPusher }}"
+			 class="xy__video"
+			 style="{{ item.style }}"
+			 data-item="{{ item }}"
+			 catchtap="onClickContent"
+			 bindlongpress="onLongPress"
+			>
+				<live-pusher
+				 wx:if="{{pushUrl}}"
+				 beauty="{{ beauty }}"
+				 whiteness="{{ whiteness }}"
+				 class="xy__video-live"
+				 device-position="{{ devicePosition }}"
+				 enable-camera="{{ camera && isPushed }}"
+				 id="pusher"
+				 muted="{{ muted }}"
+				 enable-mic="{{ true }}"
+				 enable-ans="{{ true }}"
+				 enable-agc="{{ true }}"
+				 background-mute="{{ false }}"
+				 max-bitrate="{{ maxBitrate }}"
+				 min-bitrate="{{ minBitrate }}"
+				 mode="{{mode}}"
+				 url="{{ pushUrl }}"
+				 autopush="{{ false }}"
+				 debug="{{ debug }}"
+				 waiting-image="{{ waitingImage }}"
+				 bindnetstatus="onPusherNetStatus"
+				 bindstatechange="onPusherStateChange"
+				 binderror="onPusherError"
+				 bindaudiovolumenotify="onPusherAudioVolumeNotify"
+				/>
+				<view class="video-status" wx:if="{{pushUrl && isPushed}}">
+					<image src="{{muted ? 'https://sdk-source.xylink.com/miniProgram/audio_mute.png' : 'https://sdk-source.xylink.com/miniProgram/audio_unmute.png'}}" class="video-mute-icon" />
+					<view class="video-member">{{ item.name }}</view>
+				</view>
+				<view class="video-pause-bg" wx:else>
+					<image src="{{ backgroundImage }}" class="video-pause-bg" />
+					<view class="video-pause-box">
+						{{ !!item.stateText ? item.stateText.wating : '视频请求中' }}
+					</view>
+				</view>
+				<view class="video-pause-bg" wx:if="{{!camera}}">
+					<image src="{{ backgroundImage }}" class="video-pause-bg" />
+					<view class="video-pause-box" wx:if="{{!!item.stateText}}">
+						{{item.stateText.videoMute}}
+					</view>
+					<view class="video-pause-box" wx:elif="{{item.avatar }}">
+						<xy-img outer-class="video-avatar"  style="{{item.avatarStyle}}" src="{{item.avatar}}" />
+					</view>
+					<view class="video-pause-box" wx:else>视频暂停</view>
+				</view>
+			</view>
+			<!-- 远端 -->
+			<view
+			 wx:else
+			 class="{{item.roster.isContent ? 'xy__video xy__video-content' : 'xy__video'}}"
+			 style="{{ item.style }}"
+			 data-item="{{ item }}"
+			 catchtap="onClickContent"
+			 bindlongpress="onLongPress"
+			 bindtouchstart="{{ item.roster.isContent && enablePinchToZoom ? 'handleTouchStart' : '' }}"
+			 bindtouchmove="{{ item.roster.isContent && enablePinchToZoom ? 'handleTouchMove' : '' }}"
+			 bindtouchend="{{ item.roster.isContent && enablePinchToZoom ? 'handleTouchEnd' : '' }}"
+			 bindtouchcancel="{{ item.roster.isContent && enablePinchToZoom ? 'handleTouchCancel' : '' }}"
+			>
+				<live-player
+				 wx:if="{{ item.playUrl}}"
+				 id="{{ item.id }}"
+				 data-streamid="{{item.playUrl}}"
+				 data-item="{{ item }}"
+				 class="{{item.roster.isContent ? 'xy__video-live xy__video-live-content' : 'xy__video-live'}}"
+				 style="{{item.videoStyle}}"
+				 mode="RTC"
+				 muted="{{ item.muted }}"
+				 object-fit="{{ item.fit ? item.fit : 'fillCrop' }}"
+				 src="{{ item.playUrl }}"
+				 autoplay="{{ true }}"
+				 aspect="16:9"
+				 debug="{{ debug }}"
+				 auto-pause-if-navigate="{{ false }}"
+				 auto-pause-if-open-native="{{ false }}"
+				 bindstatechange="onPlayStateChange"
+				 bindnetstatus="onPlayNetStatus"
+				 bindaudiovolumenotify="onPlayAudioVolumeNotify"
+				/>
+				<view class='video-status'>
+					<image wx:if="{{!item.roster.isContent}}" src="{{item.roster.audioTxMute? 'https://sdk-source.xylink.com/miniProgram/audio_mute.png' : 'https://sdk-source.xylink.com/miniProgram/audio_unmute.png'}}" class="video-mute-icon" />
+					<view class="video-member">{{ item.name }}</view>
+				</view>
+
+				<!-- 语音通话 -->
+				<view class="video-pause-bg" wx:if="{{ item.isAudioCall }}">
+					<image src="{{ backgroundImage }}" class="video-pause-bg" />
+					<view class="video-pause-box">
+						<view wx:if="{{item.stateText && item.stateText.audioCall}}">{{item.stateText.audioCall}}</view>
+
+						<view wx:else>
+               <xy-img outer-class="video-avatar"  style="{{item.avatarStyle}}" src="{{item.avatar}}" />
+						   <view class="video-pause-box-text">{{ !!item.stateText ? item.stateText.audioCall : '语音通话中' }}</view>
+						</view>
+					</view>
+				</view>
+
+				<!-- 正常播放情况 -->
+				<view class="video-cover-view" wx:elif="{{ item.playUrl && !item.roster.videoTxMute && item.status === 'start' }}"/>
+			
+				<!-- 视频关闭 -->
+				<!-- 正在清流 -->
+				<view class="video-pause-bg" wx:else>
+					<image src="{{ backgroundImage }}" class="video-pause-bg" />
+					<view class="video-pause-box" wx:if="{{item.roster.videoTxMute}}">
+						<view wx:if="{{!!item.stateText}}">{{item.stateText.videoMute}}</view>
+
+						<xy-img outer-class="video-avatar"  style="{{item.avatarStyle}}" wx:elif="{{item.avatar}}" src="{{item.avatar}}" />
+
+						<view wx:else>视频暂停</view>
+					</view>
+					<view class="video-pause-box" wx:else>
+						{{ !!item.stateText ? item.stateText.wating : '视频请求中' }}
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</view>
+

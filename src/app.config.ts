@@ -1,7 +1,7 @@
-import { HOME_PAGE_URL, LOGIN_PAGE_URL, MY_PAGE_URL } from '@/constants'
+import { HOME_PAGE_URL, LOGIN_PAGE_URL, MEETING_PAGE_URL } from '@/constants'
 
 export default defineAppConfig({
-  pages: [LOGIN_PAGE_URL, HOME_PAGE_URL, MY_PAGE_URL],
+  pages: [LOGIN_PAGE_URL, HOME_PAGE_URL, MEETING_PAGE_URL],
   // subPackages: [
   //   {
   //     root: 'package',

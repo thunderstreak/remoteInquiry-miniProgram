@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "sdk",
+  "component": true,
+  "disableScroll": true,
+  "backgroundColor": "#1f1f25",
+  "usingComponents": {
+    "xy-img": "../custom-components/xyImage/index"
+  }
+}

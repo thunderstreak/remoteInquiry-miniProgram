@@ -1,0 +1,220 @@
+<!-- index.wxml -->
+<view class="xylink-container">
+  <!-- 呼叫Loading -->
+  <view class="xylink-loading" wx:if="{{ meetingLoading }}">
+    <view class="xylink-user-photo">
+      <image class="img" src="../../assets/images/device/noicon.png"/>
+    </view>
+    <view class="xy__call-name">视频通话邀请中...</view>
+    <view bindtap="onStopMeeting" class="xy__call-end">
+      <image class="img" src="../../assets/images/action_hangup.png"/>
+    </view>
+  </view>
+
+  <!-- 会议操作条 -->
+  <view class="xylink-operate-left {{ showOperateBar ? '' : 'xy__operate-left-hidden' }}"
+        wx:if="{{ !onHold && !meetingLoading }}">
+    <view bindtap="onSwitchPosition"
+          class="xy__operate-btn xy__operate-btn-click {{ !camera ? 'xy__operate-btn-disabled' : '' }}">
+      <image class="icon" src="../../assets/images/icon_switch.png"/>
+      <view class="xy__operate-font">翻转</view>
+    </view>
+
+    <view bindtap="onChangeMuted" class="xy__operate-btn xy__operate-btn-click">
+      <image class="icon {{audioData.img}}"/>
+      <view class="xy__operate-font">{{ audioData.text}}</view>
+    </view>
+
+    <view bindtap="onSwitchCamera" class="xy__operate-btn xy__operate-btn-click">
+      <view class="icon {{camera ? 'video_mute' : 'video_unmute'}}"/>
+      <view class="xy__operate-font">{{ camera ? "关闭视频" : "开启视频" }}</view>
+    </view>
+
+    <view bindtap="onChangeRosterShowStatus" class="xy__operate-btn xy__operate-btn-click">
+      <image class="icon" src="../../assets/images/icon_participant.png"/>
+      <view class="xy__operate-font">参会者（{{ total > 9999 ? 9999 + '+' : total }}）</view>
+    </view>
+    <view bindtap="onStopMeeting" class="xy__operate-end">挂断</view>
+  </view>
+
+  <view class="xylink-operate-right">
+    <view bindtap="onShowNetInfo" class="xy__operate-signal" wx:if="{{!onHold&&!meetingLoading}}">
+      <view class="xy__operate-signal_image signal_{{localNetworkLevel}}"/>
+    </view>
+
+    <view class="xy__operate-time" wx:if="{{!onHold&&!meetingLoading}}">
+      {{ meetingTime }}
+    </view>
+
+    <view bindtap="onChangeinviteSatus" class="xy__operate-btn xy__operate-info" wx:if="{{!onHold&&!meetingLoading}}">
+      <view class="xy__operate-number">
+        {{ meetingInfo.displayName || meetingNum }}
+      </view>
+      <view class="info-btn" wx:if="{{!onHold&&!meetingLoading}}">
+        <view class="info-icon"/>
+      </view>
+    </view>
+  </view>
+
+  <!-- 会议信息 -->
+  <view>
+    <view bindtap="onChangeinviteSatus" class='dawer_compontents' wx:if="{{inviteInfoShow}}"></view>
+    <view
+      class="{{inviteInfoShow ? 'dawer_info dawer_info_bottom dawer_info_show_bottom' : 'dawer_info dawer_info_bottom'}}">
+      <view bindtap='onChangeinviteSatus' class="draw_tip"></view>
+      <view class="draw_title">{{meetingInfo.displayName || meetingNum}}</view>
+      <view class="draw_line"></view>
+      <view class="dawer_item">
+        <view class="drawer_info_title">会议号</view>
+        <view class="drawer_info-number">
+          {{ meetingInfo.callNumber || meetingNum }}
+          <view bindtap="copyText" class="drawer_info-btn"
+                data-data='{{ meetingInfo.callNumber||meetingNum }}' data-tip='会议号已复制到剪贴版中'>
+            <view class="drawer_info-copy"/>
+          </view>
+        </view>
+      </view>
+      <view class="dawer_item" wx:if="{{meetingInfo.inviteInfo.shareUrl}}">
+        <view class="drawer_info_title">会议链接</view>
+        <view class="drawer_info-number">
+          {{ meetingInfo.inviteInfo.shareUrl }}
+          <view bindtap="copyText" class="drawer_info-btn"
+                data-data='{{  meetingInfo.inviteInfo.shareUrl}}' data-tip='会议链接已复制到剪贴版中'>
+            <image class="drawer_info-copy" src="../../assets/images/icon_copy.png"></image>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 参会者列表 -->
+  <view>
+    <view bindtap="onChangeRosterShowStatus" class='dawer_compontents' wx:if="{{rosterShow}}">
+    </view>
+    <view class="{{rosterShow ? 'dawer_info dawer_info_right dawer_info_show_right' : 'dawer_info dawer_info_right'}}">
+      <view class="draw_title">参会者</view>
+      <view class="draw_line"></view>
+      <view class="draw_content">
+        <view class="drawer_participant">
+          <view class="drawer_participant_search">
+            <input bindinput="bindSearch" class="drawer_participant_search_input" id="rosterSearch" placeholder="搜索"
+                   type="text"/>
+            <view class="drawer_participant_search_btn">
+              <image src="../../assets/images/operate/icon_search.svg"></image>
+            </view>
+          </view>
+
+          <view class="drawer_participant_item" wx:for="{{filterRosterList}}" wx:key="id">
+            <view class="drawer-participant-avatar">
+              <image class="icon-avatar" src="{{item.avatar}}"></image>
+              <view class="icon-status icon-me" wx:if="{{item.isLocal}}">我</view>
+              <image class="icon-status" src="../../assets/images/operate/icon_speaker.gif"
+                     wx:elif="{{item.isActiveSpeaker && !item.audioTxMute}}"></image>
+            </view>
+
+            <view class="drawer-participant-name">
+              <view class="drawer-participant-name-info">
+                {{ item.displayName }}
+              </view>
+              <view class="drawer-participant-name-status" wx:if="{{item.isContentOnly}}">仅桌面共享</view>
+              <view class="drawer-participant-name-status" wx:if="{{!item.isContentOnly && item.isContent}}">
+                正在共享...
+              </view>
+            </view>
+            <view class="drawer-participant-status">
+              <view class="drawer-participant-status-item">
+                <image class="drawer-participant-status-item_image"
+                       src="{{item.audioTxMute ? '../../assets/images/operate/icon_mic_mute.png' : '../../assets/images/operate/icon_mic.png'}}">
+                </image>
+              </view>
+              <view class="drawer-participant-status-item">
+                <image class="drawer-participant-status-item_image"
+                       src="{{item.videoTxMute ? '../../assets/images/operate/icon_camera_mute.png' : '../../assets/images/operate/icon_camera.png'}}">
+                </image>
+              </view>
+            </view>
+          </view>
+
+          <view class="dawer_tips" wx:if="{{filterRosterList.length===0}}">
+            未找到符合条件的结果
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 网络信息 -->
+  <view class="netInfo_container" wx:if="{{netInfoShow}}">
+    <image bindtap="onCloseNetInfo" class="netInfo_close" src="../../assets/images/icon_close.png"/>
+    <view class="netInfo_table_container">
+      <view class="netInfo_table_title">网络探测</view>
+      <view class="netInfo_table">
+        <!-- 表格标题 -->
+        <view class="netInfo_table_tr">
+          <view class="netInfo_table_th" wx:for="{{tableHeader.networkDetection}}" wx:key="index">{{item}}</view>
+        </view>
+        <!-- 表格内容 -->
+        <view class="netInfo_table_tr" wx:for="{{netInfoDetail.detectionList}}" wx:for-item="detectionItem"
+              wx:key="index">
+          <view class="netInfo_table_td">
+
+            {{detectionItem.type}}
+          </view>
+          <view class="netInfo_table_td">{{detectionItem.netJitter || 0}}</view>
+          <view class="netInfo_table_td">{{detectionItem.bitrate || 0}}</view>
+          <!-- </view> -->
+        </view>
+      </view>
+
+      <view class="netInfo_table_title">与会者</view>
+      <view class="netInfo_table">
+        <view class="netInfo_table_tr">
+          <view class="netInfo_table_th" wx:for="{{tableHeader.member}}" wx:key="index">{{item}}</view>
+        </view>
+
+        <view class="netInfo_table_tr" wx:for="{{netInfoDetail.memberList}}" wx:for-item="member" wx:key="index">
+          <view class="netInfo_table_td">{{ member.displayName }}</view>
+          <view class="netInfo_table_td">{{member.resolution}}</view>
+          <view class="netInfo_table_td">{{member.fps}}</view>
+          <view class="netInfo_table_td">{{member.videoBitrate}}</view>
+          <view class="netInfo_table_td">{{member.audioBitrate}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 等候室状态，不显示画面，没有等候室需求，可以不添加 -->
+  <view class="xy__call" wx:if="{{ onHold }}">
+    <view class="xy__call-box">
+      <view class="xy__call-person-status">
+        请稍等，主持人稍后邀请您入会
+      </view>
+      <view class="xy__call-person-title">
+        会议主题
+      </view>
+      <view class="xy__call-person-conference">
+        {{ meetingTitle.title }}
+      </view>
+      <view class="xy__call-person-operate">
+        <image
+          bindtap="onSwitchholdCamera"
+          src="{{holdCamera ? '../../assets/images/waiting/videoMute.png' : '../../assets/images/waiting/videoUnmute.png'}}"
+        ></image>
+        <image
+          bindtap="onSwitchHandAudio"
+          src="{{holdAudioMuted ? '../../assets/images/waiting/audioMute.png' : '../../assets/images/waiting/audioUnmute.png'}}"
+        ></image>
+      </view>
+      <view bindtap="onStopMeeting" class="xy__operate-end xy__call_end">
+        挂断
+      </view>
+    </view>
+  </view>
+  <view capture-catch:tap="onClickContent" class="xy__call-box" hidden="{{onHold}}" wx:if="{{!meetingLoading}}">
+    <!-- 小鱼小程序SDK UI组件 -->
+    <xylink-room beauty="{{ 6 }}" bindonRoomEvent="onRoomEvent" camera="{{camera}}"
+                 devicePosition="{{ devicePosition }}"
+                 id="xylink" muted="{{audioMuted}}" template="{{ template }}"/>
+  </view>
+</view>
+

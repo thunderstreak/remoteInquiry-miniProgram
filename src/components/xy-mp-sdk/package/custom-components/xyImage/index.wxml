@@ -1,0 +1,20 @@
+<view>
+	<image
+	 class="outer-class"
+	 style="{{style}}"
+	 wx:if="{{ src && isShow == true }}"
+	 mode="widthFix"
+	 src="{{ src }}"
+	 lazy-load='{{true}}'
+	 binderror="loadError"
+	/>
+	<image
+	 wx:if="{{isShow == false}}"
+	 src="{{imgDefault}}"
+	 class="outer-class"
+	 style="{{style}}"
+	 mode="widthFix"
+	 lazy-load='{{true}}'
+	/>
+</view>
+

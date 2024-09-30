@@ -1,0 +1,12 @@
+{
+  "usingComponents": {
+    "xylink-room": "../../components/xy-mp-sdk/package/component"
+  },
+  "navigationBarBackgroundColor": "#000",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "在线会议",
+  "disableScroll": true,
+  "disableSwipeBack": true,
+  "pageOrientation": "landscape",
+  "navigationStyle": "custom"
+}
