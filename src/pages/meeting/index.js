@@ -104,7 +104,6 @@ Page({
    * @param { object } option - 页面URL参数信息
    */
   onLoad(option) {
-    console.log(option)
     this.pageOption = option
     const layoutMode = wx.getStorageSync('XY_LAYOUT_MODE') || 'auto'
     this.callNumber = wx.getStorageSync('XY_CALL_NUMBER')
@@ -170,10 +169,6 @@ Page({
       displayName
     })
     this.muteStatus()
-
-    setTimeout(() => {
-      wx.navigateTo({ url: '/pages/home/index' })
-    }, 3000)
   },
 
   /**

@@ -3,4 +3,7 @@ export interface Login {
   cardNo: string;
 }
 
-export interface PageRewardRecord {}
+export interface RoomQueryRoomList {
+  userName: string;
+  cardNo: string;
+}

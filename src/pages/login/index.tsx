@@ -7,23 +7,20 @@ import {
   Dialog,
   Form,
   Input,
-  Overlay,
-  WaterMark
+  Overlay
 } from '@nutui/nutui-react-taro'
 import { useDispatch } from 'react-redux'
 import { userActions } from '@/store/slice/user'
-import XYRTC from '@xylink/xy-mp-sdk'
 import Login from '@/api/login'
-import config, { lightTheme } from '@/config'
+import { lightTheme } from '@/config'
 import { FormData, LoginState } from '@/pages/login/type'
 import NavHeader from '@/components/NavHeader'
 import Video from './component/Video/index'
-import * as Res from '@/@type/response'
 import './index.less'
 
 const createFormData = (): FormData => ({
   userName: '余嘉禾',
-  cardNo: '11111'
+  cardNo: '622424198612064432'
 })
 export default function Index() {
   const dispatch = useDispatch()
@@ -68,38 +65,33 @@ export default function Index() {
 
   const handleNavigateTo = useCallback(() => {
     handleSetDialog(false, 'successShow')
-    const number = '9042180858'
-    const password = '788311'
-    const name = 'test'
-    Taro.navigateTo({
-      url: `/pages/meeting/index?displayName=${name}&password=${password}&number=${number}&videoMute=${false}&audioMute=${false}`
-    })
+    Taro.navigateTo({ url: `/pages/home/index` })
   }, [handleSetDialog])
 
-  const handleCallNumber = useCallback(
-    async (userInfo: Res.Login) => {
-      const XYClient = XYRTC.createClient({
-        report: true,
-        extId: config.DEFAULT_EXTID,
-        appId: config.DEFAULT_APPID
-      })
-      const response = await XYClient.loginExternalAccount({
-        extUserId: userInfo.id,
-        displayName: userInfo.userName
-      })
-      const { code, data = {} } = response || {}
-      // 状态是200时，初始化登录成功
-      if (code === 200 || code === 'XYSDK:980200') {
-        const cn = data.callNumber
-        console.log(cn)
-        XYClient.showToast('登录成功')
-        handleNavigateTo()
-      } else {
-        XYClient.showToast('登录失败，请稍后重试')
-      }
-    },
-    [handleNavigateTo]
-  )
+  // const handleCallNumber = useCallback(
+  //   async (userInfo: Res.Login) => {
+  //     const XYClient = XYRTC.createClient({
+  //       report: true,
+  //       extId: config.DEFAULT_EXTID,
+  //       appId: config.DEFAULT_APPID
+  //     })
+  //     const response = await XYClient.loginExternalAccount({
+  //       extUserId: userInfo.id,
+  //       displayName: userInfo.userName
+  //     })
+  //     const { code, data = {} } = response || {}
+  //     // 状态是200时，初始化登录成功
+  //     if (code === 200 || code === 'XYSDK:980200') {
+  //       const cn = data.callNumber
+  //       console.log(cn)
+  //       XYClient.showToast('登录成功')
+  //       handleNavigateTo()
+  //     } else {
+  //       XYClient.showToast('登录失败，请稍后重试')
+  //     }
+  //   },
+  //   [handleNavigateTo]
+  // )
 
   const handleSubmitSucceed = useCallback(
     (value: FormData) => {
@@ -110,11 +102,11 @@ export default function Index() {
           Taro.setStorageSync('TOKEN', token)
           dispatch(userActions.setUserInfo(data))
           setState((v) => ({ ...v, successShow: true }))
-          handleCallNumber(data)
+          handleNavigateTo()
         }
       })
     },
-    [dispatch, handleCallNumber]
+    [dispatch, handleNavigateTo]
   )
 
   const handleSubmitFailed = useCallback((error) => {
@@ -150,8 +142,7 @@ export default function Index() {
     }
   }, [state.successShow, timeLeft])
   return (
-    <ConfigProvider theme={lightTheme}>
-      <WaterMark fullPage content="nutui" />
+    <ConfigProvider theme={lightTheme} className="h-full">
       <View className="h-full flex flex-col justify-between bg-color">
         <View className="flex-shrink-0">
           <NavHeader title="千名千探" />
@@ -159,8 +150,8 @@ export default function Index() {
             远程云取证系统
           </View>
           <Image
-            src="https://ts1.cn.mm.bing.net/th?id=OIP-C.Xz0mBQM__1Qz7chc_25joQHaEL&w=80&h=80&c=1&vt=10&bgcl=e7c92e&r=0&o=6&pid=5.1"
             className="w-[315px] h-[219px] block mx-auto my-3"
+            src={require('../../assets/img/icon_cen.png')}
           />
           <View className="flex-center text-[14px] font-medium pb-[38px] text-white">
             随时随地 · 安全高效
@@ -203,7 +194,12 @@ export default function Index() {
             }
           >
             <Form.Item
-              label={<View className="w-5 h-5 block rounded bg-user" />}
+              label={
+                <Image
+                  className="w-5 h-5 block rounded"
+                  src={require('../../assets/img/icon_user.png')}
+                />
+              }
               name="userName"
               rules={[
                 { min: 2, message: '不能少于2个字' },
@@ -219,7 +215,12 @@ export default function Index() {
               />
             </Form.Item>
             <Form.Item
-              label={<View className="w-5 h-5 block rounded bg-id" />}
+              label={
+                <Image
+                  className="w-5 h-5 block rounded"
+                  src={require('../../assets/img/icon_id.png')}
+                />
+              }
               name="cardNo"
               rules={[
                 // { len: 18, message: '请输入18位证件号' },
@@ -235,19 +236,30 @@ export default function Index() {
               />
             </Form.Item>
           </Form>
-          <View
-            className="flex justify-center items-center gap-1 py-[34px]"
-            onClick={() => handleSetDialog(true, 'successShow')}
-          >
-            <View className="w-5 h-5 bg-play" />
-            <Text className="text-[12px] text-[#999999]">使用教程</Text>
+          <View className="flex-col-center gap-[6px] py-[34px]">
+            <View
+              className="flex-center gap-1"
+              onClick={() => handleSetDialog(true, 'successShow')}
+            >
+              <Image
+                className="w-5 h-5"
+                src={require('../../assets/img/icon_play.png')}
+              />
+              <Text className="text-[12px] text-[#999999]">使用教程</Text>
+            </View>
+            <View className="text-[#999999] text-[10px] font-normal flex-center">
+              Copyright @ 浙江厚志科技有限公司
+            </View>
           </View>
         </View>
         <Dialog id="dialog" />
         <Dialog
           title={
             <View className="flex justify-center items-center gap-2">
-              <View className="w-5 h-5 bg-waring" />
+              <Image
+                className="w-5 h-5"
+                src={require('../../assets/img/icon_waring.png')}
+              />
               <Text>警方提示</Text>
             </View>
           }

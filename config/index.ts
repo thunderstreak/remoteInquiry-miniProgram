@@ -16,7 +16,7 @@ export default defineConfig(async (merge, { command, mode }) => {
         return 375
       }
       // 全局使用 Taro 默认的 750 尺寸
-      return 390
+      return 375
     },
     deviceRatio: {
       640: 2.34 / 2,
@@ -47,6 +47,9 @@ export default defineConfig(async (merge, { command, mode }) => {
       enable: false // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
     },
     mini: {
+      // miniCssExtractPluginOption: {
+      //   ignoreOrder: true // 忽略css文件引入顺序
+      // },
       postcss: {
         htmltransform: {
           enable: true,

@@ -1,12 +1,15 @@
-import { Image, View } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import React, { memo, useCallback } from 'react'
 import { NavHeaderProps } from '@/components/NavHeader/type'
 import { useStatusHeight } from '@/hooks/useStatusHeight'
+import { ArrowLeft } from '@nutui/icons-react-taro'
 import Taro from '@tarojs/taro'
 
 const NavHeader: React.FC<NavHeaderProps> = (props) => {
-  const { isRadius = false, title = '' } = props
-  const { menuButtonBounding: { top } } = useStatusHeight()
+  const { title = '' } = props
+  const {
+    menuButtonBounding: { top }
+  } = useStatusHeight()
   const handleToBack = useCallback(() => {
     if (props.back) {
       return props.back
@@ -18,24 +21,20 @@ const NavHeader: React.FC<NavHeaderProps> = (props) => {
       Taro.switchTab({ url: '/pages/home/index' })
     }
   }, [props.back])
-  return <View className="relative transition-all duration-500 flex justify-between pb-[10px]"
-    style={{ paddingTop: `${top}px` }}
-  >
-    <View>
-      {isRadius ? <Image
-        src="https://obs.prod.ubanquan.cn/obs_717104887800001718198713_pre$prod-ubq"
-        className="block w-[28px] h-[28px] absolute left-[20px]"
-        style={{ top: `${top + 2}px` }}
+  return (
+    <View
+      className={`relative transition-all duration-500 pb-[10px] ${props.className}`}
+      style={{ paddingTop: `${top}px` }}
+    >
+      <ArrowLeft
+        className={`block w-[20px] h-[20px] !absolute left-[20px] text-white ${props.iconClassName}`}
         onClick={handleToBack}
-      /> : <Image
-        src="https://obs.prod.ubanquan.cn/obs_717104887800001718093861_pre$prod-ubq"
-        className="block w-[20px] h-[20px] absolute left-[20px]"
-        style={{ top: `${top + 6}px` }}
-        onClick={handleToBack}
-      />}
+      />
+      <View className="w-full text-center text-[17px] font-medium text-white">
+        {title || ''}
+      </View>
     </View>
-    <View className="pt-1 w-full h-[24px] text-center text-[17px] font-medium">{title || ''}</View>
-  </View>
+  )
 }
 
 export default memo(NavHeader)

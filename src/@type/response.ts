@@ -174,6 +174,7 @@ export interface Login {
   id: string;
   tenantCode: string;
   orgCode: string;
+  cardNo: string;
   userName: string;
   roomCode: string;
   roomPassword: string;
@@ -184,23 +185,27 @@ export interface Login {
 
 export interface UserInfo extends Login {}
 
-export interface ListBanners {
-  id: number;
-  platform: string;
-  source: string;
-  scene: string;
-  name: string;
-  path: string;
-  jumpHref: string;
-  sort: number;
-  display: number;
-  isDel: number;
-  createId: string;
+export interface RoomQueryRoomList {
+  id: string;
+  tenantCode: string;
+  orgCode: string;
+  isDelete: null | string;
+  createBy: null | string;
   createName: null | string;
-  extInfo: string;
-  gmtCreate: number;
-  gmtModify: number;
-  clientImg: string;
+  createTime: null | string;
+  updateBy: null | string;
+  updateName: null | string;
+  updateTime: null | string;
+  lawCode: string;
+  lawName: string;
+  lawType: string;
+  state: number;
+  remark: string;
+  userName: string;
+  cardNo: string;
+  roomCode: string;
+  roomName: string;
+  roomPassword: string;
 }
 
 export interface MaterialList {

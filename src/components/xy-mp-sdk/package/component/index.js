@@ -6,9 +6,9 @@
  * @authors Luo-jinghui、Chengfei (luojinghui424@gmail.com)
  * @date  2018-11-27 15:59:48
  */
-import { computedBehavior } from './utils/computed';
-import { XYRTC } from '../index';
-import ZoomUtil from './utils/ZoomUtil';
+import { computedBehavior } from './utils/computed'
+import { XYRTC } from '../index'
+import ZoomUtil from './utils/ZoomUtil'
 
 Component({
   // 关闭样式隔离，此值表示页面 wxss 样式将影响到自定义组件，但自定义组件 wxss 中指定的样式不会影响页面；
@@ -29,7 +29,7 @@ Component({
       type: Boolean,
       value: false,
       observer() {
-        this.onSwitchAudioMute();
+        this.onSwitchAudioMute()
       }
     },
     // 是否自动调用开启/关闭摄像头方法，默认是true，开启，false代表关闭，则需要业务上自行调用unmuteVideo/muteVideo方法
@@ -42,7 +42,7 @@ Component({
       type: Boolean,
       value: false,
       observer() {
-        this.onSwitchVideoMute();
+        this.onSwitchVideoMute()
       }
     },
     // 设置前/后置摄像头
@@ -62,15 +62,15 @@ Component({
       type: Object,
       value: { layout: 'auto', detail: [] },
       observer(newVal) {
-        this.logger.log('[component] template change value: ', newVal);
-        const detail = newVal ? newVal.detail : [];
-        const layoutMode = newVal ? newVal.layout : 'auto';
+        this.logger.log('[component] template change value: ', newVal)
+        const detail = newVal ? newVal.detail : []
+        const layoutMode = newVal ? newVal.layout : 'auto'
 
         if (layoutMode === 'auto' && !this.XYClient) {
-          return;
+          return
         }
 
-        this.XYClient.setLayoutMode(layoutMode).updateTemplate(detail);
+        this.XYClient.setLayoutMode(layoutMode).updateTemplate(detail)
       }
     },
     // 是否开启调试模式
@@ -103,56 +103,66 @@ Component({
   // 计算属性
   computed: {
     show() {
-      return this.data.display ? 'xy-room' : 'xy-room xy-hide';
+      return this.data.display ? 'xy-room' : 'xy-room xy-hide'
     },
     newLayout() {
-      let layoutMode = 'auto';
+      let layoutMode = 'auto'
 
       if (this.XYClient) {
-        layoutMode = this.XYClient.getLayoutMode();
+        layoutMode = this.XYClient.getLayoutMode()
       }
 
-      const layoutLen = this.data.layout.length;
+      const layoutLen = this.data.layout.length
 
       const layout = this.data.layout.map((item) => {
-        const { style, roster, seat } = item;
-        const { displayName, isActiveSpeaker, audioTxMute, isContent, videoTxMute, deviceType } =
-          roster || {};
-        let name = item.name;
-        let newStyle = style || '';
+        const { style, roster, seat } = item
+        const {
+          displayName,
+          isActiveSpeaker,
+          audioTxMute,
+          isContent,
+          videoTxMute,
+          deviceType
+        } = roster || {}
+        let name = item.name
+        let newStyle = style || ''
         // 是否是语音通话
         const isAudioCall =
-          (isContent && videoTxMute) || deviceType === 'pstngw' || deviceType === 'tel';
+          (isContent && videoTxMute) ||
+          deviceType === 'pstngw' ||
+          deviceType === 'tel'
 
         // 【UI模式】自动布局下，针对Content下的语音激励人员标记篮框
         if (layoutMode === 'auto') {
           // 自动布局使用的是Roster中的displayName
-          name = displayName;
+          name = displayName
 
           if (this.content.userId && isActiveSpeaker && !audioTxMute) {
-            newStyle = newStyle.concat(`border: 2px solid #44b5ff; box-sizing: border-box;`);
+            newStyle = newStyle.concat(
+              `border: 2px solid #44b5ff; box-sizing: border-box;`
+            )
           } else {
             // 否则清理篮框标记
-            newStyle = newStyle.concat(`border: none; box-sizing: border-box;`);
+            newStyle = newStyle.concat(`border: none; box-sizing: border-box;`)
           }
         }
 
-        let videoStyle = '';
-        let avatarStyle = 'width: 44px;height:44px';
+        let videoStyle = ''
+        let avatarStyle = 'width: 44px;height:44px'
 
         if (item.roster.isContent && this.data.enablePinchToZoom) {
-          const { x, y } = this.data.dragOffset;
-          videoStyle = `transform: matrix(${this.data.scale}, 0, 0, ${this.data.scale}, ${x}, ${y});`;
+          const { x, y } = this.data.dragOffset
+          videoStyle = `transform: matrix(${this.data.scale}, 0, 0, ${this.data.scale}, ${x}, ${y});`
         }
         // 大屏
         if (seat === 0 || layoutLen === 1) {
-          avatarStyle = 'width: 72px;height:72px';
+          avatarStyle = 'width: 72px;height:72px'
         }
 
         // 画面填充模式为图像铺满屏幕，避免出现黑边问题
         // content为保准分享内容完整，不进行裁剪
-        const fit = item.roster.isContent ? 'contain' : 'fillCrop';
-        const muted = !!item.roster.muted;
+        const fit = item.roster.isContent ? 'contain' : 'fillCrop'
+        const muted = !!item.roster.muted
 
         const newItem = Object.assign({}, item, {
           fit,
@@ -162,17 +172,19 @@ Component({
           videoStyle,
           avatarStyle,
           isAudioCall
-        });
+        })
 
-        return newItem;
-      });
+        return newItem
+      })
 
-      if (this.logger) this.logger.log('[component] new layout:', layout);
+      if (this.logger) {
+        this.logger.log('[component] new layout:', layout)
+      }
 
-      return layout;
+      return layout
     },
     onholdStyle() {
-      return this.data.onHold ? 'position: fixed; visibility: hidden;' : '';
+      return this.data.onHold ? 'position: fixed; visibility: hidden;' : ''
     }
   },
   // 组件所在页面的生命周期函数
@@ -180,58 +192,58 @@ Component({
     // 组件所在的页面被展示时执行
     show() {
       // 页面被展示
-      this.logger.log('[component] page show');
+      this.logger.log('[component] page show')
 
       // 从后台切到前台，需要重新恢复推流，否则本地和远端可能会黑屏
       setTimeout(() => {
-        this.XYClient.startLivePlayer();
-      }, 500);
+        this.XYClient.startLivePlayer()
+      }, 500)
 
       this.XYClient.report('sta-confStatus', 'pageStatus', {
         status: 'show'
-      });
+      })
     },
     // 组件所在的页面被隐藏时执行
     hide() {
-      this.logger.log('[component] page hide');
+      this.logger.log('[component] page hide')
 
       this.XYClient.report('sta-confStatus', 'pageStatus', {
         status: 'hide'
-      });
+      })
     }
   },
   // 生命周期函数
   lifetimes: {
     // 在组件在视图层布局完成后执行
     ready() {
-      this.logger.log('[component] page ready');
+      this.logger.log('[component] page ready')
     },
     // 在组件实例进入页面节点树时执行
     attached() {
-      this.logger.log('[component] page attached');
+      this.logger.log('[component] page attached')
     },
     // 在组件实例被从页面节点树移除时执行
     detached() {
-      this.logger.log('[component] page detached');
+      this.logger.log('[component] page detached')
       // 组件销毁时，掉用SDK挂断会议方法
-      this.XYClient.hangup();
+      this.XYClient.hangup()
 
       if (this.zoomUtilInstance) {
         // 销毁content缩放方法
-        this.zoomUtilInstance.destroy();
+        this.zoomUtilInstance.destroy()
 
-        this.zoomUtilInstance = null;
+        this.zoomUtilInstance = null
       }
     }
   },
   created() {
     // 是否开启了权限设置提示
-    this.isShowDetected = false;
+    this.isShowDetected = false
     // 缓存共享Content的数据
-    this.content = {};
+    this.content = {}
 
     // xyRTC初始化
-    this.initRTCEvent();
+    this.initRTCEvent()
   },
   methods: {
     /**
@@ -240,18 +252,18 @@ Component({
      * @param { IRoster } params - 参会者画面信息
      */
     onClickContent(params) {
-      const currentTime = params.timeStamp;
-      const lastTapTime = this.lastTapTime;
-      this.lastTapTime = currentTime;
+      const currentTime = params.timeStamp
+      const lastTapTime = this.lastTapTime
+      this.lastTapTime = currentTime
 
       if (currentTime - lastTapTime < 250) {
-        this.onFullScreenContent(params);
-        this.postEvent('eventDoubleClick', params);
-        clearTimeout(this.lastTapTimeoutFunc);
+        this.onFullScreenContent(params)
+        this.postEvent('eventDoubleClick', params)
+        clearTimeout(this.lastTapTimeoutFunc)
       } else {
         this.lastTapTimeoutFunc = setTimeout(() => {
-          this.postEvent('eventClick', params);
-        }, 250);
+          this.postEvent('eventClick', params)
+        }, 250)
       }
     },
 
@@ -261,8 +273,8 @@ Component({
      * @param { IRoster } params - 参会者画面信息
      */
     onLongPress(params) {
-      this.logger.log('onLongPress:', params);
-      this.postEvent('eventLongPress', params);
+      this.logger.log('onLongPress:', params)
+      this.postEvent('eventLongPress', params)
     },
 
     /**
@@ -271,11 +283,11 @@ Component({
      * @param { * } params - 切换全屏画面
      */
     onFullScreenContent(params) {
-      this.logger.log('[component] onFullScreenContent:', params);
+      this.logger.log('[component] onFullScreenContent:', params)
 
-      const item = params.currentTarget.dataset.item;
+      const item = params.currentTarget.dataset.item
 
-      this.XYClient.handleFullScreen(item);
+      this.XYClient.handleFullScreen(item)
     },
 
     /**
@@ -284,18 +296,18 @@ Component({
      * @public
      */
     onSwitchAudioMute() {
-      this.logger.log('[component] onSwitchAudioMute muted:', this.data.muted);
+      this.logger.log('[component] onSwitchAudioMute muted:', this.data.muted)
 
       if (!this.XYClient) {
-        this.logger.log('rejected switch audio mute');
-        return;
+        this.logger.log('rejected switch audio mute')
+        return
       }
 
       // 根据组件推送的最新状态，调用接口，通知远端
       if (this.data.muted) {
-        this.XYClient.muteAudio();
+        this.XYClient.muteAudio()
       } else {
-        this.XYClient.unmuteAudio();
+        this.XYClient.unmuteAudio()
       }
     },
 
@@ -305,18 +317,24 @@ Component({
      * @public
      */
     onSwitchVideoMute() {
-      this.logger.log('[component] onSwitchAudioMute camera:', this.data.camera);
+      this.logger.log(
+        '[component] onSwitchAudioMute camera:',
+        this.data.camera
+      )
 
       if (!this.XYClient || !this.data.mutedAtuoOperate) {
-        this.logger.log('rejected switch video mute: ', this.data.mutedAtuoOperate);
-        return;
+        this.logger.log(
+          'rejected switch video mute: ',
+          this.data.mutedAtuoOperate
+        )
+        return
       }
 
       // 根据组件推送的最新状态，调用接口，通知远端
       if (this.data.camera) {
-        this.XYClient.unmuteVideo();
+        this.XYClient.unmuteVideo()
       } else {
-        this.XYClient.muteVideo();
+        this.XYClient.muteVideo()
       }
     },
 
@@ -327,53 +345,53 @@ Component({
      * @param { any } detail - 事件详情
      */
     postEvent(type, detail) {
-      this.triggerEvent('onRoomEvent', { type, detail });
+      this.triggerEvent('onRoomEvent', { type, detail })
     },
 
     /**
      * 监听XYRTC Client实例上的事件
      */
     initRTCEvent() {
-      this.XYClient = XYRTC.createClient();
+      this.XYClient = XYRTC.createClient()
 
-      this.logger = this.XYClient.getLogger();
+      this.logger = this.XYClient.getLogger()
 
       // UI组件实例，内部会掉用此实例上的挂断方法
       // 注意：非UI模式下，开发者不需要调用此方法
-      this.XYClient.setComponentInstance(this);
+      this.XYClient.setComponentInstance(this)
       // 注意：非UI模式下需要调用，将页面实例也SDK绑定，内部创建推拉流实例使用
-      this.XYClient.setPageInstance(this);
+      this.XYClient.setPageInstance(this)
 
       // 默认关闭摄像头入会，发送视频关闭通知
-      this.onSwitchVideoMute();
+      this.onSwitchVideoMute()
       // 默认开启麦克风入会，发送麦克风开启通知
-      this.onSwitchAudioMute();
+      this.onSwitchAudioMute()
 
       this.XYClient.on('roomEvent', (e) => {
-        const { type, detail } = e;
+        const { type, detail } = e
 
-        this.postEvent(type, detail);
+        this.postEvent(type, detail)
 
         // 非UI模式，直接通过XYClient监听事件即可，不需要通过组件上报
         switch (type) {
           case 'connected':
             // 入会成功事件
-            this.logger.log('[component] connected message:', detail);
+            this.logger.log('[component] connected message:', detail)
 
-            this.showComponent();
-            break;
+            this.showComponent()
+            break
           case 'rtmpMode':
-            this.setPusherConfig();
-            break;
+            this.setPusherConfig()
+            break
           case 'onHold':
             // 等候室事件
-            this.logger.log('[component] onHold message:', detail);
+            this.logger.log('[component] onHold message:', detail)
 
-            this.setData({ onHold: detail });
-            break;
+            this.setData({ onHold: detail })
+            break
           case 'pushUrl':
             // 获取到推流地址事件
-            this.logger.log('[component] pushUrl message:', detail);
+            this.logger.log('[component] pushUrl message:', detail)
 
             this.setData(
               {
@@ -383,56 +401,56 @@ Component({
               () => {
                 this.XYClient.startLivePusher(
                   () => {
-                    this.logger.log('[component]start pusher success');
+                    this.logger.log('[component]start pusher success')
 
                     // 非UI模式下（自建），修复iOS开启摄像头入会后再关闭摄像头，远端听不到小程序声音问题
                     // 目的是初始设置camera为关闭状态，等到推流启动后，再开启摄像头
-                    this.setData({ isPushed: true });
+                    this.setData({ isPushed: true })
                   },
                   (err) => {
-                    this.logger.log('start pusher failed', err, 'warn');
+                    this.logger.log('start pusher failed', err, 'warn')
                   }
-                );
+                )
               }
-            );
-            break;
+            )
+            break
           case 'permission':
             // 权限被拒异常处理
-            this.logger.log('[component] permission message:', detail);
+            this.logger.log('[component] permission message:', detail)
             // UI模式下，用户第一次拒绝授权麦克风/摄像头权限，需要引导用户授权处理
             // 非UI模式下，开发者可自行选择是否需要处理权限拒绝情况
-            this.detectAuthorizeModel();
-            break;
+            this.detectAuthorizeModel()
+            break
           case 'layout':
             // 自动布局/自定义布局上报布局结果，基于此数据渲染画面
-            this.logger.log('[component] layout message:', detail);
-            this.setData({ layout: detail });
+            this.logger.log('[component] layout message:', detail)
+            this.setData({ layout: detail })
 
-            break;
+            break
           case 'content':
             // 共享Content数据
-            this.logger.log('[component] content message:', detail);
+            this.logger.log('[component] content message:', detail)
 
-            const { callUri = '' } = detail || {};
-            const { callUri: preCallUri = '' } = this.content || {};
+            const { callUri = '' } = detail || {}
+            const { callUri: preCallUri = '' } = this.content || {}
 
             if (this.enablePinchToZoom && callUri !== preCallUri) {
-              this.setScale(1);
-              this.setDragOffset({ x: 0, y: 0 });
+              this.setScale(1)
+              this.setDragOffset({ x: 0, y: 0 })
             }
 
-            this.content = detail || {};
-            break;
+            this.content = detail || {}
+            break
           case 'audioStatus':
             // 本地实时麦克风状态
-            this.logger.log('[component] audioStatus message:', detail);
+            this.logger.log('[component] audioStatus message:', detail)
 
-            this.setData({ muted: detail });
-            break;
+            this.setData({ muted: detail })
+            break
           default:
-            break;
+            break
         }
-      });
+      })
     },
 
     /**
@@ -443,34 +461,34 @@ Component({
      * @public
      */
     hangup() {
-      this.logger.log('[component] hangup meeting');
-      this.resetTemplate();
+      this.logger.log('[component] hangup meeting')
+      this.resetTemplate()
     },
 
     // 切换摄像头
     async switchCamera() {
-      this.logger.log('[component] switchCamera');
+      this.logger.log('[component] switchCamera')
 
-      return await this.XYClient.switchCamera();
+      return await this.XYClient.switchCamera()
     },
 
     // 设置live-pusher设置
     setPusherConfig() {
-      const { pusherConfig } = this.XYClient.getMediaConfig();
-      const { maxBitrate, minBitrate, mode } = pusherConfig;
+      const { pusherConfig } = this.XYClient.getMediaConfig()
+      const { maxBitrate, minBitrate, mode } = pusherConfig
 
-      this.logger.log('[component] get pusher config:', pusherConfig);
+      this.logger.log('[component] get pusher config:', pusherConfig)
 
       this.setData({
         maxBitrate,
         minBitrate,
         mode
-      });
+      })
     },
 
     // 显示组件
     showComponent() {
-      this.setData({ display: true });
+      this.setData({ display: true })
     },
 
     /**
@@ -479,9 +497,9 @@ Component({
      * @param { * } e - live-player状态事件
      */
     onPlayStateChange(e) {
-      this.XYClient.playerEventHandler(e);
+      this.XYClient.playerEventHandler(e)
 
-      this.postEvent('playerStatusChange', e);
+      this.postEvent('playerStatusChange', e)
     },
 
     /**
@@ -490,9 +508,9 @@ Component({
      * @param { * } e - live-pusher状态事件
      */
     onPusherStateChange(e) {
-      this.XYClient.pusherEventHandler(e);
+      this.XYClient.pusherEventHandler(e)
 
-      this.postEvent('roomChange', e.detail);
+      this.postEvent('roomChange', e.detail)
     },
 
     /**
@@ -501,7 +519,7 @@ Component({
      * @param { * } e -
      */
     onPusherNetStatus(e) {
-      this.XYClient.pusherNetStatusHandler(e);
+      this.XYClient.pusherNetStatusHandler(e)
     },
 
     /**
@@ -510,7 +528,7 @@ Component({
      * @param { * } e - live-pusher网络状态数据事件
      */
     onPlayNetStatus(e) {
-      this.XYClient.playNetStatusHandler(e);
+      this.XYClient.playNetStatusHandler(e)
     },
 
     /**
@@ -519,9 +537,9 @@ Component({
      * @param { * } e - live-pusher推流失败事件
      */
     onPusherError(e) {
-      this.XYClient.pusherErrorHandler(e);
+      this.XYClient.pusherErrorHandler(e)
 
-      this.logger.warn('[component]pusher other error: ', e);
+      this.logger.warn('[component]pusher other error: ', e)
     },
 
     /**
@@ -530,7 +548,7 @@ Component({
      * @param { * } e - live-pusher麦克风音量大小事件
      */
     onPusherAudioVolumeNotify(e) {
-      this.XYClient.pusherAudioVolumeNotify(e);
+      this.XYClient.pusherAudioVolumeNotify(e)
     },
 
     /**
@@ -539,24 +557,24 @@ Component({
      * @param { * } e - live-player组件播放音量大小事件
      */
     onPlayAudioVolumeNotify(e) {
-      this.XYClient.playAudioVolumeNotify(e);
+      this.XYClient.playAudioVolumeNotify(e)
     },
 
     /**
      * 重置template
      */
     resetTemplate() {
-      this.logger.log('[component] resetTemplate');
+      this.logger.log('[component] resetTemplate')
 
       try {
-        let template = { layout: 'auto', detail: [] };
+        let template = { layout: 'auto', detail: [] }
 
         if (this.data.template && JSON.stringify(this.data.template) !== '{}') {
-          template = this.data.template;
+          template = this.data.template
         }
-        this.setData({ template });
+        this.setData({ template })
       } catch (err) {
-        this.logger.log('[component] resetTemplate err:', err);
+        this.logger.log('[component] resetTemplate err:', err)
       }
     },
 
@@ -568,10 +586,13 @@ Component({
      * @param { object } data - 数据
      */
     exitRoom(key, msg = '', data = null) {
-      const response = { code: 'ROOM_EXIT', key, message: msg, data };
-      this.logger.log('[component]exit room, send disconnected msg: ', response);
+      const response = { code: 'ROOM_EXIT', key, message: msg, data }
+      this.logger.log(
+        '[component]exit room, send disconnected msg: ',
+        response
+      )
 
-      this.postEvent('disconnected', response);
+      this.postEvent('disconnected', response)
     },
 
     /**
@@ -584,7 +605,7 @@ Component({
      */
     detectAuthorizeModel() {
       if (!this.isShowDetected) {
-        this.isShowDetected = true;
+        this.isShowDetected = true
 
         wx.showModal({
           title: '权限提示',
@@ -597,13 +618,13 @@ Component({
           success: (res) => {
             if (res.confirm) {
               // 打开小程序权限设置界面，重新授权
-              this.detectAuthorize();
+              this.detectAuthorize()
             } else if (res.cancel) {
               // 点击取消，拒绝授权，退会处理
-              this.exitRoom('XYSDK:980403', '用户拒绝授权', null);
+              this.exitRoom('XYSDK:980403', '用户拒绝授权', null)
             }
           }
-        });
+        })
       }
     },
 
@@ -616,28 +637,35 @@ Component({
       try {
         wx.openSetting({
           success: (res) => {
-            const camera = res.authSetting['scope.camera'];
-            const record = res.authSetting['scope.record'];
-            this.isShowDetected = false;
+            const camera = res.authSetting['scope.camera']
+            const record = res.authSetting['scope.record']
+            this.isShowDetected = false
 
             if (!camera || !record) {
-              this.logger.log('pusher set permission: ', res);
+              this.logger.log('pusher set permission: ', res)
 
-              this.detectAuthorizeModel();
+              this.detectAuthorizeModel()
             } else {
-              this.logger.log('pusher set permission success: ', res.authSetting);
+              this.logger.log(
+                'pusher set permission success: ',
+                res.authSetting
+              )
 
-              this.exitRoom('XYSDK:980404', '手动授权成功，请重新入会', res.authSetting);
+              this.exitRoom(
+                'XYSDK:980404',
+                '手动授权成功，请重新入会',
+                res.authSetting
+              )
             }
           },
           fail: (error) => {
-            this.logger.warn('pusher set permission fail: ', error);
+            this.logger.warn('pusher set permission fail: ', error)
 
-            this.exitRoom('XYSDK:980405', '授权错误', error);
+            this.exitRoom('XYSDK:980405', '授权错误', error)
           }
-        });
+        })
       } catch (err) {
-        this.logger.warn('pusher set permission catch error: ', err);
+        this.logger.warn('pusher set permission catch error: ', err)
       }
     },
 
@@ -651,21 +679,22 @@ Component({
      */
     setViewZoom({ id, enablePinchToZoom, scale }) {
       if (id && this.content.id !== id) {
-        return;
+        return
       }
 
       if (!this.zoomUtilInstance) {
-        this.zoomUtilInstance = new ZoomUtil();
+        this.zoomUtilInstance = new ZoomUtil()
       }
 
-      this.enablePinchToZoom = enablePinchToZoom;
+      this.enablePinchToZoom = enablePinchToZoom
 
       this.setData({
         enablePinchToZoom: enablePinchToZoom
-      });
+      })
 
-      if (this.zoomUtilInstance && scale)
-        this.zoomUtilInstance.updateZoomScale(scale, this.setScale.bind(this));
+      if (this.zoomUtilInstance && scale) {
+        this.zoomUtilInstance.updateZoomScale(scale, this.setScale.bind(this))
+      }
     },
 
     /**
@@ -675,22 +704,22 @@ Component({
      * @param {*} fn
      */
     handleTouch(fn) {
-      const query = wx.createSelectorQuery().in(this);
-      query.select('.xy__video-content').boundingClientRect();
-      query.select('.xy__video-live-content').boundingClientRect();
+      const query = wx.createSelectorQuery().in(this)
+      query.select('.xy__video-content').boundingClientRect()
+      query.select('.xy__video-live-content').boundingClientRect()
 
       query.exec((res) => {
-        const { width, height } = res[0] || {};
-        const { width: outerWidth, height: outerHeight } = res[1] || {};
+        const { width, height } = res[0] || {}
+        const { width: outerWidth, height: outerHeight } = res[1] || {}
 
-        const outerDOMSize = { clientWidth: width, clientHeight: height };
+        const outerDOMSize = { clientWidth: width, clientHeight: height }
         const innerDOMSize = {
           clientWidth: outerWidth,
           clientHeight: outerHeight
-        };
+        }
 
-        fn(innerDOMSize, outerDOMSize);
-      });
+        fn(innerDOMSize, outerDOMSize)
+      })
     },
 
     /**
@@ -701,11 +730,13 @@ Component({
      * @returns
      */
     handleTouchStart(e) {
-      if (!this.enablePinchToZoom || !this.zoomUtilInstance) return;
+      if (!this.enablePinchToZoom || !this.zoomUtilInstance) {
+        return
+      }
 
       this.handleTouch((innerDOMSize, outerDOMSize) => {
-        this.zoomUtilInstance.handleTouchStart(e, innerDOMSize, outerDOMSize);
-      });
+        this.zoomUtilInstance.handleTouchStart(e, innerDOMSize, outerDOMSize)
+      })
     },
 
     /**
@@ -716,7 +747,9 @@ Component({
      * @returns
      */
     handleTouchMove(e) {
-      if (!this.enablePinchToZoom || !this.zoomUtilInstance) return;
+      if (!this.enablePinchToZoom || !this.zoomUtilInstance) {
+        return
+      }
 
       this.handleTouch((innerDOMSize, outerDOMSize) => {
         this.zoomUtilInstance.handleTouchMove(
@@ -725,8 +758,8 @@ Component({
           outerDOMSize,
           this.setScale.bind(this),
           this.setDragOffset.bind(this)
-        );
-      });
+        )
+      })
     },
 
     /**
@@ -735,9 +768,11 @@ Component({
      * @private
      */
     handleTouchCancel() {
-      if (!this.enablePinchToZoom || !this.zoomUtilInstance) return;
+      if (!this.enablePinchToZoom || !this.zoomUtilInstance) {
+        return
+      }
 
-      this.zoomUtilInstance.handleTouchEnd();
+      this.zoomUtilInstance.handleTouchEnd()
     },
 
     /**
@@ -746,9 +781,11 @@ Component({
      * @private
      */
     handleTouchEnd() {
-      if (!this.enablePinchToZoom || !this.zoomUtilInstance) return;
+      if (!this.enablePinchToZoom || !this.zoomUtilInstance) {
+        return
+      }
 
-      this.zoomUtilInstance.handleTouchEnd();
+      this.zoomUtilInstance.handleTouchEnd()
     },
 
     /**
@@ -757,7 +794,7 @@ Component({
      * @private
      */
     setScale(scale) {
-      this.setData({ scale });
+      this.setData({ scale })
     },
 
     /**
@@ -766,7 +803,7 @@ Component({
      * @private
      */
     setDragOffset(dragOffset) {
-      this.setData({ dragOffset });
+      this.setData({ dragOffset })
     },
 
     /**
@@ -776,7 +813,7 @@ Component({
      * @param {*} e
      */
     getImageError(e) {
-      console.log('getImageError:', e);
+      console.log('getImageError:', e)
     }
   }
-});
+})

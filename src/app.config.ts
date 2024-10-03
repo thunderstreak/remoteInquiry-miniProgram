@@ -1,7 +1,21 @@
-import { HOME_PAGE_URL, LOGIN_PAGE_URL, MEETING_PAGE_URL } from '@/constants'
+import {
+  CONFERENCE_PAGE_URL,
+  HOME_PAGE_URL,
+  LOGIN_PAGE_URL,
+  MEETING_PAGE_URL,
+  PHOTO_PAGE_URL,
+  SIGN_PAGE_URL
+} from '@/constants'
 
 export default defineAppConfig({
-  pages: [LOGIN_PAGE_URL, HOME_PAGE_URL, MEETING_PAGE_URL],
+  pages: [
+    LOGIN_PAGE_URL,
+    HOME_PAGE_URL,
+    MEETING_PAGE_URL,
+    PHOTO_PAGE_URL,
+    SIGN_PAGE_URL,
+    CONFERENCE_PAGE_URL
+  ],
   // subPackages: [
   //   {
   //     root: 'package',
@@ -34,8 +48,8 @@ export default defineAppConfig({
   //     {
   //       pagePath: MY_PAGE_URL,
   //       text: '我的',
-  //       iconPath: 'assets/img/tabbar/my.png',
-  //       selectedIconPath: 'assets/img/tabbar/my-active.png'
+  //       iconPath: 'assets/img/tabbar/photo.png',
+  //       selectedIconPath: 'assets/img/tabbar/photo-active.png'
   //     }
   //   ]
   // },

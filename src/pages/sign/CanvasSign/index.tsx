@@ -1,11 +1,17 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState
+} from 'react'
 import { Canvas } from '@tarojs/components'
 import Taro, { CanvasContext, useReady } from '@tarojs/taro'
 
 import { CanvasTouchEvent } from '@tarojs/components/types/common'
 import { CanvasSignProps, CanvasSignState } from './type'
 
-export { CanvasSignContext, ToDataURLResult, CanvasSignProps } from './type'
+// export { CanvasSignContext, ToDataURLResult, CanvasSignProps } from './type'
 
 /**
  * 将 canvas 内容转换成 base64 字符串
@@ -20,33 +26,40 @@ const toDataURL = async (canvas: CanvasSignState['canvas']) => {
 // React.ForwardRefExoticComponent<Omit<CanvasSignProps, 'ref'> & React.RefAttributes<unknown>>
 // React.ForwardRefExoticComponent<React.PropsWithoutRef<{}> & React.RefAttributes<unknown>>
 export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
+  const [rect, setRect] = useState({ width: 0, height: 0 })
   const state = useRef<CanvasSignState>({ canvas: null, width: 0, height: 0 })
   // 绘图画布引用
   const context = useRef<Taro.CanvasContext>()
   // 绘制轨迹信息
   const lineInfo = useRef({ startX: 0, startY: 0 })
 
-  const canvasStart = useCallback((e: CanvasTouchEvent) => {
-    e.preventDefault()
-    props?.onChange?.('ON_START', e.changedTouches)
+  const canvasStart = useCallback(
+    (e: CanvasTouchEvent) => {
+      e.preventDefault()
+      props?.onChange?.('ON_START', e.changedTouches)
 
-    const { x, y } = e.changedTouches[0]
-    lineInfo.current.startX = x
-    lineInfo.current.startY = y
-    context.current?.beginPath()
-  }, [props])
+      const { x, y } = e.changedTouches[0]
+      lineInfo.current.startX = x
+      lineInfo.current.startY = y
+      context.current?.beginPath()
+    },
+    [props]
+  )
 
-  const canvasMove = useCallback((e: CanvasTouchEvent) => {
-    e.preventDefault()
-    props?.onChange?.('ON_MOVE', e.changedTouches)
+  const canvasMove = useCallback(
+    (e: CanvasTouchEvent) => {
+      e.preventDefault()
+      props?.onChange?.('ON_MOVE', e.changedTouches)
 
-    const { x, y } = e.changedTouches[0]
-    context.current?.moveTo(lineInfo.current.startX, lineInfo.current.startY)
-    context.current?.lineTo(x, y)
-    context.current?.stroke()
-    lineInfo.current.startX = x
-    lineInfo.current.startY = y
-  }, [props])
+      const { x, y } = e.changedTouches[0]
+      context.current?.moveTo(lineInfo.current.startX, lineInfo.current.startY)
+      context.current?.lineTo(x, y)
+      context.current?.stroke()
+      lineInfo.current.startX = x
+      lineInfo.current.startY = y
+    },
+    [props]
+  )
 
   const handleClear = useCallback(() => {
     context.current?.clearRect(0, 0, state.current.width, state.current.height)
@@ -70,11 +83,14 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
           return
         }
 
-        const { windowWidth: width, windowHeight: height } = Taro.getSystemInfoSync()
-        const rect = { width, height }
-        state.current = { ...rect, canvas }
+        const { windowWidth: width, windowHeight: height } =
+          Taro.getSystemInfoSync()
+        const rectUnit = { width, height }
+        state.current = { ...rectUnit, canvas }
 
-        props.onReady?.(rect)
+        setRect({ width, height })
+
+        props.onReady?.(rectUnit)
 
         canvas.width = width
         canvas.height = height
@@ -92,13 +108,16 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
 
   useImperativeHandle(ref, () => ({ handleClear, handleSaveImage }))
 
-  return <Canvas
-    className="h-full w-full"
-    canvasId="myCanvas"
-    id="myCanvas"
-    disableScroll
-    type="2d"
-    onTouchStart={canvasStart}
-    onTouchMove={canvasMove}
-  />
+  return (
+    <Canvas
+      style={{ width: rect.width, height: rect.height }}
+      className={`${props.className}`}
+      canvasId="myCanvas"
+      id="myCanvas"
+      disableScroll
+      type="2d"
+      onTouchStart={canvasStart}
+      onTouchMove={canvasMove}
+    />
+  )
 })

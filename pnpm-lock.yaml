@@ -11,6 +11,9 @@ importers:
       '@babel/runtime':
         specifier: ^7.21.5
         version: 7.24.5
+      '@nutui/icons-react-taro':
+        specifier: ^1.0.5
+        version: 1.0.5
       '@nutui/nutui-react-taro':
         specifier: ^2.6.5
         version: 2.6.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1295,8 +1298,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@nutui/icons-react-taro@1.0.4':
-    resolution: {integrity: sha512-2sDhJXJPAgatSg8dSWVYLYVvxCZo2OIWpSzVO0xkyCU0X6pWtKt7Hh26UbT9PTWaTfg9cX9xqwYvBkkxUypvSQ==}
+  '@nutui/icons-react-taro@1.0.5':
+    resolution: {integrity: sha512-p7dCW29wASH/qQ1OaUGGKA6PRV33wDPb80+qrHnWtT40syIb0W+e92mpplbULWM01s+GYVGyUU3i8b7Iy7qfvw==}
 
   '@nutui/nutui-react-taro@2.6.6':
     resolution: {integrity: sha512-gIOusqhF2kQwXfrCUlxtZuMuQXlcTP0kFLYVRCMvMCbbK9F+bfHvje7/GP2StpnkHsnzOR+/QSet/rfJrPWYKg==}
@@ -9016,12 +9019,12 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@nutui/icons-react-taro@1.0.4': {}
+  '@nutui/icons-react-taro@1.0.5': {}
 
   '@nutui/nutui-react-taro@2.6.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.24.5
-      '@nutui/icons-react-taro': 1.0.4
+      '@nutui/icons-react-taro': 1.0.5
       '@nutui/touch-emulator': 1.0.0
       '@react-spring/web': 9.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@use-gesture/react': 10.2.20(react@18.3.1)

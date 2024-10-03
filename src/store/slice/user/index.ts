@@ -10,7 +10,8 @@ const createInitialState = (): UserState => ({
   roomCode: '',
   roomPassword: '',
   isExpire: false,
-  token: ''
+  token: '',
+  refreshToken: ''
 })
 export const userSlice = createSlice({
   name: 'user',

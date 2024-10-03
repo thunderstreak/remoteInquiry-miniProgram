@@ -1,5 +1,6 @@
 export default definePageConfig({
-  navigationBarTitleText: '签字',
+  navigationBarTitleText: '千名千探',
   navigationStyle: 'custom',
+  backgroundTextStyle: 'dark',
   pageOrientation: 'landscape'
 })

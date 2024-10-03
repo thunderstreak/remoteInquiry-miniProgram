@@ -1,210 +1,150 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import Taro, { getCurrentInstance, useRouter } from '@tarojs/taro'
+import { useCallback, useEffect, useState } from 'react'
+import Taro from '@tarojs/taro'
+import { Divider } from '@nutui/nutui-react-taro'
+import { Image, Text, View } from '@tarojs/components'
+import NavHeader from '@/components/NavHeader'
+import * as Res from '@/@type/response'
 import XYRTC from '@xylink/xy-mp-sdk'
+import { useSelector } from 'react-redux'
+import { selectUserInfo } from '@/store/slice/user'
+import config from '@/config'
+import HomeApi from '@/api/home'
 import './index.less'
 
 export default function Index() {
-  const router = useRouter()
-  const [state, setState] = useState({ meetingLoading: false })
-  const XYClient = useRef<ReturnType<typeof XYRTC.createClient>>()
-  const handleOnRoomEvent = (event) => {
-    console.log(event)
-    const { type, detail } = event.detail
+  // const router = useRouter()
+  const userInfo = useSelector(selectUserInfo)
+  const [list, setList] = useState<Res.RoomQueryRoomList[]>([])
+  // console.log(router)
+  // console.log(userInfo)
 
-    switch (type) {
-      case 'connected':
-        // 入会成功消息
-        console.log('demo get connected message: ', detail)
-        this.data.localCallUri = detail.callUri
-        // 开始计算会议时长
-        this.onCreateMeetingTimeCount()
-        // 订阅参会者
-        XYClient.current?.subscribeBulkRoster()
-        // 五秒后收起会议操作调
-        this.resetOperateBarTimmer()
-        break
-      case 'disconnected':
-        // 退出会议消息
-        console.log('demo get disconnected message: ', detail)
-        this.disConnectMeeting(detail)
-        break
-      case 'meetingInfo':
-        // 会议相关信息，包含会议ID、会议邀请信息等
-        console.log('demo get meetingInfo message', detail)
-        this.setData({ meetingInfo: detail })
-        break
-      case 'roomChange':
-        // live-pusher推流状态消息
-        console.log('demo get live-pusher status change message: ', detail)
-
-        break
-      case 'onHold':
-        // 被会控移入等候室，当前参会者无法接收到远端的声音和画面，本地画面和声音也无法发送
-        console.log('demo get onHold message: ', detail)
-
-        this.setData({ onHold: detail })
-        // 进入等候室
-        if (detail) {
-          console.log(
-            this.data.audioMuted,
-            this.data.camera,
-            '进入等候音视频状态'
-          )
-          this.setData({
-            holdCamera: !this.data.camera,
-            holdAudioMuted: this.data.audioMuted
-          })
-        } else {
-          console.log(
-            this.data.holdAudioMuted,
-            this.data.holdCamera,
-            '进入会议音视频状态'
-          )
-
-          this.setData({
-            camera: !this.data.holdCamera,
-            audioMuted: this.data.holdAudioMuted
-          })
-          this.muteStatus()
-        }
-
-        break
-      case 'roster':
-        // 参会者列表数据，当有人员变动或者状态变动，会实时推送最新的列表数据
-        console.log('demo get roster message: ', detail)
-
-        this.setData({ total: detail.participantsNum })
-        // 自动布局不需要处理Roster数据
-        if (this.data.template.layout !== 'custom') {
-          return
-        }
-
-        this.handleCustomLayout(detail)
-        break
-      case 'bulkRoster':
-        // 全量参会者列表数据
-        console.log('demo get bulkRoster message: ', detail)
-        this.data.rosterList = detail
-        this.bindSearch({ detail: { value: this.data.searchVal } })
-
-        break
-      case 'netQualityLevel':
-        // 网络质量等级
-        console.log('demo get netQualityLevel: ', detail)
-
-        break
-      case 'audioStatus':
-        // 推送实时麦克风状态，最新的麦克风状态请以此为准
-        console.log('demo get audio status: ', detail)
-
-        this.setData({ audioMuted: detail })
-        break
-      case 'confMgmt':
-        // 会控消息
-        console.log('demo get 会控消息：', detail)
-
-        const { muteOperation, disableMute } = detail
-        this.showAudioStatus(muteOperation, disableMute)
-        break
-      case 'eventClick':
-        // 画面点击事件
-        console.log('demo get eventClick message：', detail)
-
-        break
-      case 'eventLongPress':
-        // 画面长按事件
-        console.log('demo get eventLongPress message：', detail)
-        break
-      case 'eventDoubleClick':
-        // 画面双击事件
-        console.log('demo get eventDoubleClick message：', detail)
-        break
-      case 'speakersInfo':
-        // 当前讲话人信息
-        console.log('demo get speakersInfo message：', detail)
-        break
-      case 'networkParameter':
-        // 网络质量等级
-        console.log('networkParameter msg:', detail)
-        break
-      case 'networkLevel':
-        // 监听本地端网络质量等级
-        console.log('networkLevel msg:', detail)
-        this.setData({ localNetworkLevel: detail })
-        break
-      case 'meetingStats':
-        // 参会者网络质量数据
-        console.log('meetingStats msg:', detail)
-        this.handleNetInfo(detail)
-        break
-      case 'content':
-        // 当前共享content的参会者信息
-        console.log('content msg:', detail)
-        this.data.content = detail || {}
-        break
-      default: {
-        console.log('demo get other message: ', event.detail)
-      }
-    }
-  }
-
-  const handleInit = useCallback(async () => {
-    // XYRTC.createClient()创建了一个单例对象client，在多个小程序页面之间共享一个实例，可以重复调用获取最新的实例；
-    XYClient.current = XYRTC.createClient({
-      // 目的是排除底部40px空间，显示操作条
-      container: { offset: [0, 40, 0, 0] },
-      report: true
+  // 跳转会议
+  const handleNavigateTo = useCallback(() => {
+    const number = '9042180858' || userInfo.roomCode
+    const password = '788311' || userInfo.roomPassword
+    const name = 'local' || userInfo.userName
+    Taro.navigateTo({
+      url: `/pages/conference/index?displayName=${name}&password=${password}&number=${number}&videoMute=${false}&audioMute=${false}`
     })
-    // 配置-获取邀请链接，参会者头像
-    XYClient.current.setFeatureConfig({
-      enableLayoutAvatar: true,
-      enableMeetingInvite: true
-    })
-    // 发起SDK呼叫，通过回调获取结果
-    // 此处请参考API文档，新版本新增其他配置参数
-    const response = await XYClient.current.makeCall({
-      number: router.params.number ?? '',
-      password: router.params.password,
-      displayName: router.params.displayName
-    })
-    console.log(response)
-    const { code, message = '' } = response
-    // 隐藏呼叫Loading
-    setState((v) => ({ ...v, meetingLoading: true }))
+  }, [userInfo.roomCode, userInfo.roomPassword, userInfo.userName])
 
-    // 缓存sdk <xylink-sdk/>组件节点context，为后续调用组件内部方法用
-    const { page } = getCurrentInstance()
-    const XYLinkRoom = page?.selectComponent?.('#xylink') as any
-    // const XYLinkRoom = this.selectComponent('#xylink')
-    // 支持content画面缩放
-    if (XYLinkRoom) {
-      XYLinkRoom.setViewZoom({ enablePinchToZoom: true })
-    }
-
-    // 最新的逻辑仅需要处理异常呼叫入会即可，其他逻辑不需要再处理
-    if (code !== 200) {
-      XYClient.current.showToast(message, () => {
-        // 退出呼叫页面
-        Taro.navigateBack({ delta: 1 })
+  // 登陆会议
+  const handleCallNumber = useCallback(
+    async (user: Res.Login) => {
+      const XYClient = XYRTC.createClient({
+        report: true,
+        extId: config.DEFAULT_EXTID,
+        appId: config.DEFAULT_APPID
       })
-    }
-  }, [router.params.displayName, router.params.number, router.params.password])
+      // 登陆
+      const response = await XYClient.loginExternalAccount({
+        extUserId: user.id,
+        displayName: user.userName
+      })
+      const { code, data = {} } = response || {}
+      // 状态是200时，初始化登录成功
+      if (code === 200 || code === 'XYSDK:980200') {
+        const cn = data.callNumber
+        console.log(cn)
+        XYClient.showToast('登录成功')
+        handleNavigateTo()
+      } else {
+        XYClient.showToast('登录失败，请稍后重试')
+      }
+    },
+    [handleNavigateTo]
+  )
+
+  const handleEntry = useCallback(() => {
+    handleCallNumber(userInfo).then(console.log)
+  }, [handleCallNumber, userInfo])
+
+  const handleGetRoomList = useCallback(() => {
+    HomeApi.roomQueryRoomList({
+      userName: userInfo.userName,
+      cardNo: userInfo.cardNo
+    }).then((res) => {
+      const { data } = res
+      if (data) {
+        setList(data)
+      }
+    })
+  }, [userInfo.cardNo, userInfo.userName])
 
   useEffect(() => {
-    handleInit()
-  }, [handleInit])
+    handleGetRoomList()
+  }, [handleGetRoomList])
 
   return (
-    <view className="h-full">
-      <xylink-room
-        template={{ layout: 'auto', detail: [] }}
-        beauty={6}
-        muted={false}
-        camera={!false}
-        devicePosition="front"
-        id="xylink"
-        bindonRoomEvent={handleOnRoomEvent}
-      />
-    </view>
+    <View className="h-full w-full flex flex-col bg-[#2766CF]">
+      <View className="flex-shrink-0 flex flex-col justify-between">
+        <View className="flex-shrink-0">
+          <NavHeader title="千名千探" />
+        </View>
+        <View className="flex-col-center">
+          <View className="flex-center gap-3 pt-[37px]">
+            <Image
+              className="w-[60px] h-[60px]"
+              src={require('../../assets/img/icon_card.png')}
+            />
+            <View className="flex flex-col text-white text-[16px] font-normal gap-[6px]">
+              <View>{userInfo.userName}</View>
+              <View>{userInfo.cardNo}</View>
+            </View>
+          </View>
+
+          <View className="w-[260px]">
+            <Divider style={{ borderStyle: 'dashed', borderColor: 'white' }} />
+          </View>
+          <View className="flex-center gap-2 pb-[33px]">
+            <Text className="text-[18px] font-medium text-white">
+              身份审核通过
+            </Text>
+            <Image
+              className="w-5 h-5"
+              src={require('../../assets/img/icon_safety.png')}
+            />
+          </View>
+        </View>
+      </View>
+      <View className="flex-1 flex flex-col rounded-t-[20px] bg-color pt-[25px] px-3">
+        <View className="flex-1">
+          {list.map((x, i) => (
+            <View className="rounded-[8px] bg-white py-3" key={i}>
+              <View className="px-4 flex flex-col gap-2 text-[13px] font-medium">
+                <View className="flex items-center justify-between ">
+                  <Image
+                    className="w-5 h-5"
+                    src={require('../../assets/img/icon_copy.png')}
+                  />
+                  <View
+                    className={`text-white text-[12px] font-medium py-1 px-2 rounded ${
+                      x.state ? 'bg-[#999999]' : 'bg-[#FA913A]'
+                    }`}
+                  >
+                    {x.state ? '待开放' : '取证中'}
+                  </View>
+                </View>
+                <View>案件编号：{x.lawCode}</View>
+                <View>案件名称：{x.lawName}</View>
+                <View>预约时间：{x.createName}</View>
+              </View>
+              <Divider style={{ borderColor: '#E9E9E9', margin: '10px 0' }} />
+              <View
+                className={`text-[16px] font-medium  text-center ${
+                  x.state ? 'text-[#666666]' : 'text-[#3777E1]'
+                }`}
+                onClick={handleEntry}
+              >
+                进入取证室
+              </View>
+            </View>
+          ))}
+        </View>
+        <View className="flex-shrink-0 text-[12px] text-[#999999] font-medium flex-center pb-[40px]">
+          某某分局执法中心
+        </View>
+      </View>
+    </View>
   )
 }

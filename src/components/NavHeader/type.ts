@@ -1,5 +1,8 @@
+import React from 'react'
+
 export interface NavHeaderProps {
-  isRadius?: boolean
-  back?: boolean | Function
-  title?: string
+  className?: string;
+  iconClassName?: string;
+  back?: boolean | Function;
+  title?: string | React.ReactNode;
 }
