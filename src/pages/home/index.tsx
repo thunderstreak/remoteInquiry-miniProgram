@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import Taro from '@tarojs/taro'
+import Taro, { usePullDownRefresh } from '@tarojs/taro'
 import { Divider } from '@nutui/nutui-react-taro'
 import { Image, Text, View } from '@tarojs/components'
 import NavHeader from '@/components/NavHeader'
@@ -16,51 +16,55 @@ export default function Index() {
   const userInfo = useSelector(selectUserInfo)
   const [list, setList] = useState<Res.RoomQueryRoomList[]>([])
   // console.log(router)
-  // console.log(userInfo)
+  // console.log(userInfo) 9042180858
 
   // 跳转会议
-  const handleNavigateTo = useCallback(() => {
-    const number = '9042180858' || userInfo.roomCode
-    const password = '788311' || userInfo.roomPassword
-    const name = 'local' || userInfo.userName
-    Taro.navigateTo({
-      url: `/pages/conference/index?displayName=${name}&password=${password}&number=${number}&videoMute=${false}&audioMute=${false}`
-    })
-  }, [userInfo.roomCode, userInfo.roomPassword, userInfo.userName])
+  // const handleNavigateTo = useCallback(() => {
+  //   const number = userInfo.roomCode
+  //   const password = userInfo.roomPassword
+  //   const name = userInfo.userName
+  //   console.log(number, password, name)
+  //   Taro.navigateTo({
+  //     url: `/pages/conference/index?displayName=${name}&password=${password}&number=${number}&videoMute=${false}&audioMute=${false}`
+  //   })
+  // }, [userInfo.roomCode, userInfo.roomPassword, userInfo.userName])
 
   // 登陆会议
-  const handleCallNumber = useCallback(
-    async (user: Res.Login) => {
-      const XYClient = XYRTC.createClient({
-        report: true,
-        extId: config.DEFAULT_EXTID,
-        appId: config.DEFAULT_APPID
+  const handleCallNumber = useCallback(async (user: Res.RoomQueryRoomList) => {
+    const { roomCode, roomPassword, userName, id } = user
+    const XYClient = XYRTC.createClient({
+      report: true,
+      extId: config.DEFAULT_EXTID,
+      appId: config.DEFAULT_APPID
+    })
+    // 登陆
+    const response = await XYClient.loginExternalAccount({
+      extUserId: id,
+      displayName: userName
+    })
+    const { code, data = {} } = response || {}
+    // 状态是200时，初始化登录成功
+    if (code === 200 || code === 'XYSDK:980200') {
+      const cn = data.callNumber
+      console.log(cn)
+      XYClient.showToast('登录成功')
+      await Taro.navigateTo({
+        url: `/pages/conference/index?displayName=${userName}&password=${roomPassword}&number=${roomCode}&videoMute=${false}&audioMute=${false}`
       })
-      // 登陆
-      const response = await XYClient.loginExternalAccount({
-        extUserId: user.id,
-        displayName: user.userName
-      })
-      const { code, data = {} } = response || {}
-      // 状态是200时，初始化登录成功
-      if (code === 200 || code === 'XYSDK:980200') {
-        const cn = data.callNumber
-        console.log(cn)
-        XYClient.showToast('登录成功')
-        handleNavigateTo()
-      } else {
-        XYClient.showToast('登录失败，请稍后重试')
-      }
+    } else {
+      XYClient.showToast('登录失败，请稍后重试')
+    }
+  }, [])
+
+  const handleEntry = useCallback(
+    (data: Res.RoomQueryRoomList) => {
+      handleCallNumber(data).then(console.log)
     },
-    [handleNavigateTo]
+    [handleCallNumber]
   )
 
-  const handleEntry = useCallback(() => {
-    handleCallNumber(userInfo).then(console.log)
-  }, [handleCallNumber, userInfo])
-
-  const handleGetRoomList = useCallback(() => {
-    HomeApi.roomQueryRoomList({
+  const handleGetRoomList = useCallback(async () => {
+    await HomeApi.roomQueryRoomList({
       userName: userInfo.userName,
       cardNo: userInfo.cardNo
     }).then((res) => {
@@ -68,8 +72,14 @@ export default function Index() {
       if (data) {
         setList(data)
       }
+      return res
     })
   }, [userInfo.cardNo, userInfo.userName])
+
+  usePullDownRefresh(async () => {
+    await handleGetRoomList()
+    Taro.stopPullDownRefresh()
+  })
 
   useEffect(() => {
     handleGetRoomList()
@@ -117,12 +127,8 @@ export default function Index() {
                     className="w-5 h-5"
                     src={require('../../assets/img/icon_copy.png')}
                   />
-                  <View
-                    className={`text-white text-[12px] font-medium py-1 px-2 rounded ${
-                      x.state ? 'bg-[#999999]' : 'bg-[#FA913A]'
-                    }`}
-                  >
-                    {x.state ? '待开放' : '取证中'}
+                  <View className="text-white text-[12px] font-medium py-1 px-2 rounded bg-[#FA913A]">
+                    待进入
                   </View>
                 </View>
                 <View>案件编号：{x.lawCode}</View>
@@ -131,10 +137,8 @@ export default function Index() {
               </View>
               <Divider style={{ borderColor: '#E9E9E9', margin: '10px 0' }} />
               <View
-                className={`text-[16px] font-medium  text-center ${
-                  x.state ? 'text-[#666666]' : 'text-[#3777E1]'
-                }`}
-                onClick={handleEntry}
+                className="text-[16px] font-medium  text-center text-[#3777E1]"
+                onClick={() => handleEntry(x)}
               >
                 进入取证室
               </View>

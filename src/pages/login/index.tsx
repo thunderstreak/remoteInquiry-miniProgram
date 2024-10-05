@@ -102,11 +102,11 @@ export default function Index() {
           Taro.setStorageSync('TOKEN', token)
           dispatch(userActions.setUserInfo(data))
           setState((v) => ({ ...v, successShow: true }))
-          handleNavigateTo()
+          Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' })
         }
       })
     },
-    [dispatch, handleNavigateTo]
+    [dispatch]
   )
 
   const handleSubmitFailed = useCallback((error) => {
@@ -145,15 +145,17 @@ export default function Index() {
     <ConfigProvider theme={lightTheme} className="h-full">
       <View className="h-full flex flex-col justify-between bg-color">
         <View className="flex-shrink-0">
-          <NavHeader title="千名千探" />
-          <View className="pt-[37px] font-bold text-[20px] text-center text-white">
-            远程云取证系统
+          <NavHeader title="千名千探" back={false} />
+          <View className="relative mt-[35px]">
+            <View className="absolute left-0 right-0 top-4 mx-auto font-bold text-[20px] text-center text-white">
+              远程云取证系统
+            </View>
+            <Image
+              className="w-[374px] h-[286px] block mx-auto"
+              src={require('../../assets/img/icon_cen1.png')}
+            />
           </View>
-          <Image
-            className="w-[315px] h-[219px] block mx-auto my-3"
-            src={require('../../assets/img/icon_cen.png')}
-          />
-          <View className="flex-center text-[14px] font-medium pb-[38px] text-white">
+          <View className="flex-center text-[14px] font-medium pb-4 text-white pt-2">
             随时随地 · 安全高效
           </View>
         </View>
@@ -236,7 +238,7 @@ export default function Index() {
               />
             </Form.Item>
           </Form>
-          <View className="flex-col-center gap-[6px] py-[34px]">
+          <View className="flex-col-center gap-[6px] pb-[20px] pt-[20px]">
             <View
               className="flex-center gap-1"
               onClick={() => handleSetDialog(true, 'successShow')}
@@ -269,7 +271,7 @@ export default function Index() {
           confirmText={<View>继续({timeLeft ?? ''}s)</View>}
         >
           <ScrollView scrollY style={{ height: '300px' }}>
-            <View className="flex flex-col gap-3 text-[14px] font-medium py-6">
+            <View className="flex flex-col gap-3 text-[14px] font-medium my-6">
               <View className="flex">
                 <View className="w-2 h-2 rounded-full bg-[#3777E1] ml-1 mt-2 mr-2 flex-shrink-0" />
                 <Text>
