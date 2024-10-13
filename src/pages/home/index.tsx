@@ -31,7 +31,7 @@ export default function Index() {
 
   // 登陆会议
   const handleCallNumber = useCallback(async (user: Res.RoomQueryRoomList) => {
-    const { roomCode, roomPassword, userName, id } = user
+    const { roomCode, roomPassword, userName, id, lawId } = user
     const XYClient = XYRTC.createClient({
       report: true,
       extId: config.DEFAULT_EXTID,
@@ -49,7 +49,7 @@ export default function Index() {
       console.log(cn)
       XYClient.showToast('登录成功')
       await Taro.navigateTo({
-        url: `/pages/conference/index?displayName=${userName}&password=${roomPassword}&number=${roomCode}&videoMute=${false}&audioMute=${false}`
+        url: `/pages/conference/index?displayName=${userName}&password=${roomPassword}&number=${roomCode}&videoMute=${false}&audioMute=${false}&lawId=${lawId}`
       })
     } else {
       XYClient.showToast('登录失败，请稍后重试')

@@ -3,6 +3,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { Button, View } from '@tarojs/components'
 import { WaterMark } from '@nutui/nutui-react-taro'
 import NavHeader from '@/components/NavHeader'
+import config from '@/config/index'
 
 import { useSocket } from '@/utils/socket'
 import { CanvasSign } from './CanvasSign'
@@ -26,7 +27,7 @@ const Index: React.FC = () => {
       url: `${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`,
       filePath: result.tempFilePath,
       name: 'file',
-      header: { tenantCode: 'ZY001', orgCode: 'Z01' }
+      header: config.headers
     }).then((res) => {
       const { data } = JSON.parse(res.data)
       const type = router.params.type

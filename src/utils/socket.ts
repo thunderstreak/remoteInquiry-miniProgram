@@ -24,13 +24,17 @@ export const useSocket = () => {
   }, [])
 
   const handleOnError = useCallback(() => {
-    socketTask?.onError((err) =>
-      Taro.showToast({ title: err.errMsg, icon: 'none' })
+    socketTask?.onError((err) => {
+        console.log(err)
+        Taro.showToast({ title: err.errMsg, icon: 'none' })
+      }
     )
   }, [])
   const handleOnClose = useCallback(() => {
-    socketTask?.onClose((err) =>
-      Taro.showToast({ title: err.reason, icon: 'none' })
+    socketTask?.onClose((err) => {
+        console.log(err)
+        Taro.showToast({ title: err.reason, icon: 'none' })
+      }
     )
   }, [])
 

@@ -153,8 +153,9 @@ export default function Index() {
   const hangup = useCallback(() => {
     XYClient.current?.hangup()
     XYClient.current?.off('roomEvent')
+    handleClose() // 关闭ws链接
     Taro.navigateBack({ delta: 1 })
-  }, [])
+  }, [handleClose])
 
   /**
    * 授权状态更新，需要重新入会
@@ -340,9 +341,13 @@ export default function Index() {
   }, [handleInit])
 
   useEffect(() => {
-    handleCreateSocket({
-      url: `wss://www.zjhzkjyx.com/api/ws/241001123153479068`
-    }).then(() => {
+    const { lawId } = router.params
+    const wsUrl = `${process.env.TARO_APP_API.replace(
+      'https',
+      'wss'
+    )}/api/ws/${lawId}`
+    console.log(wsUrl)
+    handleCreateSocket({ url: wsUrl }).then(() => {
       handleOnMessage((res) => {
         const { type, data } = res
         // console.log(data)
@@ -359,7 +364,7 @@ export default function Index() {
         }
       })
     })
-  }, [handleCreateSocket, handleOnMessage])
+  }, [handleCreateSocket, handleOnMessage, router.params])
 
   return (
     <View className="h-full w-full text-white relative bg-[#1f1f25]">

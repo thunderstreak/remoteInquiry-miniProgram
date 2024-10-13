@@ -95,6 +95,7 @@ export default function Index() {
 
   const handleSubmitSucceed = useCallback(
     (value: FormData) => {
+      Taro.showLoading()
       Login.login(value).then(async (res) => {
         const { data } = res
         if (data) {
@@ -104,6 +105,8 @@ export default function Index() {
           setState((v) => ({ ...v, successShow: true }))
           Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' })
         }
+      }).finally(() => {
+        Taro.hideLoading()
       })
     },
     [dispatch]

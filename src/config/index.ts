@@ -1,5 +1,6 @@
 export interface IConfig {
   baseURL: string;
+  headers: Record<string, string>;
   DEFAULT_EXTID: string;
   DEFAULT_APPID: string;
   DEFAULT_SERVER: string;
@@ -7,6 +8,7 @@ export interface IConfig {
 
 const config: IConfig = {
   baseURL: process.env.TARO_APP_API, // api地址
+  headers: { tenantCode: 'ZY001', orgCode: 'Z01' },
   /**
    * 企业ID
    */

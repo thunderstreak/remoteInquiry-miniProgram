@@ -5,7 +5,7 @@ import type {
   InternalAxiosRequestConfig
 } from 'axios'
 import Taro from '@tarojs/taro'
-import { filterCodes } from '@/config/index'
+import Config, { filterCodes } from '@/config/index'
 import { userActions } from '@/store/slice/user'
 
 type Interceptors = ResponseData | ResponseList<undefined>;
@@ -39,8 +39,8 @@ export const requestConfigInterceptors = (
   if (token) {
     config.headers.token = token
   }
-  config.headers.tenantCode = 'ZY001'
-  config.headers.orgCode = 'Z01'
+  config.headers.tenantCode = Config.headers.tenantCode
+  config.headers.orgCode = Config.headers.orgCode
 
   return config
 }

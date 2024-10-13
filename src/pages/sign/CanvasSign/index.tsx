@@ -104,6 +104,9 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
         canvas.height = height
 
         const ctx: CanvasContext = canvas.getContext('2d')
+        // todo canvas设置背景色需要先绘制到另外一个canvas上并保存，否则会影响页面的颜色
+        // ctx.fillStyle = '#c1c1c1' // 设置填充颜色
+        // ctx.fillRect(0, 0, canvas.width, canvas.height) // 绘制一个覆盖整个Canvas的矩形
 
         ctx.strokeStyle = '#000000'
         ctx.lineWidth = 4

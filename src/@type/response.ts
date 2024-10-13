@@ -187,6 +187,7 @@ export interface UserInfo extends Login {}
 
 export interface RoomQueryRoomList {
   id: string;
+  lawId: string;
   tenantCode: string;
   orgCode: string;
   isDelete: null | string;

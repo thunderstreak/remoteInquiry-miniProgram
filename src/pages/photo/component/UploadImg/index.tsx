@@ -4,6 +4,7 @@ import { FileItem } from '@nutui/nutui-react-taro/dist/types/packages/uploader/f
 import { UploadOptions } from '@nutui/nutui-react-taro/dist/types/packages/uploader/upload'
 import { responseText } from '@/pages/photo/type'
 import { View } from '@tarojs/components'
+import config from '@/config/index'
 import { UploadImgProps } from './type'
 
 const createFileItem = (params): FileItem => ({
@@ -62,7 +63,7 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
         <Uploader
           value={photoRef.current}
           url={`${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`}
-          headers={{ tenantCode: 'ZY001', orgCode: 'Z01' }}
+          headers={config.headers}
           onDelete={handelOnDelete}
           multiple
           onSuccess={handelOnSuccess}
