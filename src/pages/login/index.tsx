@@ -136,11 +136,15 @@ export default function Index() {
         setTimeLeft((prevTimeLeft) => prevTimeLeft - 1)
       }, 1000)
       return () => clearInterval(intervalId)
-    } else {
-      console.log('success')
-      // Taro.navigateTo({ url: '/pages/home/index' })
     }
   }, [state.successShow, timeLeft])
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      console.log('success')
+      Taro.navigateTo({ url: '/pages/home/index' })
+    }
+  }, [timeLeft])
   return (
     <ConfigProvider theme={lightTheme} className="h-full">
       <View className="h-full flex flex-col justify-between bg-color">
@@ -163,7 +167,7 @@ export default function Index() {
           <View className="flex items-center justify-between py-5">
             <View className="flex items-center gap-2">
               <Image
-                src="https://ts1.cn.mm.bing.net/th?id=OIP-C.Xz0mBQM__1Qz7chc_25joQHaEL&w=80&h=80&c=1&vt=10&bgcl=e7c92e&r=0&o=6&pid=5.1"
+                src={require('../../assets/img/icon_logo.png')}
                 className="block w-6 h-6"
               />
               <Text className="text-[16px] font-medium">请先进行身份核验</Text>

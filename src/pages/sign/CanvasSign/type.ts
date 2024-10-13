@@ -16,7 +16,10 @@ export interface CanvasSignContext {
 export interface CanvasSignProps {
   className?: string;
   ref?: Ref<CanvasSignContext>;
-  onChange?: (type: 'ON_START' | 'ON_MOVE', data: CanvasTouch[]) => void;
+  onChange?: (
+    type: 'ON_START' | 'ON_MOVE' | 'ON_END',
+    data: CanvasTouch
+  ) => void;
   onReady?: (res: Pick<CanvasSignState, 'width' | 'height'>) => void;
 }
 

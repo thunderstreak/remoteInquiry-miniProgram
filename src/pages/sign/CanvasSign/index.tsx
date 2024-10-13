@@ -36,9 +36,10 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
   const canvasStart = useCallback(
     (e: CanvasTouchEvent) => {
       e.preventDefault()
-      props?.onChange?.('ON_START', e.changedTouches)
+      const changedTouches = e.changedTouches[0]
+      props?.onChange?.('ON_START', changedTouches)
 
-      const { x, y } = e.changedTouches[0]
+      const { x, y } = changedTouches
       lineInfo.current.startX = x
       lineInfo.current.startY = y
       context.current?.beginPath()
@@ -49,14 +50,23 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
   const canvasMove = useCallback(
     (e: CanvasTouchEvent) => {
       e.preventDefault()
-      props?.onChange?.('ON_MOVE', e.changedTouches)
+      const changedTouches = e.changedTouches[0]
+      props?.onChange?.('ON_MOVE', changedTouches)
 
-      const { x, y } = e.changedTouches[0]
+      const { x, y } = changedTouches
       context.current?.moveTo(lineInfo.current.startX, lineInfo.current.startY)
       context.current?.lineTo(x, y)
       context.current?.stroke()
       lineInfo.current.startX = x
       lineInfo.current.startY = y
+    },
+    [props]
+  )
+  const canvasEnd = useCallback(
+    (e: CanvasTouchEvent) => {
+      e.preventDefault()
+      const changedTouches = e.changedTouches[0]
+      props?.onChange?.('ON_END', changedTouches)
     },
     [props]
   )
@@ -66,9 +76,7 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
   }, [])
 
   const handleSaveImage = useCallback(async () => {
-    const result = await toDataURL(state.current.canvas)
-    console.log(result.tempFilePath)
-    return result
+    return await toDataURL(state.current.canvas)
   }, [])
 
   useReady(() => {
@@ -118,6 +126,7 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
       type="2d"
       onTouchStart={canvasStart}
       onTouchMove={canvasMove}
+      onTouchEnd={canvasEnd}
     />
   )
 })

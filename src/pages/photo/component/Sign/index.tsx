@@ -6,7 +6,7 @@ import { SignProps } from './type'
 
 const STEP_MPA = {
   1: '',
-  2: 'SIGN_REMARK',
+  2: 'SIGN_MARK',
   3: 'SIGN_NAME',
   4: 'SIGN_TIME'
 }

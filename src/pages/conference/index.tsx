@@ -6,11 +6,13 @@ import { ConferenceStates } from '@/pages/conference/type'
 import { getDeviceAvatar, getNetworkLevelImage } from '@/utils/meeting'
 import { useTimer } from '@/utils/useTime'
 import { Event } from '@/utils'
+import { useSocket } from '@/utils/socket'
 import './index.less'
 
 export default function Index() {
   const { startStopTimer, formatTime } = useTimer(0)
   const router = useRouter()
+  const { handleCreateSocket, handleOnMessage, handleClose } = useSocket()
   const [state, setState] = useState<ConferenceStates>({
     loading: true,
     pushUrl: '', // 推流地址
@@ -176,7 +178,7 @@ export default function Index() {
 
   const handleOnRoomEvent = useCallback(
     (event) => {
-      console.log(event)
+      // console.log(event)
       const { type, detail } = event
 
       switch (type) {
@@ -313,7 +315,7 @@ export default function Index() {
       password: password,
       displayName: displayName
     })
-    console.log(response)
+    // console.log(response)
     const { code, message = '' } = response
 
     // 缓存sdk <xylink-sdk/>组件节点context，为后续调用组件内部方法用
@@ -336,6 +338,28 @@ export default function Index() {
   useEffect(() => {
     handleInit()
   }, [handleInit])
+
+  useEffect(() => {
+    handleCreateSocket({
+      url: `wss://www.zjhzkjyx.com/api/ws/241001123153479068`
+    }).then(() => {
+      handleOnMessage((res) => {
+        const { type, data } = res
+        // console.log(data)
+        switch (type) {
+          case 'NOTICE_SIGN_NAME': // 通知签名
+          case 'NOTICE_SIGN_TIME': // 通知签日期
+          case 'NOTICE_SIGN_MARK': // 通知签备注
+            const suffix = type.replace('NOTICE', 'ON')
+            Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}` })
+            break
+          case 'NOTICE_UPLOAD': // 通知上传证据
+            Taro.navigateTo({ url: '/pages/photo/index' })
+            break
+        }
+      })
+    })
+  }, [handleCreateSocket, handleOnMessage])
 
   return (
     <View className="h-full w-full text-white relative bg-[#1f1f25]">

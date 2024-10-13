@@ -4,14 +4,15 @@ import { Button, View } from '@tarojs/components'
 import { WaterMark } from '@nutui/nutui-react-taro'
 import NavHeader from '@/components/NavHeader'
 
+import { useSocket } from '@/utils/socket'
 import { CanvasSign } from './CanvasSign'
 import { CanvasSignContext } from './CanvasSign/type'
 // import './index.less'
 
 const Index: React.FC = () => {
+  const { handleSend } = useSocket()
   const router = useRouter()
   const rect = useRef({ width: 0, height: 0 })
-  const socketTask = useRef<Taro.SocketTask | null>(null)
   const signRef = useRef<CanvasSignContext>(null)
   // const router = useRouter()
 
@@ -21,67 +22,87 @@ const Index: React.FC = () => {
     if (!result) {
       return console.error('签名失败')
     }
+    Taro.uploadFile({
+      url: `${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`,
+      filePath: result.tempFilePath,
+      name: 'file',
+      header: { tenantCode: 'ZY001', orgCode: 'Z01' }
+    }).then((res) => {
+      const { data } = JSON.parse(res.data)
+      const type = router.params.type
+      console.log('type===>', type)
+      switch (type) {
+        // 用事件总线把导出的签名图发射出去 SIGN_MARK SIGN_NAME SIGN_TIME
+        case 'SIGN_MARK':
+        case 'SIGN_NAME':
+        case 'SIGN_TIME':
+          Taro.eventCenter.trigger(type ?? '', data)
+          handleSend({ type: `ON_${type}`, data })
+          break
+        case 'ON_SIGN_NAME': // 返回接受到的通知签名
+        case 'ON_SIGN_TIME': // 返回接受到的通知签日期
+        case 'ON_SIGN_MARK': // 返回接受到的通知签备注
+          handleSend({ type, data })
+          break
+      }
 
-    // 用事件总线把导出的签名图发射出去
-    Taro.eventCenter.trigger(router.params.type ?? '', {
-      url: result.tempFilePath
+      Taro.navigateBack({ delta: 1 })
     })
-    Taro.navigateBack({ delta: 1 })
-  }, [router.params.type])
+  }, [handleSend, router.params.type])
 
   const onClear = useCallback(() => {
     signRef.current?.handleClear()
-  }, [])
+    handleSend({ type: 'ON_SIGN_CLEAR', data: Date.now() })
+  }, [handleSend])
 
   // const onCancel = useCallback(() => {
   //   Taro.navigateBack({ delta: 1 })
   // }, [])
 
   // 签名轨迹开始
-  const handleChange = useCallback((type: 'ON_START' | 'ON_MOVE', val) => {
-    console.log(val)
-    const data = JSON.stringify({ type, data: val })
-    socketTask.current?.send({ data })
-  }, [])
+  const handleChange = useCallback(
+    (type: 'ON_START' | 'ON_MOVE' | 'ON_END', val) => {
+      const data = { type, data: val }
+      handleSend(data)
+    },
+    [handleSend]
+  )
+
+  // 发送签名事件
+  const handleSendSign = useCallback(() => {
+    if (rect.current.height && rect.current.width) {
+      const type = router.params.type
+      console.log('type', type)
+      switch (type) {
+        case 'SIGN_MARK': // 上传照片中的签备注
+        case 'SIGN_NAME':// 上传照片中的签名
+        case 'SIGN_TIME':// 上传照片中的签时间
+        case 'ON_SIGN_NAME': // 发送通知签名准备
+        case 'ON_SIGN_TIME': // 发送通知签时间准备
+        case 'ON_SIGN_MARK': // 发送通知签备注准备
+          const suffix = type.replace(/(SIGN_|ON_SIGN_)/g, '')
+          handleSend({ type: `ON_READY_${suffix}`, data: rect.current })
+          break
+      }
+    }
+  }, [handleSend, router.params.type])
+
+  // 返回通知
+  const handleBack = useCallback(() => {
+    handleSend({ type: 'ON_SIGN_BACK', data: Date.now() })
+    Taro.navigateBack()
+  }, [handleSend])
 
   // 签名组件初始化完成
-  const handleReady = useCallback(({ width, height }) => {
-    console.log(width, height)
-    rect.current = { width, height }
-  }, [])
+  const handleReady = useCallback(
+    ({ width, height }) => {
+      rect.current = { width, height }
+      handleSendSign()
+    },
+    [handleSendSign]
+  )
 
-  // 初始化建立wss链接
-  useEffect(() => {
-    // 通过 WebSocket 连接发送数据。需要先 connectSocket，并在 onSocketOpen 回调之后才能发送。
-    Taro.connectSocket({ url: 'wss://echo.websocket.org', header: {} }).then(
-      (task) => {
-        task.onOpen((res) => {
-          console.log(res)
-
-          socketTask.current = task
-
-          const data = JSON.stringify({ type: 'ON_READY', data: rect.current })
-          socketTask.current?.send({ data })
-        })
-        task.onError((err) =>
-          Taro.showToast({ title: err.errMsg, icon: 'none' })
-        )
-        task.onMessage((res) => {
-          console.log(res.data)
-        })
-      }
-    )
-    return () => {
-      socketTask.current?.close({
-        code: 1000,
-        reason: '结束链接',
-        complete: () => {
-          console.log('链接已关闭')
-        }
-      })
-      socketTask.current = null
-    }
-  }, [])
+  useEffect(() => {}, [])
 
   return (
     <View className="h-full w-full flex flex-col relative">
@@ -89,7 +110,8 @@ const Index: React.FC = () => {
       <View className="flex-shrink-0 flex flex-col justify-between bg-[#2766CF] h-[24px]">
         <View className="flex-shrink-0">
           <NavHeader
-            className="pb-0"
+            back={handleBack}
+            className="pb-0 z-20"
             iconClassName="!w-3 !h-3 top-[5px]"
             title={<View className="text-[12px]">照片签字</View>}
           />

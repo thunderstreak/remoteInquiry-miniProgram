@@ -4,13 +4,16 @@ import { View } from '@tarojs/components'
 import Step from '@/components/Step'
 import { PhotoState } from '@/pages/photo/type'
 import NavHeader from '@/components/NavHeader'
+import { useSocket } from '@/utils/socket'
 import UploadImg from './component/UploadImg'
 import Sign from './component/Sign'
 // import './index.less'
 
 export default function Index() {
+  const { handleSend } = useSocket()
   const [state, setState] = useState<PhotoState>({
     step: 1,
+    photo: [],
     markUrl: '',
     nameUrl: '',
     timeUrl: ''
@@ -20,37 +23,59 @@ export default function Index() {
     return { 1: '', 2: markUrl, 3: nameUrl, 4: timeUrl }[step]
   }, [state])
 
+  // const photoList = useMemo(() => {
+  //   return [...state.photo, state.markUrl, state.nameUrl, state.timeUrl].filter(x => x)
+  // }, [state.markUrl, state.nameUrl, state.photo, state.timeUrl])
+
+  // 发送图片
+  const handleSendImages = useCallback(() => {
+    const data = {
+      photo: state.photo,
+      markUrl: state.markUrl,
+      nameUrl: state.nameUrl,
+      timeUrl: state.timeUrl
+    }
+    handleSend({ type: 'ON_UPLOAD', data })
+  }, [handleSend, state.markUrl, state.nameUrl, state.photo, state.timeUrl])
+
   const handleNext = useCallback(
     (res) => {
       const { type, data } = res
       switch (type) {
         case 'UPLOAD':
-          console.log(data)
+          const photo = data.map((x) => x.url)
+          setState((v) => ({ ...v, photo }))
+          // handleSend({ type: 'ON_UPLOAD', data: photo })
           break
       }
       if (state.step < 4) {
         setState((v) => ({ ...v, step: state.step + 1 }))
       } else {
-        console.log('上传')
+        handleSend({ type: 'ON_UPLOAD_END', data: `${Date.now()}` })
+        Taro.navigateBack({ delta: 1 })
       }
     },
-    [state.step]
+    [handleSend, state.step]
   )
   const handlePrev = useCallback(() => {
     setState((v) => ({ ...v, step: state.step - 1 }))
   }, [state.step])
 
   useEffect(() => {
-    Taro.eventCenter.on('SIGN_REMARK', (res) => {
-      console.log(res)
+    handleSendImages()
+  }, [handleSendImages])
+
+  useEffect(() => {
+    // 签备注
+    Taro.eventCenter.on('SIGN_MARK', (res) => {
       setState((v) => ({ ...v, markUrl: res.url }))
     })
+    // 签名
     Taro.eventCenter.on('SIGN_NAME', (res) => {
-      console.log(res)
       setState((v) => ({ ...v, nameUrl: res.url }))
     })
+    // 签时间
     Taro.eventCenter.on('SIGN_TIME', (res) => {
-      console.log(res)
       setState((v) => ({ ...v, timeUrl: res.url }))
     })
   }, [])

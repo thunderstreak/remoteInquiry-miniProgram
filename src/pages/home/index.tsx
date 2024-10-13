@@ -58,7 +58,10 @@ export default function Index() {
 
   const handleEntry = useCallback(
     (data: Res.RoomQueryRoomList) => {
-      handleCallNumber(data).then(console.log)
+      Taro.showLoading()
+      handleCallNumber(data).finally(() => {
+        Taro.hideLoading()
+      })
     },
     [handleCallNumber]
   )
