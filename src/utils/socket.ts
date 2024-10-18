@@ -43,6 +43,7 @@ export const useSocket = () => {
       code: 1000,
       reason: '结束链接',
       complete: () => {
+        clearInterval(inter.current)
         console.log('链接已关闭')
       }
     })
