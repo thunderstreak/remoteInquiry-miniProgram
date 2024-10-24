@@ -20,8 +20,10 @@ import Video from './component/Video/index'
 import './index.less'
 
 const createFormData = (): FormData => ({
-  userName: '余嘉禾',
-  cardNo: '622424198612064432'
+  // userName: '余嘉禾',
+  // cardNo: '622424198612064432'
+  userName: '',
+  cardNo: ''
 })
 export default function Index() {
   const dispatch = useDispatch()
