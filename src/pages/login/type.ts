@@ -1,6 +1,7 @@
 import { Login } from '@/@type/request'
 
 export interface LoginState {
+  loading: boolean;
   videoShow: boolean;
   successShow: boolean;
   times: number;

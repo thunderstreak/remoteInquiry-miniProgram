@@ -29,6 +29,7 @@ export default function Index() {
   const [formInstance] = Form.useForm()
   const [form, setForm] = useState(createFormData())
   const [state, setState] = useState<LoginState>({
+    loading: false,
     videoShow: false,
     successShow: false,
     times: 8,
@@ -97,8 +98,9 @@ export default function Index() {
 
   const handleSubmitSucceed = useCallback(
     (value: FormData) => {
-      Taro.showLoading().catch(console.log)
-      Login.login(value).then(async (res) => {
+      // Taro.showLoading().catch(console.log)
+      setState((v) => ({ ...v, loading: true }))
+      Login.login(value).then((res) => {
         const { data } = res
         if (data) {
           const { token } = data
@@ -108,7 +110,8 @@ export default function Index() {
           Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' }).catch(console.log)
         }
       }).finally(() => {
-        Taro.hideLoading()
+        // Taro.hideLoading()
+        setState((v) => ({ ...v, loading: false }))
       })
     },
     [dispatch]
@@ -194,6 +197,7 @@ export default function Index() {
               <Button
                 block
                 type="primary"
+                loading={state.loading}
                 className="!h-[44px] !rounded"
                 color={disabled ? '#9BBBF0' : '#3777E1'}
                 disabled={disabled}
