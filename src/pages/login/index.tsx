@@ -9,6 +9,7 @@ import {
   Input,
   Overlay
 } from '@nutui/nutui-react-taro'
+import { Close } from '@nutui/icons-react-taro'
 import { useDispatch } from 'react-redux'
 import { userActions } from '@/store/slice/user'
 import Login from '@/api/login'
@@ -47,25 +48,26 @@ export default function Index() {
   )
 
   const handleSetDialog = useCallback((value: boolean, field: string) => {
+    console.log(field)
     setState((v) => ({ ...v, [field]: value }))
   }, [])
 
   const handleScan = useCallback(() => {
-    Dialog.open('dialog', {
-      title: '函数式调用',
-      content: '可通过 Dialog.open 打开对话框',
-      onConfirm: () => {
-        Dialog.close('dialog')
-      },
-      onCancel: () => {
-        Dialog.close('dialog')
-      }
-    })
+    // Dialog.open('dialog', {
+    //   title: '函数式调用',
+    //   content: '可通过 Dialog.open 打开对话框',
+    //   onConfirm: () => {
+    //     Dialog.close('dialog')
+    //   },
+    //   onCancel: () => {
+    //     Dialog.close('dialog')
+    //   }
+    // })
   }, [])
 
   const handleNavigateTo = useCallback(() => {
     handleSetDialog(false, 'successShow')
-    Taro.navigateTo({ url: `/pages/home/index` })
+    Taro.navigateTo({ url: `/pages/home/index` }).catch(console.log)
   }, [handleSetDialog])
 
   // const handleCallNumber = useCallback(
@@ -95,7 +97,7 @@ export default function Index() {
 
   const handleSubmitSucceed = useCallback(
     (value: FormData) => {
-      Taro.showLoading()
+      Taro.showLoading().catch(console.log)
       Login.login(value).then(async (res) => {
         const { data } = res
         if (data) {
@@ -103,7 +105,7 @@ export default function Index() {
           Taro.setStorageSync('TOKEN', token)
           dispatch(userActions.setUserInfo(data))
           setState((v) => ({ ...v, successShow: true }))
-          Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' })
+          Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' }).catch(console.log)
         }
       }).finally(() => {
         Taro.hideLoading()
@@ -144,9 +146,8 @@ export default function Index() {
 
   useEffect(() => {
     if (timeLeft === 0) {
-      console.log('success')
-      Taro.navigateTo({ url: '/pages/home/index' })
-    }
+      Taro.navigateTo({ url: '/pages/home/index' }).catch(console.log)
+     }
   }, [timeLeft])
   return (
     <ConfigProvider theme={lightTheme} className="h-full">
@@ -248,7 +249,7 @@ export default function Index() {
           <View className="flex-col-center gap-[6px] pb-[20px] pt-[20px]">
             <View
               className="flex-center gap-1"
-              onClick={() => handleSetDialog(true, 'successShow')}
+              onClick={() => handleSetDialog(true, 'videoShow')}
             >
               <Image
                 className="w-5 h-5"
@@ -307,12 +308,12 @@ export default function Index() {
           </ScrollView>
         </Dialog>
 
-        <Overlay
-          visible={state.videoShow}
-          onClick={() => handleSetDialog(false, 'videoShow')}
-        >
-          <View className="h-full flex-center">
+        <Overlay visible={state.videoShow}>
+          <View className="h-full flex-col-center gap-4">
             <Video />
+            <View className="w-[25px] h-[25px] rounded-full border-[0.5px] border-solid border-[#fff] text-white flex-center" onClick={() => handleSetDialog(false, 'videoShow')}>
+              <Close width="10px" height="10px" />
+            </View>
           </View>
         </Overlay>
       </View>
