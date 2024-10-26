@@ -80,41 +80,43 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
   }, [])
 
   useReady(() => {
-    const query = Taro.createSelectorQuery()
+    setTimeout(() => {
+      const query = Taro.createSelectorQuery()
+      Taro.showToast({ title: 'ready' })
+      query
+        .select('#myCanvas')
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          const canvas = res[0].node
+          if (!canvas) {
+            return
+          }
 
-    query
-      .select('#myCanvas')
-      .fields({ node: true, size: true })
-      .exec((res) => {
-        const canvas = res[0].node
-        if (!canvas) {
-          return
-        }
+          const { windowWidth: width, windowHeight: height } =
+            Taro.getSystemInfoSync()
+          const rectUnit = { width, height }
+          state.current = { ...rectUnit, canvas }
 
-        const { windowWidth: width, windowHeight: height } =
-          Taro.getSystemInfoSync()
-        const rectUnit = { width, height }
-        state.current = { ...rectUnit, canvas }
+          setRect({ width, height })
 
-        setRect({ width, height })
+          props.onReady?.(rectUnit)
 
-        props.onReady?.(rectUnit)
+          canvas.width = width
+          canvas.height = height
 
-        canvas.width = width
-        canvas.height = height
+          const ctx: CanvasContext = canvas.getContext('2d')
+          // todo canvas设置背景色需要先绘制到另外一个canvas上并保存，否则会影响页面的颜色
+          // ctx.fillStyle = '#c1c1c1' // 设置填充颜色
+          // ctx.fillRect(0, 0, canvas.width, canvas.height) // 绘制一个覆盖整个Canvas的矩形
 
-        const ctx: CanvasContext = canvas.getContext('2d')
-        // todo canvas设置背景色需要先绘制到另外一个canvas上并保存，否则会影响页面的颜色
-        // ctx.fillStyle = '#c1c1c1' // 设置填充颜色
-        // ctx.fillRect(0, 0, canvas.width, canvas.height) // 绘制一个覆盖整个Canvas的矩形
+          ctx.strokeStyle = '#000000'
+          ctx.lineWidth = 4
+          ctx.lineCap = 'round'
+          ctx.lineJoin = 'round'
 
-        ctx.strokeStyle = '#000000'
-        ctx.lineWidth = 4
-        ctx.lineCap = 'round'
-        ctx.lineJoin = 'round'
-
-        context.current = ctx
-      })
+          context.current = ctx
+        })
+    }, 500)
   })
 
   useImperativeHandle(ref, () => ({ handleClear, handleSaveImage }))

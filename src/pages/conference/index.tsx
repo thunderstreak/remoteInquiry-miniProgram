@@ -40,8 +40,8 @@ export default function Index() {
   const localVideoImg = useMemo(
     () =>
       state.videoMute
-        ? require('../../assets/images/video_mute.png')
-        : require('../../assets/images/video_unmute.png'),
+        ? require('../../assets/images/video_unmute.png')
+        : require('../../assets/images/video_mute.png'),
     [state.videoMute]
   )
 
