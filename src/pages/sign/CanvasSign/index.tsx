@@ -82,7 +82,7 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
   useReady(() => {
     setTimeout(() => {
       const query = Taro.createSelectorQuery()
-      Taro.showToast({ title: 'ready' })
+      Taro.showToast({ title: '准备完成' })
       query
         .select('#myCanvas')
         .fields({ node: true, size: true })

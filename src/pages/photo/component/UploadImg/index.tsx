@@ -4,6 +4,7 @@ import { FileItem } from '@nutui/nutui-react-taro/dist/types/packages/uploader/f
 import { UploadOptions } from '@nutui/nutui-react-taro/dist/types/packages/uploader/upload'
 import { responseText } from '@/pages/photo/type'
 import { View } from '@tarojs/components'
+import Taro from '@tarojs/taro'
 import config from '@/config/index'
 import { UploadImgProps } from './type'
 
@@ -38,12 +39,15 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
       files: FileItem[];
     }) => {
       const result = param.responseText as unknown as responseText
-      const { data } = JSON.parse(result.data)
-      console.log(data)
-      setPhoto((v) => [
-        ...v,
-        createFileItem({ url: data.url, uid: data.id, name: data.url })
-      ])
+      try {
+        const { data } = JSON.parse(result.data)
+        setPhoto((v) => [
+          ...v,
+          createFileItem({ url: data.url, uid: data.id, name: data.url })
+        ])
+      } catch (err) {
+        Taro.showToast({ title: err })
+      }
     },
     []
   )

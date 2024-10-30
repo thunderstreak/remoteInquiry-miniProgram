@@ -2,7 +2,6 @@ import {
   CONFERENCE_PAGE_URL,
   HOME_PAGE_URL,
   LOGIN_PAGE_URL,
-  MEETING_PAGE_URL,
   PHOTO_PAGE_URL,
   SIGN_PAGE_URL
 } from '@/constants'
@@ -11,7 +10,6 @@ export default defineAppConfig({
   pages: [
     LOGIN_PAGE_URL,
     HOME_PAGE_URL,
-    MEETING_PAGE_URL,
     PHOTO_PAGE_URL,
     SIGN_PAGE_URL,
     CONFERENCE_PAGE_URL
