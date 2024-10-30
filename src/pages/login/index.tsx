@@ -55,18 +55,18 @@ export default function Index() {
     setState((v) => ({ ...v, [field]: value }))
   }, [])
 
-  const handleScan = useCallback(() => {
-    // Dialog.open('dialog', {
-    //   title: '函数式调用',
-    //   content: '可通过 Dialog.open 打开对话框',
-    //   onConfirm: () => {
-    //     Dialog.close('dialog')
-    //   },
-    //   onCancel: () => {
-    //     Dialog.close('dialog')
-    //   }
-    // })
-  }, [])
+  // const handleScan = useCallback(() => {
+  //   Dialog.open('dialog', {
+  //     title: '函数式调用',
+  //     content: '可通过 Dialog.open 打开对话框',
+  //     onConfirm: () => {
+  //       Dialog.close('dialog')
+  //     },
+  //     onCancel: () => {
+  //       Dialog.close('dialog')
+  //     }
+  //   })
+  // }, [])
 
   const handleNavigateTo = useCallback(() => {
     handleSetDialog(false, 'successShow')
@@ -181,12 +181,12 @@ export default function Index() {
               />
               <Text className="text-[16px] font-medium">请先进行身份核验</Text>
             </View>
-            <View
+            {/* <View
               className="text-[14px] text-[#3777E1] font-medium"
               onClick={handleScan}
             >
               直接扫描身份证
-            </View>
+            </View>*/}
           </View>
           <Form
             form={formInstance}

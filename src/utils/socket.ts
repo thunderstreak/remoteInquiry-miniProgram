@@ -41,7 +41,7 @@ export const useSocket = () => {
   const handleClose = useCallback(() => {
     socketTask?.close({
       code: 1000,
-      reason: '结束链接',
+      reason: '结束连接',
       complete: () => {
         clearInterval(inter.current)
         console.log('链接已关闭')
