@@ -67,7 +67,7 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
         <Uploader
           value={photoRef.current}
           url={`${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`}
-          headers={config.headers}
+          headers={{ ...config.headers, 'Content-Type': 'multipart/form-data' }}
           onDelete={handelOnDelete}
           multiple
           onSuccess={handelOnSuccess}
