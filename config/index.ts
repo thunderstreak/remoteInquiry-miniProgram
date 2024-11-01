@@ -8,7 +8,7 @@ import prodConfig from './prod' // https://taro-docs.jd.com/docs/next/config#def
 export default defineConfig(async (merge, { command, mode }) => {
   console.log('command:', command, 'mode:', mode)
   const baseConfig: UserConfigExport = {
-    projectName: 'ubq mini',
+    projectName: '远程询问',
     date: '2024-5-24',
     designWidth(input: any) {
       // 配置 NutUI 375 尺寸
