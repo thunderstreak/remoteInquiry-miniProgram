@@ -51,6 +51,14 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
     },
     []
   )
+  const handleOnFailure = useCallback((param: {
+    responseText: XMLHttpRequest['responseText'];
+    option: UploadOptions;
+    files: FileItem[];
+  }) => {
+    const result = param.responseText
+    Taro.showToast({ title: result })
+  }, [])
 
   const handleNext = useCallback(() => {
     if (photo.length) {
@@ -67,10 +75,11 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
         <Uploader
           value={photoRef.current}
           url={`${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`}
-          headers={{ ...config.headers, 'Content-Type': 'multipart/form-data' }}
+          headers={{ 'Content-Type': 'multipart/form-data', ...config.headers }}
           onDelete={handelOnDelete}
           multiple
           onSuccess={handelOnSuccess}
+          onFailure={handleOnFailure}
           maxCount={27}
         />
       </View>

@@ -27,7 +27,7 @@ const Index: React.FC = () => {
       url: `${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`,
       filePath: result.tempFilePath,
       name: 'file',
-      header: config.headers
+      header: { 'Content-Type': 'multipart/form-data', ...config.headers }
     }).then((res) => {
       const { data } = JSON.parse(res.data)
       const type = router.params.type
@@ -48,6 +48,8 @@ const Index: React.FC = () => {
       }
 
       Taro.navigateBack({ delta: 1 })
+    }).catch(err => {
+      Taro.showToast({ title: err })
     })
   }, [handleSend, router.params.type])
 
