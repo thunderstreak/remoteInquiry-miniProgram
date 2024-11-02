@@ -116,7 +116,7 @@ const Index: React.FC = () => {
             back={handleBack}
             className="pb-0 z-20"
             iconClassName="!w-3 !h-3 top-[5px]"
-            title={<View className="text-[12px]">照片签字</View>}
+            title={<View className="text-[12px] absolute top-0 bottom-0 left-0 right-0 flex-center">照片签字</View>}
           />
         </View>
       </View>
