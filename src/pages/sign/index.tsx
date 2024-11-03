@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import Taro, { useRouter } from '@tarojs/taro'
 import { Button, View } from '@tarojs/components'
 import { WaterMark } from '@nutui/nutui-react-taro'
@@ -17,6 +17,22 @@ const Index: React.FC = () => {
   const signRef = useRef<CanvasSignContext>(null)
   // const router = useRouter()
 
+  const title = useMemo(() => {
+    const type = router.params.type
+    switch (type) {
+      case 'SIGN_MARK':
+      case 'ON_SIGN_MARK':
+        return '通知签备注'
+      case 'SIGN_NAME':
+      case 'ON_SIGN_NAME':
+        return '通知签名'
+      case 'SIGN_TIME':
+      case 'ON_SIGN_TIME':
+        return '通知签日期'
+      default:
+        return '签字'
+    }
+  }, [router.params.type])
   // 确认签名完成
   const onSubmit = useCallback(async () => {
     const result = await signRef.current?.handleSaveImage()
@@ -111,12 +127,12 @@ const Index: React.FC = () => {
     <View className="h-full w-full flex flex-col relative">
       <WaterMark fullPage content="千名千探" />
       <View className="flex-shrink-0 flex flex-col justify-between bg-[#2766CF] h-[24px]">
-        <View className="flex-shrink-0">
+        <View className="flex-shrink-0 h-full">
           <NavHeader
             back={handleBack}
             className="pb-0 z-20"
             iconClassName="!w-3 !h-3 top-[5px]"
-            title={<View className="text-[12px] absolute top-0 bottom-0 left-0 right-0 flex-center">签字</View>}
+            title={<View className="text-[12px] absolute top-0 bottom-0 left-0 right-0 flex-center">{title}</View>}
           />
         </View>
       </View>

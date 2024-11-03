@@ -28,7 +28,7 @@ const NavHeader: React.FC<NavHeaderProps> = (props) => {
     >
       {back && (
         <ArrowLeft
-          className={`block w-[20px] h-[20px] !absolute left-[20px] text-white ${iconClassName}`}
+          className={`block w-[20px] h-[20px] !absolute z-10 left-[20px] text-white ${iconClassName}`}
           onClick={handleToBack}
         />
       )}

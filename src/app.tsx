@@ -10,7 +10,7 @@ const App = ({ children }: PropsWithChildren<any>): ReactNode => {
     await Taro.setVisualEffectOnCapture({
       visualEffect: 'hidden',
       success: () => {
-        Taro.showToast({ title: '禁止截屏', icon: 'none' }).catch(console.log)
+        // Taro.showToast({ title: '禁止截屏', icon: 'none' }).catch(console.log)
       }
     })
 

@@ -63,6 +63,7 @@ export default function Index() {
 
   useEffect(() => {
     handleSendImages()
+    Taro.showToast({ title: '请点击【签字】按钮', icon: 'none' })
   }, [handleSendImages])
 
   useEffect(() => {
