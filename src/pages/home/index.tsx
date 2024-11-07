@@ -7,6 +7,7 @@ import * as Res from '@/@type/response'
 import XYRTC from '@xylink/xy-mp-sdk'
 import { useSelector } from 'react-redux'
 import { selectUserInfo } from '@/store/slice/user'
+import { useSetting } from '@/hooks/useSetting'
 import config from '@/config'
 import HomeApi from '@/api/home'
 import './index.less'
@@ -15,6 +16,7 @@ export default function Index() {
   // const router = useRouter()
   const userInfo = useSelector(selectUserInfo)
   const [list, setList] = useState<Res.RoomQueryRoomList[]>([])
+  const { handleSetting } = useSetting()
   // console.log(router)
   // console.log(userInfo) 9042180858
 
@@ -30,31 +32,38 @@ export default function Index() {
   // }, [userInfo.roomCode, userInfo.roomPassword, userInfo.userName])
 
   // 登陆会议
-  const handleCallNumber = useCallback(async (user: Res.RoomQueryRoomList) => {
-    const { roomCode, roomPassword, userName, id, lawId } = user
-    const XYClient = XYRTC.createClient({
-      report: true,
-      extId: config.DEFAULT_EXTID,
-      appId: config.DEFAULT_APPID
-    })
-    // 登陆
-    const response = await XYClient.loginExternalAccount({
-      extUserId: id,
-      displayName: userName
-    })
-    const { code, data = {} } = response || {}
-    // 状态是200时，初始化登录成功
-    if (code === 200 || code === 'XYSDK:980200') {
-      const cn = data.callNumber
-      console.log(cn)
-      XYClient.showToast('登录成功')
-      await Taro.navigateTo({
-        url: `/pages/conference/index?displayName=${userName}&password=${roomPassword}&number=${roomCode}&videoMute=${false}&audioMute=${false}&lawId=${lawId}`
+  const handleCallNumber = useCallback(
+    async (user: Res.RoomQueryRoomList) => {
+      const res = await handleSetting()
+      if (!res) {
+        return
+      }
+      const { roomCode, roomPassword, userName, id, lawId } = user
+      const XYClient = XYRTC.createClient({
+        report: true,
+        extId: config.DEFAULT_EXTID,
+        appId: config.DEFAULT_APPID
       })
-    } else {
-      XYClient.showToast('登录失败，请稍后重试')
-    }
-  }, [])
+      // 登陆
+      const response = await XYClient.loginExternalAccount({
+        extUserId: id,
+        displayName: userName
+      })
+      const { code, data = {} } = response || {}
+      // 状态是200时，初始化登录成功
+      if (code === 200 || code === 'XYSDK:980200') {
+        const cn = data.callNumber
+        console.log(cn)
+        XYClient.showToast('登录成功')
+        await Taro.navigateTo({
+          url: `/pages/conference/index?displayName=${userName}&password=${roomPassword}&number=${roomCode}&videoMute=${false}&audioMute=${false}&lawId=${lawId}`
+        })
+      } else {
+        XYClient.showToast('登录失败，请稍后重试')
+      }
+    },
+    [handleSetting]
+  )
 
   const handleEntry = useCallback(
     (data: Res.RoomQueryRoomList) => {

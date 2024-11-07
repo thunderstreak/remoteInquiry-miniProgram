@@ -16,6 +16,7 @@ import Login from '@/api/login'
 import { lightTheme } from '@/config'
 import { FormData, LoginState } from '@/pages/login/type'
 import NavHeader from '@/components/NavHeader'
+import { useSetting } from '@/hooks/useSetting'
 import Video from './component/Video/index'
 import './index.less'
 
@@ -37,6 +38,7 @@ export default function Index() {
     times: 8,
     timer: 0
   })
+  const { handleSetting } = useSetting()
 
   const disabled = useMemo(
     () => form.userName === '' || form.cardNo === '',
@@ -121,19 +123,6 @@ export default function Index() {
 
   const handleSubmitFailed = useCallback((error) => {
     console.log(error)
-  }, [])
-
-  const handleSetting = useCallback(async () => {
-    const setting = await Taro.getSetting()
-    if (!setting.authSetting['scope.record']) {
-      await Taro.authorize({ scope: 'scope.record' })
-    }
-    if (!setting.authSetting['scope.userLocation']) {
-      await Taro.authorize({ scope: 'scope.userLocation' })
-    }
-    if (!setting.authSetting['scope.camera']) {
-      await Taro.authorize({ scope: 'scope.camera' })
-    }
   }, [])
 
   useEffect(() => {
