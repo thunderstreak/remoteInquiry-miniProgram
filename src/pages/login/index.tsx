@@ -75,36 +75,13 @@ export default function Index() {
     Taro.navigateTo({ url: `/pages/home/index` }).catch(console.log)
   }, [handleSetDialog])
 
-  // const handleCallNumber = useCallback(
-  //   async (userInfo: Res.Login) => {
-  //     const XYClient = XYRTC.createClient({
-  //       report: true,
-  //       extId: config.DEFAULT_EXTID,
-  //       appId: config.DEFAULT_APPID
-  //     })
-  //     const response = await XYClient.loginExternalAccount({
-  //       extUserId: userInfo.id,
-  //       displayName: userInfo.userName
-  //     })
-  //     const { code, data = {} } = response || {}
-  //     // 状态是200时，初始化登录成功
-  //     if (code === 200 || code === 'XYSDK:980200') {
-  //       const cn = data.callNumber
-  //       console.log(cn)
-  //       XYClient.showToast('登录成功')
-  //       handleNavigateTo()
-  //     } else {
-  //       XYClient.showToast('登录失败，请稍后重试')
-  //     }
-  //   },
-  //   [handleNavigateTo]
-  // )
-
   const handleSubmitSucceed = useCallback(
     (value: FormData) => {
       // Taro.showLoading().catch(console.log)
       setState((v) => ({ ...v, loading: true }))
-      Login.login(value).then((res) => {
+      const { brand, model, system, platform } = Taro.getDeviceInfo()
+      const deviceInfo = `${brand},${model},${system},${platform}`
+      Login.login({ ...value, deviceInfo }).then((res) => {
         const { data } = res
         if (data) {
           const { token } = data
