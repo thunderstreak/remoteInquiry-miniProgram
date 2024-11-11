@@ -13,6 +13,7 @@ export default function Index() {
   const { handleSend } = useSocket()
   const [state, setState] = useState<PhotoState>({
     step: 1,
+    end: 0,
     photo: [],
     markUrl: '',
     nameUrl: '',
@@ -44,7 +45,7 @@ export default function Index() {
       switch (type) {
         case 'UPLOAD':
           const photo = data.map((x) => x.url)
-          setState((v) => ({ ...v, photo }))
+          setState((v) => ({ ...v, photo, end: photo.length ? 1 : 0 }))
           // handleSend({ type: 'ON_UPLOAD', data: photo })
           break
       }
@@ -68,15 +69,18 @@ export default function Index() {
   useEffect(() => {
     // 签备注
     Taro.eventCenter.on('SIGN_MARK', (res) => {
-      setState((v) => ({ ...v, markUrl: res.url }))
+      const { url } = res
+      setState((v) => ({ ...v, markUrl: url, end: url ? 2 : 0 }))
     })
     // 签名
     Taro.eventCenter.on('SIGN_NAME', (res) => {
-      setState((v) => ({ ...v, nameUrl: res.url }))
+      const { url } = res
+      setState((v) => ({ ...v, nameUrl: url, end: url ? 3 : 0 }))
     })
     // 签时间
     Taro.eventCenter.on('SIGN_TIME', (res) => {
-      setState((v) => ({ ...v, timeUrl: res.url }))
+      const { url } = res
+      setState((v) => ({ ...v, timeUrl: url, end: url ? 4 : 0 }))
     })
   }, [])
 
@@ -88,7 +92,7 @@ export default function Index() {
         </View>
       </View>
       <View className="flex-1 flex flex-col bg-white">
-        <Step active={state.step} className="mx-3 mt-6 mb-4" />
+        <Step active={state.step} fulfill={state.end} className="mx-3 mt-6 mb-4" />
         {state.step === 1 ? (
           <UploadImg onNext={handleNext} />
         ) : (

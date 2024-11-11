@@ -82,7 +82,6 @@ export const CanvasSign = forwardRef((props: CanvasSignProps, ref) => {
   useReady(() => {
     setTimeout(() => {
       const query = Taro.createSelectorQuery()
-      Taro.showToast({ title: '请点击【签字】按钮', icon: 'none' })
       query
         .select('#myCanvas')
         .fields({ node: true, size: true })

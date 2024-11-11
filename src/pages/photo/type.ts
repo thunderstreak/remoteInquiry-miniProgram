@@ -8,6 +8,7 @@ export interface responseText {
 
 export interface PhotoState {
   step: number;
+  end: number;
   photo: string[];
   markUrl: string;
   nameUrl: string;

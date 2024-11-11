@@ -1,10 +1,12 @@
 import { View } from '@tarojs/components'
 import { Divider } from '@nutui/nutui-react-taro'
-import React, { memo, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
+import Taro from '@tarojs/taro'
+import { Checklist } from '@nutui/icons-react-taro'
 import { StepProps } from './type'
 
 const Step: React.FC<StepProps> = (props) => {
-  const { active = 1 } = props
+  const { active = 1, fulfill = 0 } = props
   const [state] = useState({
     list: [
       { step: 1, label: '添加照片' },
@@ -13,6 +15,17 @@ const Step: React.FC<StepProps> = (props) => {
       { step: 4, label: '签署日期' }
     ]
   })
+
+  useEffect(() => {
+    if (active !== 1) {
+      Taro.showToast({
+        title: '请点击【签字】按钮',
+        icon: 'none',
+        duration: 2000
+      })
+    }
+  }, [active])
+
   return (
     <View className={`relative h-[76px] ${props.className}`}>
       <View className="pt-2 px-4">
@@ -28,7 +41,7 @@ const Step: React.FC<StepProps> = (props) => {
                   : 'border-[1px] border-solid border-[#DADADA] bg-[#fff] text-[#DADADA]'
               }`}
             >
-              {x.step}
+              {fulfill >= x.step ? <Checklist className="w-2 h-2" /> : x.step}
             </View>
             <View
               className={`font-bold text-[13px] ${
