@@ -387,10 +387,6 @@ export default function Index() {
           </View>
         </View>
       )}
-      <View className="bg-[#1f1f25] h-[20px]">
-        <View>img</View>
-        <View>img</View>
-      </View>
       {newLayout?.map((x, i) => (
         <View key={i}>
           {/* 本地端画面*/}
@@ -423,9 +419,9 @@ export default function Index() {
 
               {!(state.pushUrl && state.isPushed) && !state.videoMute && (
                 <View className="video-bg">
-                  <view className="video-pause-box">
-                    <view> 获取推流中...</view>
-                  </view>
+                  <View className="video-pause-box">
+                    <View> 获取推流中...</View>
+                  </View>
                 </View>
               )}
               {state.pushUrl && state.videoMute && (

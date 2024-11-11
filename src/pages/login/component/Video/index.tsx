@@ -9,7 +9,7 @@ const options = {
 
 const Index: React.FC = () => {
   const [source, setSource] = useState({
-    src: 'https://storage.360buyimg.com/nutui/video/video_NutUI.mp4',
+    src: '',
     type: 'video/mp4'
   })
 

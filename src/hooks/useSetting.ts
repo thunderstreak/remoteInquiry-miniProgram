@@ -15,11 +15,11 @@ export const useSetting = () => {
         authorize = false
       })
     }
-    if (!setting.authSetting['scope.userLocation']) {
-      await Taro.authorize({ scope: 'scope.userLocation' }).catch(() => {
-        authorize = false
-      })
-    }
+    // if (!setting.authSetting['scope.userLocation']) {
+    //   await Taro.authorize({ scope: 'scope.userLocation' }).catch(() => {
+    //     authorize = false
+    //   })
+    // }
     if (!authorize) {
       return Taro.showModal({
         title: '提示',

@@ -23,7 +23,7 @@ const Step: React.FC<StepProps> = (props) => {
           <View key={i} className="flex-col-center gap-2">
             <View
               className={`w-5 h-5 box-border rounded-full text-[12px] text-white flex-center ${
-                active === x.step
+                active >= x.step
                   ? 'bg-[#2E6EF4]'
                   : 'border-[1px] border-solid border-[#DADADA] bg-[#fff] text-[#DADADA]'
               }`}
@@ -32,7 +32,7 @@ const Step: React.FC<StepProps> = (props) => {
             </View>
             <View
               className={`font-bold text-[13px] ${
-                active === x.step ? 'text-[#2E6EF4]' : 'text-[#999999]'
+                active >= x.step ? 'text-[#2E6EF4]' : 'text-[#999999]'
               }`}
             >
               {x.label}

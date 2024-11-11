@@ -15,8 +15,6 @@ import { userActions } from '@/store/slice/user'
 import Login from '@/api/login'
 import { lightTheme } from '@/config'
 import { FormData, LoginState } from '@/pages/login/type'
-import NavHeader from '@/components/NavHeader'
-import { useSetting } from '@/hooks/useSetting'
 import Video from './component/Video/index'
 import './index.less'
 
@@ -38,7 +36,6 @@ export default function Index() {
     times: 8,
     timer: 0
   })
-  const { handleSetting } = useSetting()
 
   const disabled = useMemo(
     () => form.userName === '' || form.cardNo === '',
@@ -103,10 +100,6 @@ export default function Index() {
   }, [])
 
   useEffect(() => {
-    handleSetting().catch(console.log)
-  }, [handleSetting])
-
-  useEffect(() => {
     if (timeLeft > 0 && state.successShow) {
       const intervalId = setInterval(() => {
         setTimeLeft((prevTimeLeft) => prevTimeLeft - 1)
@@ -124,7 +117,7 @@ export default function Index() {
     <ConfigProvider theme={lightTheme} className="h-full">
       <View className="h-full flex flex-col justify-between bg-color">
         <View className="flex-shrink-0">
-          <NavHeader title="千名千探" back={false} />
+          {/* <NavHeader title="千名千探" back={false} />*/}
           <View className="relative mt-[35px]">
             <View className="absolute left-0 right-0 top-4 mx-auto font-bold text-[20px] text-center text-white">
               远程云取证系统
@@ -193,6 +186,7 @@ export default function Index() {
                 placeholder="请输入姓名"
                 type="text"
                 value={form.userName}
+                cursorSpacing={20}
                 onChange={(value) => handleSetFromValue(value, 'userName')}
               />
             </Form.Item>
@@ -214,6 +208,7 @@ export default function Index() {
                 placeholder="请输入证件号码"
                 type="idcard"
                 value={form.cardNo}
+                cursorSpacing={20}
                 onChange={(value) => handleSetFromValue(value, 'cardNo')}
               />
             </Form.Item>
