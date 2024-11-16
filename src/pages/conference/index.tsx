@@ -451,6 +451,7 @@ export default function Index() {
                   autoplay
                   autoPauseIfOpenNative={false}
                   autoPauseIfNavigate={false}
+                  objectFit="fillCrop"
                   onStateChange={handlePlayStateChange}
                   onNetStatus={handlePlayNetStatus}
                   onAudioVolumeNotify={handlePlayAudioVolumeNotify}
