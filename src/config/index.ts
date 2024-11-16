@@ -1,6 +1,10 @@
+export interface ConfigHeaders {
+  tenantCode: string
+  orgCode: string
+}
 export interface IConfig {
   baseURL: string;
-  headers: Record<string, string>;
+  headers: ConfigHeaders;
   DEFAULT_EXTID: string;
   DEFAULT_APPID: string;
   DEFAULT_SERVER: string;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import Taro from '@tarojs/taro'
+import Taro, { useRouter } from '@tarojs/taro'
 import { Image, ScrollView, Text, View } from '@tarojs/components'
 import {
   Button,
@@ -13,7 +13,7 @@ import { Close } from '@nutui/icons-react-taro'
 import { useDispatch } from 'react-redux'
 import { userActions } from '@/store/slice/user'
 import Login from '@/api/login'
-import { lightTheme } from '@/config'
+import config, { lightTheme } from '@/config'
 import { FormData, LoginState } from '@/pages/login/type'
 import Video from './component/Video/index'
 import './index.less'
@@ -36,6 +36,7 @@ export default function Index() {
     times: 8,
     timer: 0
   })
+  const router = useRouter()
 
   const disabled = useMemo(
     () => form.userName === '' || form.cardNo === '',
@@ -98,6 +99,13 @@ export default function Index() {
   const handleSubmitFailed = useCallback((error) => {
     console.log(error)
   }, [])
+
+  useEffect(() => {
+    const { tenantCode = '', orgCode = '' } = router.params
+    config.headers.tenantCode = tenantCode
+    config.headers.orgCode = orgCode
+    console.log(router.params)
+  }, [router.params])
 
   useEffect(() => {
     if (timeLeft > 0 && state.successShow) {
