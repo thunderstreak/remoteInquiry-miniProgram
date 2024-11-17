@@ -152,7 +152,7 @@ export default function Index() {
                 className="text-[16px] font-medium  text-center text-[#3777E1]"
                 onClick={() => handleEntry(x)}
               >
-                进入取证室
+                进入询问室
               </View>
             </View>
           ))}
