@@ -104,7 +104,7 @@ export default function Index() {
           <NavHeader title="千名千探" />
         </View>
         <View className="flex-col-center">
-          <View className="flex-center gap-3 pt-[37px]">
+          <View className="flex-center gap-3 pt-[35px] pb-[25px] mb-[10px] w-[260px] border border-dashed border-white">
             <Image
               className="w-[60px] h-[60px]"
               src={require('../../assets/img/icon_card.png')}
@@ -115,9 +115,9 @@ export default function Index() {
             </View>
           </View>
 
-          <View className="w-[260px]">
+          {/* <View className="w-[260px]">
             <Divider style={{ borderStyle: 'dashed', borderColor: 'white' }} />
-          </View>
+          </View>*/}
           <View className="flex-center gap-2 pb-[33px]">
             <Text className="text-[18px] font-medium text-white">
               身份审核通过

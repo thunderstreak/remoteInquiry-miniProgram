@@ -12,7 +12,7 @@ export interface IConfig {
 
 const config: IConfig = {
   baseURL: process.env.TARO_APP_API, // api地址
-  headers: { tenantCode: '', orgCode: '' },
+  headers: { tenantCode: 'ZY001', orgCode: 'Z01' },
   /**
    * 企业ID
    */
