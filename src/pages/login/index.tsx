@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Taro, { useRouter } from '@tarojs/taro'
-import { Image, ScrollView, Text, View } from '@tarojs/components'
+import {
+  BaseEventOrig,
+  Image,
+  ScrollView,
+  Text,
+  View
+} from '@tarojs/components'
 import {
   Button,
   Checkbox,
@@ -103,7 +109,8 @@ export default function Index() {
     console.log(error)
   }, [])
 
-  const handleGoPage = useCallback((path: string) => {
+  const handleGoPage = useCallback((e: BaseEventOrig, path: string) => {
+    e.stopPropagation()
     Taro.navigateTo({ url: path })
   }, [])
 
@@ -243,10 +250,7 @@ export default function Index() {
           </Form>
 
           <View className="flex-col-center gap-[6px] pb-[20px] pt-[20px]">
-            <View className="text-[#999999] text-[10px] font-normal flex-center">
-              Copyright @ 浙江厚志科技有限公司
-            </View>
-            <View className="">
+            <View className="flex items-center">
               <Checkbox
                 className="!text-[10px] flex items-center gap-1"
                 icon={<CheckNormal className="!w-[12px] !h-[12px] text-[#2040ba]" />}
@@ -256,14 +260,17 @@ export default function Index() {
                 onChange={(val) => setState((v) => ({ ...v, controlled: val }))}
               >
                 我已阅读并同意与
-                <Text className="text-[#2040ba]" onClick={() => handleGoPage('/package/pages/userProtocol/index')}>
+                <Text className="text-[#2040ba]" onClick={(e) => handleGoPage(e, '/package/pages/userProtocol/index')}>
                   《用户协议》
                 </Text>
                 和
-                <Text className="text-[#2040ba]" onClick={() => handleGoPage('/package/pages/privacyPolicy/index')}>
+                <Text className="text-[#2040ba]" onClick={(e) => handleGoPage(e, '/package/pages/privacyPolicy/index')}>
                   《隐私政策》
                 </Text>
               </Checkbox>
+            </View>
+            <View className="text-[#999999] text-[10px] font-normal flex-center">
+              Copyright @ 浙江厚志科技有限公司
             </View>
           </View>
         </View>
