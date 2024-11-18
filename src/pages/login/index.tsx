@@ -3,13 +3,14 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { Image, ScrollView, Text, View } from '@tarojs/components'
 import {
   Button,
+  Checkbox,
   ConfigProvider,
   Dialog,
   Form,
   Input,
   Overlay
 } from '@nutui/nutui-react-taro'
-import { Close } from '@nutui/icons-react-taro'
+import { Checked, CheckNormal, Close } from '@nutui/icons-react-taro'
 import { useDispatch } from 'react-redux'
 import { userActions } from '@/store/slice/user'
 import Login from '@/api/login'
@@ -30,6 +31,7 @@ export default function Index() {
   const [formInstance] = Form.useForm()
   const [form, setForm] = useState(createFormData())
   const [state, setState] = useState<LoginState>({
+    controlled: true,
     loading: false,
     videoShow: false,
     successShow: false,
@@ -75,7 +77,9 @@ export default function Index() {
 
   const handleSubmitSucceed = useCallback(
     (value: FormData) => {
-      // Taro.showLoading().catch(console.log)
+      if (!state.controlled) {
+        return Taro.showToast({ title: '请先阅读并勾选用户服务协议', icon: 'none' })
+      }
       setState((v) => ({ ...v, loading: true }))
       const { brand, model, system, platform } = Taro.getDeviceInfo()
       const deviceInfo = `${brand},${model},${system},${platform}`
@@ -89,15 +93,18 @@ export default function Index() {
           Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' }).catch(console.log)
         }
       }).finally(() => {
-        // Taro.hideLoading()
         setState((v) => ({ ...v, loading: false }))
       })
     },
-    [dispatch]
+    [dispatch, state.controlled]
   )
 
   const handleSubmitFailed = useCallback((error) => {
     console.log(error)
+  }, [])
+
+  const handleGoPage = useCallback((path: string) => {
+    Taro.navigateTo({ url: path })
   }, [])
 
   useEffect(() => {
@@ -154,6 +161,19 @@ export default function Index() {
             >
               直接扫描身份证
             </View>*/}
+            <View className="flex-col-center gap-[6px] pb-[20px] pt-[20px]">
+              <View
+                className="flex-center gap-1"
+                onClick={() => handleSetDialog(true, 'videoShow')}
+              >
+                <Image
+                  className="w-5 h-5"
+                  src={require('../../assets/img/icon_play.png')}
+                />
+                <Text className="text-[12px] text-[#999999]">使用教程</Text>
+              </View>
+
+            </View>
           </View>
           <Form
             form={formInstance}
@@ -221,19 +241,29 @@ export default function Index() {
               />
             </Form.Item>
           </Form>
+
           <View className="flex-col-center gap-[6px] pb-[20px] pt-[20px]">
-            <View
-              className="flex-center gap-1"
-              onClick={() => handleSetDialog(true, 'videoShow')}
-            >
-              <Image
-                className="w-5 h-5"
-                src={require('../../assets/img/icon_play.png')}
-              />
-              <Text className="text-[12px] text-[#999999]">使用教程</Text>
-            </View>
             <View className="text-[#999999] text-[10px] font-normal flex-center">
               Copyright @ 浙江厚志科技有限公司
+            </View>
+            <View className="">
+              <Checkbox
+                className="!text-[10px] flex items-center gap-1"
+                icon={<CheckNormal className="!w-[12px] !h-[12px] text-[#2040ba]" />}
+                activeIcon={<Checked className="!w-[12px] !h-[12px] text-[#2040ba]" />}
+                label=""
+                checked={state.controlled}
+                onChange={(val) => setState((v) => ({ ...v, controlled: val }))}
+              >
+                我已阅读并同意与
+                <Text className="text-[#2040ba]" onClick={() => handleGoPage('/package/pages/userProtocol/index')}>
+                  《用户协议》
+                </Text>
+                和
+                <Text className="text-[#2040ba]" onClick={() => handleGoPage('/package/pages/privacyPolicy/index')}>
+                  《隐私政策》
+                </Text>
+              </Checkbox>
             </View>
           </View>
         </View>

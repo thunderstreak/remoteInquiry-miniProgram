@@ -174,6 +174,7 @@ export interface Login {
   id: string;
   tenantCode: string;
   orgCode: string;
+  orgName: string;
   cardNo: string;
   userName: string;
   roomCode: string;

@@ -14,13 +14,13 @@ export default defineAppConfig({
     SIGN_PAGE_URL,
     CONFERENCE_PAGE_URL
   ],
-  // subPackages: [
-  //   {
-  //     root: 'package',
-  //     name: 'package',
-  //     pages: []
-  //   }
-  // ],
+  subPackages: [
+    {
+      root: 'package',
+      name: 'package',
+      pages: ['pages/userProtocol/index', 'pages/privacyPolicy/index']
+    }
+  ],
   permission: {
     'scope.userLocation': {
       desc: '你的位置信息将用于小程序位置接口的效果展示'

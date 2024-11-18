@@ -158,7 +158,7 @@ export default function Index() {
           ))}
         </View>
         <View className="flex-shrink-0 text-[12px] text-[#999999] font-medium flex-center pb-[40px]">
-          某某分局执法中心
+          {userInfo.orgName}
         </View>
       </View>
     </View>

@@ -361,10 +361,22 @@ export default function Index() {
           case 'NOTICE_UPLOAD': // 通知上传证据
             Taro.navigateTo({ url: '/pages/photo/index' })
             break
+          case 'NOTICE_CLOSE': // 关闭询问
+            Taro.showModal({
+              title: '提示',
+              content: '远程取证已结束!',
+              showCancel: false,
+              confirmText: '知道了'
+            }).then(({ confirm }) => {
+              if (confirm) {
+                hangup()
+              }
+            })
+            break
         }
       })
     })
-  }, [handleCreateSocket, handleOnMessage, router.params])
+  }, [handleCreateSocket, handleOnMessage, hangup, router.params])
 
   return (
     <View className="h-full w-full text-white relative bg-[#1f1f25]">

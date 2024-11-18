@@ -6,6 +6,8 @@ const createInitialState = (): UserState => ({
   id: '',
   tenantCode: '',
   orgCode: '',
+  orgName: '',
+  cardNo: '',
   userName: '',
   roomCode: '',
   roomPassword: '',
