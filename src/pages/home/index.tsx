@@ -103,8 +103,8 @@ export default function Index() {
         <View className="flex-shrink-0">
           <NavHeader title="千名千探" />
         </View>
-        <View className="flex-col-center">
-          <View className="flex-center gap-3 pt-[35px] pb-[25px] mb-[10px] w-[260px] border border-dashed border-white">
+        <View className="flex-col-center pt-[20px]">
+          <View className="flex-center gap-3 py-[25px] mb-[10px] w-[260px] border border-dashed border-white">
             <Image
               className="w-[60px] h-[60px]"
               src={require('../../assets/img/icon_card.png')}
