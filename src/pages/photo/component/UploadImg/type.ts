@@ -10,6 +10,7 @@ export interface NextParams {
 
 export interface UploadImgProps {
   onNext?: (data: NextParams) => void;
+  value?: string[]
 }
 
 export interface UploadImgState {}

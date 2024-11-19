@@ -94,7 +94,7 @@ export default function Index() {
       <View className="flex-1 flex flex-col bg-white">
         <Step active={state.step} fulfill={state.end} className="mx-3 mt-6 mb-4" />
         {state.step === 1 ? (
-          <UploadImg onNext={handleNext} />
+          <UploadImg onNext={handleNext} value={state.photo} />
         ) : (
           <Sign
             step={state.step}

@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { Button, ImagePreview, Uploader } from '@nutui/nutui-react-taro'
+import { Close } from '@nutui/icons-react-taro'
 import { FileItem } from '@nutui/nutui-react-taro/dist/types/packages/uploader/file-item'
 import { UploadOptions } from '@nutui/nutui-react-taro/dist/types/packages/uploader/upload'
 import { responseText } from '@/pages/photo/type'
@@ -73,9 +74,16 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
 
   const handleOnFileItemClick = useCallback((file: FileItem, index: number) => {
     console.log(file, index)
-    // setShowPreview(true)
-    // setInit(index + 1)
+    setShowPreview(true)
+    setInit(index + 1)
   }, [])
+
+  // useEffect(() => {
+  //   if (props.value) {
+  //     const list = props.value
+  //     setPhoto((v) => ([...v, ...list]))
+  //   }
+  // }, [])
 
   return (
     <View className="px-3 pb-6 flex-1 flex flex-col">
@@ -105,12 +113,15 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
         </Button>
       </View>
       <ImagePreview
-        autoPlay
+        autoPlay={false}
         images={previewImages}
         visible={showPreview}
+        value={init}
         defaultValue={init}
         onClose={() => setShowPreview(false)}
         indicator
+        closeIcon={<Close />}
+        closeIconPosition="bottom"
       />
     </View>
   )
