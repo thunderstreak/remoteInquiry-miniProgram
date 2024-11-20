@@ -28,15 +28,7 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
     setPhoto(fileList)
   }, [])
   const handleOnChange = useCallback((fileList: FileItem[]) => {
-    const successList = fileList.filter((x) => x.status === 'success')
-    if (successList.length) {
-      const list = successList.map(x => {
-        const result = x.responseText as XMLHttpRequest['responseText'] as unknown as responseText
-        const { data } = JSON.parse(result.data)
-        return createFileItem({ url: data.url, uid: data.id, name: data.url })
-      })
-      setPhoto(list)
-    }
+    setPhoto(fileList)
   }, [])
   // const handelOnSuccess = useCallback(
   //   (param: {
@@ -66,7 +58,14 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
 
   const handleNext = useCallback(() => {
     if (photo.length) {
-      const data = photo.map((x) => ({ url: x.url ?? '', id: x.uid }))
+      // 合并，responseText代表走上传添加，responseText不存在代表通过props添加
+      const urlList = photo.filter(x => !x.responseText)
+      const textList = photo.filter(x => x.responseText).map(x => {
+        const result = x.responseText as XMLHttpRequest['responseText'] as unknown as responseText
+        const { data } = JSON.parse(result.data)
+        return createFileItem({ url: data.url, uid: data.id, name: data.url })
+      })
+      const data = [...urlList, ...textList].map((x) => ({ url: x.url ?? '', id: x.uid }))
       console.log(data)
       props?.onNext?.({ type: 'UPLOAD', data })
     }
