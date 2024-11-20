@@ -270,7 +270,7 @@ export default function Index() {
               </Checkbox>
             </View>
             <View className="text-[#999999] text-[10px] font-normal flex-center">
-              Copyright @ 浙江厚志科技有限公司
+              Copyright @ 浙江厚志科技有限公司版权所有
             </View>
           </View>
         </View>
