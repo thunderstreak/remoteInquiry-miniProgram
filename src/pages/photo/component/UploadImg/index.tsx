@@ -120,7 +120,7 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
         defaultValue={init}
         onClose={() => setShowPreview(false)}
         indicator
-        closeIcon={<Close />}
+        closeIcon={<View className="w-[40px] h-[40px] rounded-full flex-center bg-[#c1c1c1]"><Close /></View>}
         closeIconPosition="bottom"
       />
     </View>
