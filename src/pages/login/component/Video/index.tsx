@@ -9,7 +9,7 @@ const options = {
 
 const Index: React.FC = () => {
   const [source, setSource] = useState({
-    src: '',
+    src: 'https://www.zjhzkjyx.com/file/qianming/video/video_0001.mp4',
     type: 'video/mp4'
   })
 

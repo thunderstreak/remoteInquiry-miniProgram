@@ -366,7 +366,7 @@ export default function Index() {
               title: '提示',
               content: '远程取证已结束!',
               showCancel: false,
-              confirmText: '知道了'
+              confirmText: '确定'
             }).then(({ confirm }) => {
               if (confirm) {
                 hangup()
