@@ -1,7 +1,7 @@
 {
   "miniprogramRoot": "dist/",
-  "projectname": "ubq mini",
-  "description": "ubq mini",
+  "projectname": "remote inquiry",
+  "description": "remote inquiry",
   "appid": "wx5572e840615ac0d6",
   "setting": {
     "urlCheck": true,

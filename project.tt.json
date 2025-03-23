@@ -1,6 +1,6 @@
 {
   "miniprogramRoot": "./",
-  "projectname": "ubq mini",
+  "projectname": "remote inquiry",
   "appid": "wx5572e840615ac0d6",
   "setting": {
     "es6": false,

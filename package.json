@@ -1,8 +1,8 @@
 {
-  "name": "ubq_mini",
+  "name": "remote-inquiry",
   "version": "1.0.0",
   "private": true,
-  "description": "ubq mini",
+  "description": "remote inquiry",
   "templateInfo": {
     "name": "default",
     "typescript": true,
