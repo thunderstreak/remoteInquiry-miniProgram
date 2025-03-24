@@ -130,7 +130,7 @@ export default function Index() {
         </View>
       </View>
       <View className="flex-1 flex flex-col rounded-t-[20px] bg-color pt-[25px] px-3">
-        <View className="flex-1">
+        <View className="flex-1 flex flex-col gap-2">
           {list.map((x, i) => (
             <View className="rounded-[8px] bg-white py-3" key={i}>
               <View className="px-4 flex flex-col gap-2 text-[13px] font-medium">
