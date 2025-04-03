@@ -115,7 +115,7 @@ export default function Index() {
   }, [])
 
   useEffect(() => {
-    const { tenantCode = 'ZY001', orgCode = 'Z01' } = router.params
+    const { tenantCode = 'ZY001', orgCode = 'YTkzph' } = router.params
     config.headers.tenantCode = tenantCode
     config.headers.orgCode = orgCode
     console.log(router.params)
