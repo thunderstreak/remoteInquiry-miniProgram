@@ -37,7 +37,7 @@ export const requestConfigInterceptors = (
   const token = Taro.getStorageSync('userInfo').token
 
   if (token) {
-    config.headers.token = token
+    config.headers.Authorization = token
   }
   config.headers.tenantCode = Config.headers.tenantCode
   config.headers.orgCode = Config.headers.orgCode

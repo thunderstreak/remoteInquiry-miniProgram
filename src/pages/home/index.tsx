@@ -10,6 +10,7 @@ import { selectUserInfo } from '@/store/slice/user'
 import { useSetting } from '@/hooks/useSetting'
 import config from '@/config'
 import HomeApi from '@/api/home'
+import CommonApi from '@/api/common'
 import './index.less'
 
 export default function Index() {
@@ -88,6 +89,15 @@ export default function Index() {
     })
   }, [userInfo.cardNo, userInfo.userName])
 
+  const handleGetSignTemplate = useCallback(() => {
+    CommonApi.getSaasInfo().then((res) => {
+      const { data } = res
+      if (data) {
+        Taro.setStorageSync('REMARK_TEMPLATE', data.xwtzs_remark)
+      }
+    })
+  }, [])
+
   usePullDownRefresh(async () => {
     await handleGetRoomList()
     Taro.stopPullDownRefresh()
@@ -95,7 +105,8 @@ export default function Index() {
 
   useEffect(() => {
     handleGetRoomList()
-  }, [handleGetRoomList])
+    handleGetSignTemplate()
+  }, [handleGetRoomList, handleGetSignTemplate])
 
   return (
     <View className="h-full w-full flex flex-col bg-[#2766CF]">

@@ -4,14 +4,19 @@ import { Button, View } from '@tarojs/components'
 import { WaterMark } from '@nutui/nutui-react-taro'
 import NavHeader from '@/components/NavHeader'
 import config from '@/config/index'
-
+import { useSelector } from 'react-redux'
+import { selectUserInfo } from '@/store/slice/user'
 import { useSocket } from '@/utils/socket'
+import dayjs from 'dayjs'
+
 import { CanvasSign } from './CanvasSign'
-import { CanvasSignContext } from './CanvasSign/type' // import './index.less'
+import { CanvasSignContext } from './CanvasSign/type'
+
 // import './index.less'
 
 const Index: React.FC = () => {
   const { handleSend } = useSocket()
+  const userInfo = useSelector(selectUserInfo)
   const router = useRouter()
   const rect = useRef({ width: 0, height: 0 })
   const signRef = useRef<CanvasSignContext>(null)
@@ -33,6 +38,33 @@ const Index: React.FC = () => {
         return '签字'
     }
   }, [router.params.type])
+
+  const signTemplate = useMemo(() => {
+    const type = router.params.type
+    switch (type) {
+      case 'ON_SIGN_NAME': // 签名
+        const name = userInfo.userName.split('') || []
+        if (name.length > 4) {
+          return <View className="flex-1 h-full flex-center text-[32px]">
+            <View className="w-full h-full flex-center text-[#CECECE] text-center">{name}</View>
+          </View>
+        }
+        return name.map((x, i) => <View key={i} className="flex-1 h-full flex-center border-solid border-[1px] border-[#CECECE] bg-[#efefef] text-[72px] relative">
+          <View className="absolute h-full w-[1px] left-[calc(50%-1px)] bg-[#CECECE]" />
+          <View className="absolute w-full h-[1px] top-[calc(50%+1px)] bg-[#CECECE]" />
+          <View className="absolute top-0 left-0 right-0 bottom-0 m-auto w-full h-full flex-center text-[#CECECE]">{x}</View>
+        </View>)
+      case 'ON_SIGN_TIME': // 签日期
+        return <View className="flex-1 h-full flex-center text-[52px] bg-[#efefef]">
+          <View className="w-full h-full flex-center text-[#CECECE]">{dayjs().format('YYYY.MM.DD')}</View>
+        </View>
+      case 'ON_SIGN_MARK': // 签备注
+        return <View className="flex-1 h-full flex-center text-[32px]">
+          <View className="w-full h-full flex-center text-[#CECECE] text-center">{Taro.getStorageSync<string>('REMARK_TEMPLATE')}</View>
+        </View>
+    }
+  }, [router.params.type, userInfo.userName])
+
   // 确认签名完成
   const onSubmit = useCallback(async () => {
     const result = await signRef.current?.handleSaveImage()
@@ -137,14 +169,8 @@ const Index: React.FC = () => {
         </View>
       </View>
       <View className="flex-1 flex flex-col border-dashed border-[1px] border-[#2766CF] m-[6px] rounded overflow-hidden">
-        <View className="h-full p-2 flex items-center justify-between gap-2">
-          {
-            Array.from({ length: 3 }).fill(0).map((x, i) => <View key={i} className="flex-1 h-full flex-center border-solid border-[1px] border-[red] text-[72px] relative">
-              <View className="absolute h-full w-[1px] left-[calc(50%-1px)] bg-[#000]" />
-              <View className="absolute w-full h-[1px] top-[calc(50%+1px)] bg-[#000]" />
-              <View className="absolute top-0 left-0 right-0 bottom-0 m-auto w-full h-full flex-center">王</View>
-            </View>)
-          }
+        <View className="h-full p-2 flex-center gap-2">
+          {signTemplate}
 
         </View>
         <CanvasSign

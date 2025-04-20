@@ -342,13 +342,8 @@ export interface GetUserAssetList {
   totalNum: number;
 }
 
-export interface CheckGiftToken {
-  /**
-   * 展示图
-   */
-  coverImg: string;
-  /**
-   * NFR名称
-   */
-  name: string;
+export interface GetSaasInfo {
+  orgCode: string
+  tenantCode: string
+  xwtzs_remark: string
 }
