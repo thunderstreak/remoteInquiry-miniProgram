@@ -7,7 +7,7 @@ import config from '@/config/index'
 
 import { useSocket } from '@/utils/socket'
 import { CanvasSign } from './CanvasSign'
-import { CanvasSignContext } from './CanvasSign/type'
+import { CanvasSignContext } from './CanvasSign/type' // import './index.less'
 // import './index.less'
 
 const Index: React.FC = () => {
@@ -130,13 +130,23 @@ const Index: React.FC = () => {
         <View className="flex-shrink-0 h-full">
           <NavHeader
             back={handleBack}
-            className="pb-0 z-20"
+            className="!pb-0 !pt-0 z-20 h-full"
             iconClassName="!w-3 !h-3 top-[5px]"
             title={<View className="text-[12px] absolute top-0 bottom-0 left-0 right-0 flex-center">{title}</View>}
           />
         </View>
       </View>
-      <View className="flex-1 border-dashed border-[1px] border-[#2766CF] m-[6px] rounded overflow-hidden">
+      <View className="flex-1 flex flex-col border-dashed border-[1px] border-[#2766CF] m-[6px] rounded overflow-hidden">
+        <View className="h-full p-2 flex items-center justify-between gap-2">
+          {
+            Array.from({ length: 3 }).fill(0).map((x, i) => <View key={i} className="flex-1 h-full flex-center border-solid border-[1px] border-[red] text-[72px] relative">
+              <View className="absolute h-full w-[1px] left-[calc(50%-1px)] bg-[#000]" />
+              <View className="absolute w-full h-[1px] top-[calc(50%+1px)] bg-[#000]" />
+              <View className="absolute top-0 left-0 right-0 bottom-0 m-auto w-full h-full flex-center">王</View>
+            </View>)
+          }
+
+        </View>
         <CanvasSign
           className="absolute top-0 left-0 right-0 bottom-0"
           ref={signRef}
