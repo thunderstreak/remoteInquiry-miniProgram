@@ -92,8 +92,7 @@ export default function Index() {
       Login.login({ ...value, deviceInfo }).then((res) => {
         const { data } = res
         if (data) {
-          const { token } = data
-          Taro.setStorageSync('TOKEN', token)
+          Taro.setStorageSync('userInfo', data)
           dispatch(userActions.setUserInfo(data))
           setState((v) => ({ ...v, successShow: true }))
           Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' }).catch(console.log)
