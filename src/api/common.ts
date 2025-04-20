@@ -28,6 +28,13 @@ class CommonApi {
   >('/api/v1/record/updateFingerUrl')
 
   /*
+   * 身份证ocr - 阿里
+   * */
+  cardOcr = wrapperPost<Req.CardOcr, Com.ResponseData<Res.CardOcr>>(
+    '/api/v1/aliyun/cardOcr'
+  )
+
+  /*
    * 图片上传
    * */
   fileUpload = (tempFilePath: string) =>
