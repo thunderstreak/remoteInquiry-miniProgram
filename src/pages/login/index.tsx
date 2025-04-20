@@ -113,6 +113,10 @@ export default function Index() {
     Taro.navigateTo({ url: path })
   }, [])
 
+  const handleVerifyId = useCallback(() => {
+    Taro.navigateTo({ url: '/pages/' })
+  }, [])
+
   useEffect(() => {
     const { tenantCode = 'ZY001', orgCode = 'Z01' } = router.params
     config.headers.tenantCode = tenantCode
@@ -215,14 +219,21 @@ export default function Index() {
                 { message: '请输入姓名' }
               ]}
             >
-              <Input
-                className="nut-input-text"
-                placeholder="请输入姓名"
-                type="text"
-                value={form.userName}
-                cursorSpacing={20}
-                onChange={(value) => handleSetFromValue(value, 'userName')}
-              />
+              <View className="flex-center">
+                <Input
+                  className="nut-input-text flex-1"
+                  placeholder="请输入姓名"
+                  type="text"
+                  value={form.userName}
+                  cursorSpacing={20}
+                  onChange={(value) => handleSetFromValue(value, 'userName')}
+                />
+                <Image
+                  onClick={handleVerifyId}
+                  className="w-5 h-5 block rounded shrink-0"
+                  src={require('../../assets/img/icon_verify.png')}
+                />
+              </View>
             </Form.Item>
             <Form.Item
               label={

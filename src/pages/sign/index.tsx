@@ -3,10 +3,11 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { Button, View } from '@tarojs/components'
 import { WaterMark } from '@nutui/nutui-react-taro'
 import NavHeader from '@/components/NavHeader'
-import config from '@/config/index'
+// import config from '@/config/index'
 import { useSelector } from 'react-redux'
 import { selectUserInfo } from '@/store/slice/user'
 import { useSocket } from '@/utils/socket'
+import CommonApi from '@/api/common'
 import dayjs from 'dayjs'
 
 import { CanvasSign } from './CanvasSign'
@@ -71,13 +72,14 @@ const Index: React.FC = () => {
     if (!result) {
       return console.error('签名失败')
     }
-    Taro.uploadFile({
-      url: `${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`,
-      filePath: result.tempFilePath,
-      name: 'file',
-      header: { 'Content-Type': 'multipart/form-data', ...config.headers }
-    }).then((res) => {
-      const { data } = JSON.parse(res.data)
+    // Taro.uploadFile({
+    //   url: `${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`,
+    //   filePath: result.tempFilePath,
+    //   name: 'file',
+    //   header: { 'Content-Type': 'multipart/form-data', ...config.headers }
+    // })
+    CommonApi.fileUpload(result.tempFilePath).then((res) => {
+      const { data } = res
       const type = router.params.type
       console.log('type===>', type)
       switch (type) {

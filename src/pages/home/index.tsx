@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import Taro, { usePullDownRefresh } from '@tarojs/taro'
-import { Divider } from '@nutui/nutui-react-taro'
+import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro'
+import { Button, Divider } from '@nutui/nutui-react-taro'
 import { Image, Text, View } from '@tarojs/components'
 import NavHeader from '@/components/NavHeader'
 import * as Res from '@/@type/response'
@@ -98,15 +98,30 @@ export default function Index() {
     })
   }, [])
 
+  const handleUploadFinger = useCallback((data: Res.RoomQueryRoomList) => {
+    const { fingerUrl, isShowFinger } = data
+    if (isShowFinger && !fingerUrl) {
+      Taro.navigateTo({ url: '/pages/' })
+    }
+  }, [])
+
+  const handleGetAllInfo = useCallback(() => {
+    handleGetRoomList().catch(console.log)
+    handleGetSignTemplate()
+  }, [handleGetRoomList, handleGetSignTemplate])
+
   usePullDownRefresh(async () => {
     await handleGetRoomList()
     Taro.stopPullDownRefresh()
   })
 
+  useDidShow(() => {
+    handleGetAllInfo()
+  })
+
   useEffect(() => {
-    handleGetRoomList()
-    handleGetSignTemplate()
-  }, [handleGetRoomList, handleGetSignTemplate])
+    handleGetAllInfo()
+  }, [handleGetAllInfo])
 
   return (
     <View className="h-full w-full flex flex-col bg-[#2766CF]">
@@ -115,29 +130,33 @@ export default function Index() {
           <NavHeader title="千名千探" />
         </View>
         <View className="flex-col-center pt-[20px]">
-          <View className="flex-center gap-3 py-[25px] mb-[10px] w-[260px] border border-dashed border-white">
+          <View className="flex-center gap-3 py-[25px] mb-[10px] w-[260px]">
             <Image
-              className="w-[60px] h-[60px]"
+              className="w-[72px] h-[80px]"
               src={require('../../assets/img/icon_card.png')}
             />
             <View className="flex flex-col text-white text-[16px] font-normal gap-[6px]">
-              <View>{userInfo.userName}</View>
-              <View>{userInfo.cardNo}</View>
+              <View className="text-[14px] text-[#CECECE]">
+                {userInfo.userName}
+              </View>
+              <View className="text-[14px] text-[#CECECE]">
+                {userInfo.cardNo}
+              </View>
+              <View className="flex items-center gap-2">
+                <Text className="text-[18px] font-medium text-white">
+                  身份审核通过
+                </Text>
+                <Image
+                  className="w-5 h-5"
+                  src={require('../../assets/img/icon_safety.png')}
+                />
+              </View>
             </View>
           </View>
 
           {/* <View className="w-[260px]">
             <Divider style={{ borderStyle: 'dashed', borderColor: 'white' }} />
           </View>*/}
-          <View className="flex-center gap-2 pb-[33px]">
-            <Text className="text-[18px] font-medium text-white">
-              身份审核通过
-            </Text>
-            <Image
-              className="w-5 h-5"
-              src={require('../../assets/img/icon_safety.png')}
-            />
-          </View>
         </View>
       </View>
       <View className="flex-1 flex flex-col rounded-t-[20px] bg-color pt-[25px] px-3">
@@ -145,25 +164,80 @@ export default function Index() {
           {list.map((x, i) => (
             <View className="rounded-[8px] bg-white py-3" key={i}>
               <View className="px-4 flex flex-col gap-2 text-[13px] font-medium">
-                <View className="flex items-center justify-between ">
-                  <Image
-                    className="w-5 h-5"
-                    src={require('../../assets/img/icon_copy.png')}
-                  />
-                  <View className="text-white text-[12px] font-medium py-1 px-2 rounded bg-[#FA913A]">
-                    待进入
+                <View className="flex items-center justify-end ">
+                  <View className="text-[#0F40F5] text-[12px] font-medium py-[2px] px-2 rounded bg-[#FCCA00] border-[1px] border-solid border-[#0F40F5]">
+                    取证中
                   </View>
                 </View>
-                <View>案件编号：{x.lawCode}</View>
-                <View>案件名称：{x.lawName}</View>
-                <View>预约时间：{x.createName}</View>
+                <View className="flex-center gap-3">
+                  <Image
+                    className="w-[66px] h-[66px]"
+                    src={require('../../assets/img/icon_case.png')}
+                  />
+                  <View className="flex-1 flex flex-col gap-[6px]">
+                    <View className="text-[14px]">
+                      <Text className="text-[#6C6C6C]">案件编号：</Text>
+                      {x.lawCode}
+                    </View>
+                    <View className="text-[14px]">
+                      <Text className="text-[#6C6C6C]">案件名称：</Text>
+                      {x.lawName}
+                    </View>
+                    <View className="text-[14px]">
+                      <Text className="text-[#6C6C6C]">预约时间：</Text>
+                      {x.createTime}
+                    </View>
+                  </View>
+                </View>
               </View>
               <Divider style={{ borderColor: '#E9E9E9', margin: '10px 0' }} />
-              <View
-                className="text-[16px] font-medium  text-center text-[#3777E1]"
-                onClick={() => handleEntry(x)}
-              >
-                进入询问室
+              {x.isShowFinger ? (
+                <View className="flex flex-col px-3">
+                  <View className="pb-[10px] text-[12px] text-[#6C6C6C]">
+                    根据取证要求，进入取证室需要完成：
+                  </View>
+                  <View className="border border-solid border-[#BBBBBB] rounded-[5px] px-5 py-[18px] flex-center">
+                    <View className="flex items-center gap-4 flex-1">
+                      <Image
+                        className="w-[34px] h-[34px]"
+                        src={require('../../assets/img/icon_finger.png')}
+                      />
+                      <View className="flex flex-col gap-1">
+                        <View className="text-[14px] text-[#333333]">
+                          指纹上传
+                        </View>
+                        <View className="text-[12px] text-[#6C6C6C]">
+                          请上传本人指纹
+                        </View>
+                      </View>
+                    </View>
+                    <View
+                      className="text-[14px]"
+                      onClick={() => handleUploadFinger(x)}
+                    >
+                      {x.fingerUrl ? (
+                        <Text className="text-[#6C6C6C] font-bold">已上传</Text>
+                      ) : (
+                        <Text className="text-[#0F40F5] font-bold">
+                          去采集&gt;
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              ) : null}
+
+              <View className="px-3 py-8">
+                <Button
+                  block
+                  type="primary"
+                  disabled={!x.fingerUrl}
+                  color={x.fingerUrl ? '#3777E1' : '#9BBBF0'}
+                  className="!h-[52px] !rounded-[10px] border-0"
+                  onClick={() => handleEntry(x)}
+                >
+                  进入取证室
+                </Button>
               </View>
             </View>
           ))}

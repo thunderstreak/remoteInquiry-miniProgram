@@ -5,6 +5,7 @@ import Step from '@/components/Step'
 import { PhotoState } from '@/pages/photo/type'
 import NavHeader from '@/components/NavHeader'
 import { useSocket } from '@/utils/socket'
+import { UploadResponse } from '@/@type/common'
 import UploadImg from './component/UploadImg'
 import Sign from './component/Sign'
 // import './index.less'
@@ -68,17 +69,17 @@ export default function Index() {
 
   useEffect(() => {
     // 签备注
-    Taro.eventCenter.on('SIGN_MARK', (res) => {
+    Taro.eventCenter.on('SIGN_MARK', (res: UploadResponse) => {
       const { url } = res
       setState((v) => ({ ...v, markUrl: url, end: url ? 2 : 0 }))
     })
     // 签名
-    Taro.eventCenter.on('SIGN_NAME', (res) => {
+    Taro.eventCenter.on('SIGN_NAME', (res: UploadResponse) => {
       const { url } = res
       setState((v) => ({ ...v, nameUrl: url, end: url ? 3 : 0 }))
     })
     // 签时间
-    Taro.eventCenter.on('SIGN_TIME', (res) => {
+    Taro.eventCenter.on('SIGN_TIME', (res: UploadResponse) => {
       const { url } = res
       setState((v) => ({ ...v, timeUrl: url, end: url ? 4 : 0 }))
     })
