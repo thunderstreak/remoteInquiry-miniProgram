@@ -16,7 +16,7 @@ class CommonApi {
   /*
    * 提取的指纹图片
    * */
-  fingerPrint = wrapperPost<Req.FingerPrint, Com.ResponseData<Res.FingerPrint>>(
+  fingerPrint = wrapperPost<Req.FingerPrint, Com.ResponseData<string>>(
     '/api/v1/aliyun/fingerPrint'
   )
   /*

@@ -223,4 +223,13 @@ export interface GetSaasInfo {
 }
 export interface FingerPrint{}
 export interface UpdateFingerUrl{}
-export interface CardOcr{}
+export interface CardOcr{
+  address: string
+  birthDate: string
+  ethnicity: string
+  idNumber: string
+  issueAuthority: string | null
+  name: string
+  sex: string
+  validPeriod: string | null
+}

@@ -70,3 +70,8 @@ export const transformPxToRpx = (px: number) => {
   }
   return `${px * 2}rpx`
 }
+
+export const hiddenLoadingCatch = <T>(err: T) => {
+  Taro.hideLoading()
+  return err
+}
