@@ -14,11 +14,10 @@ const App = ({ children }: PropsWithChildren<any>): ReactNode => {
       }
     })
 
-    Taro.getSystemInfo().then((res) => {
-      if (res.platform === 'ios') {
-        handleGetScreenRecordingState()
-      }
-    })
+    const res = Taro.getDeviceInfo()
+    if (res.platform === 'ios') {
+      handleGetScreenRecordingState()
+    }
   })
 
   const handleGetScreenRecordingState = useCallback(() => {

@@ -208,147 +208,28 @@ export interface RoomQueryRoomList {
   roomCode: string;
   roomName: string;
   roomPassword: string;
+  lawPeopleRecordNumId:string;
+  isFinger: 0 | 1; // 是否指纹进入（0不需要，1需要）
+  isFace: 0 | 1;// 是否需要人脸识别（0不需要，1需要） isFinger;
+  fingerUrl: string;// 指纹地址（为空，表示指纹未上传）
+  isShowFace: 0 | 1;// 是否调用人脸识别（0不调用，1调用） 根据isShowFace判断是否调用人脸，isShowFinger判断是否显示“去采集”
+  isShowFinger: 0 | 1;// 是否显示指纹采集（0不显示，1显示）
 }
 
-export interface MaterialList {
-  /**
-   * 图片
-   */
-  coverImg: string;
-  /**
-   * 材料编号
-   */
-  materialNo: string;
-  /**
-   * 材料名称
-   */
-  name: string;
-  /**
-   * 用户收集材料数量
-   */
-  userMaterialNum: number;
+export interface GetSaasInfo {
+  orgCode: string
+  tenantCode: string
+  xwtzs_remark: string
 }
-
-export interface TaskList {
-  /**
-   * 结束时间
-   */
-  deadline: number;
-  /**
-   * 任务说明
-   */
-  describe: string;
-  /**
-   * 材料列表
-   */
-  materialList: MaterialList[];
-  /**
-   * 任务名称
-   */
-  name: string;
-  /**
-   * 规则介绍
-   */
-  ruleIntroduction: string;
-  /**
-   * 展示图
-   */
-  showImg: string;
-  /**
-   * 开始时间
-   */
-  startTime: number;
-  /**
-   * 状态
-   */
-  status: string;
-  /**
-   * 任务编号
-   */
-  taskNo: string;
-  /**
-   * 总共材料
-   */
-  totalMaterialNum: number;
-  /**
-   * 任务类型
-   */
-  type: string;
-  /**
-   * 用户收集材料数
-   */
-  userMaterialNum: number;
-}
-
-/**
- * 奖励组列表
- */
-
-export interface PageRewardRecord {
-  /**
-   * nfr编号
-   */
-  auctionNo?: string;
-  /**
-   * 展示图
-   */
-  coverImg?: string;
-  /**
-   * nfr名称
-   */
-  nfrName?: string;
-  /**
-   * 奖励时间，奖励时间
-   */
-  rewardTime?: string;
-  /**
-   * 链上地址
-   */
-  serialNum?: string;
-}
-
-export interface AssetList {
-  /**
-   * 资产数量
-   */
-  assetNum: number;
-  /**
-   * 图片
-   */
-  coverImg: string;
-  /**
-   * nfr名称
-   */
-  metaProductName: string;
-  /**
-   * 编号
-   */
-  metaProductNo: string;
-}
-
-export interface GetUserAssetList {
-  /**
-   * 资产列表
-   */
-  assetList: AssetList[];
-  /**
-   * 活动名称
-   */
-  taskName: string;
-  taskNo: string;
-  /**
-   * 总共数量
-   */
-  totalNum: number;
-}
-
-export interface CheckGiftToken {
-  /**
-   * 展示图
-   */
-  coverImg: string;
-  /**
-   * NFR名称
-   */
-  name: string;
+export interface FingerPrint{}
+export interface UpdateFingerUrl{}
+export interface CardOcr{
+  address: string
+  birthDate: string
+  ethnicity: string
+  idNumber: string
+  issueAuthority: string | null
+  name: string
+  sex: string
+  validPeriod: string | null
 }

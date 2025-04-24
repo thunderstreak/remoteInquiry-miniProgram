@@ -19,9 +19,12 @@ import {
 import { Checked, CheckNormal, Close } from '@nutui/icons-react-taro'
 import { useDispatch } from 'react-redux'
 import { userActions } from '@/store/slice/user'
-import Login from '@/api/login'
+import LoginApi from '@/api/login'
+import CommonApi from '@/api/common'
 import config, { lightTheme } from '@/config'
 import { FormData, LoginState } from '@/pages/login/type'
+import type * as Res from '@/@type/response'
+import { hiddenLoadingCatch } from '@/utils'
 import Video from './component/Video/index'
 import './index.less'
 
@@ -82,14 +85,14 @@ export default function Index() {
   }, [handleSetDialog])
 
   const handleSubmitSucceed = useCallback(
-    (value: FormData) => {
+    () => {
       if (!state.controlled) {
         return Taro.showToast({ title: '请先阅读并勾选用户服务协议', icon: 'none' })
       }
       setState((v) => ({ ...v, loading: true }))
       const { brand, model, system, platform } = Taro.getDeviceInfo()
       const deviceInfo = `${brand},${model},${system},${platform}`
-      Login.login({ ...value, deviceInfo }).then((res) => {
+      LoginApi.login({ ...form, deviceInfo }).then((res) => {
         const { data } = res
         if (data) {
           Taro.setStorageSync('userInfo', data)
@@ -101,7 +104,7 @@ export default function Index() {
         setState((v) => ({ ...v, loading: false }))
       })
     },
-    [dispatch, state.controlled]
+    [dispatch, form, state.controlled]
   )
 
   const handleSubmitFailed = useCallback((error) => {
@@ -113,11 +116,36 @@ export default function Index() {
     Taro.navigateTo({ url: path })
   }, [])
 
+  const handleVerifyId = useCallback(async () => {
+    // Taro.navigateTo({ url: '/pages/' })
+    Taro.showLoading()
+    const { tempFiles } = await Taro.chooseMessageFile({ count: 1, type: 'image' }).catch(hiddenLoadingCatch<ReturnType<typeof Taro.chooseMessageFile>>)
+    if (!tempFiles) {
+      return
+    }
+    const { data } = await CommonApi.fileUpload(tempFiles[0].path).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.fileUpload>>)
+    if (!data || !data.url) {
+      return
+    }
+    await CommonApi.cardOcr({ cardUrl: 'https://img.alicdn.com/tfs/TB1q5IeXAvoK1RjSZFNXXcxMVXa-483-307.jpg' }).then((res) => {
+      const { data: result } = res
+      if (result) {
+        Taro.eventCenter.trigger('ON_OCR_CARD', { ...result })
+      }
+    }).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.cardOcr>>)
+    Taro.hideLoading()
+  }, [])
+
   useEffect(() => {
     const { tenantCode = 'ZY001', orgCode = 'Z01' } = router.params
     config.headers.tenantCode = tenantCode
     config.headers.orgCode = orgCode
     console.log(router.params)
+
+    Taro.eventCenter.on('ON_OCR_CARD', (res: Res.CardOcr) => {
+      setForm(v => ({ ...v, cardNo: res.idNumber, userName: res.name }))
+      // formInstance.setFieldsValue({ cardNo: res.idNumber, userName: res.name })
+    })
   }, [router.params])
 
   useEffect(() => {
@@ -215,14 +243,21 @@ export default function Index() {
                 { message: '请输入姓名' }
               ]}
             >
-              <Input
-                className="nut-input-text"
-                placeholder="请输入姓名"
-                type="text"
-                value={form.userName}
-                cursorSpacing={20}
-                onChange={(value) => handleSetFromValue(value, 'userName')}
-              />
+              <View className="flex-center gap-2">
+                <Input
+                  className="nut-input-text flex-1"
+                  placeholder="请输入姓名"
+                  type="text"
+                  value={form.userName}
+                  cursorSpacing={20}
+                  onChange={(value) => handleSetFromValue(value, 'userName')}
+                />
+                <Image
+                  onClick={handleVerifyId}
+                  className="w-5 h-5 block rounded shrink-0"
+                  src={require('../../assets/img/icon_verify.png')}
+                />
+              </View>
             </Form.Item>
             <Form.Item
               label={
@@ -237,14 +272,16 @@ export default function Index() {
                 { message: '请输入证件号码' }
               ]}
             >
-              <Input
-                className="nut-input-text"
-                placeholder="请输入证件号码"
-                type="idcard"
-                value={form.cardNo}
-                cursorSpacing={20}
-                onChange={(value) => handleSetFromValue(value, 'cardNo')}
-              />
+              <View className="flex-center">
+                <Input
+                  className="nut-input-text"
+                  placeholder="请输入证件号码"
+                  type="idcard"
+                  value={form.cardNo}
+                  cursorSpacing={20}
+                  onChange={(value) => handleSetFromValue(value, 'cardNo')}
+                />
+              </View>
             </Form.Item>
           </Form>
 

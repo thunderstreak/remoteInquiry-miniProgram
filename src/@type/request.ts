@@ -8,3 +8,15 @@ export interface RoomQueryRoomList {
   userName: string;
   cardNo: string;
 }
+
+export interface FingerPrint {
+  fingerUrl: string
+}
+
+export interface UpdateFingerUrl extends FingerPrint{
+  lawPeopleRecordNumId: string
+}
+
+export interface CardOcr{
+  cardUrl: string
+}

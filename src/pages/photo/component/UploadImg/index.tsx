@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, ImagePreview, Uploader } from '@nutui/nutui-react-taro'
 import { Close } from '@nutui/icons-react-taro'
 import { FileItem } from '@nutui/nutui-react-taro/dist/types/packages/uploader/file-item'
@@ -19,42 +19,34 @@ const createFileItem = (params): FileItem => ({
   ...params
 })
 const UploadImg: React.FC<UploadImgProps> = (props) => {
-  const photoRef = useRef<FileItem[]>([])
   const [showPreview, setShowPreview] = useState(false)
   const [init, setInit] = useState(0)
-  const [photo, setPhoto] = useState<FileItem[]>([
-    // {
-    //   name: '文件文件文件文件1文件文件文件文件1文件文件文件文件1.png',
-    //   url: 'https://m.360buyimg.com/babel/jfs/t1/164410/22/25162/93384/616eac6cE6c711350/0cac53c1b82e1b05.gif',
-    //   status: 'success',
-    //   message: '上传成功',
-    //   type: 'image',
-    //   uid: '122'
-    // }
-  ])
+  const [photo, setPhoto] = useState<FileItem[]>([])
   const previewImages = useMemo(() => photo.map((x) => ({ src: x.url })) as {src: string}[], [photo])
-  const handelOnDelete = useCallback((file: any, fileList: any) => {
+  const handelOnDelete = useCallback((file: FileItem, fileList: FileItem[]) => {
     console.log('delete事件触发', file, fileList)
+    setPhoto(fileList)
   }, [])
-  const handelOnSuccess = useCallback(
-    (param: {
-      responseText: XMLHttpRequest['responseText'];
-      option: UploadOptions;
-      files: FileItem[];
-    }) => {
-      const result = param.responseText as unknown as responseText
-      try {
-        const { data } = JSON.parse(result.data)
-        setPhoto((v) => [
-          ...v,
-          createFileItem({ url: data.url, uid: data.id, name: data.url })
-        ])
-      } catch (err) {
-        Taro.showToast({ title: err })
-      }
-    },
-    []
-  )
+  const handleOnChange = useCallback((fileList: FileItem[]) => {
+    setPhoto(fileList)
+  }, [])
+  // const handelOnSuccess = useCallback(
+  //   (param: {
+  //     responseText: XMLHttpRequest['responseText'];
+  //     option: UploadOptions;
+  //     files: FileItem[];
+  //   }) => {
+  //     const result = param.responseText as unknown as responseText
+  //     try {
+  //       const { data } = JSON.parse(result.data)
+  //       const file = createFileItem({ url: data.url, uid: data.id, name: data.url })
+  //       setPhoto((v) => [...v, file])
+  //     } catch (err) {
+  //       Taro.showToast({ title: err })
+  //     }
+  //   },
+  //   []
+  // )
   const handleOnFailure = useCallback((param: {
     responseText: XMLHttpRequest['responseText'];
     option: UploadOptions;
@@ -66,7 +58,14 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
 
   const handleNext = useCallback(() => {
     if (photo.length) {
-      const data = photo.map((x) => ({ url: x.url ?? '', id: x.uid }))
+      // 合并，responseText代表走上传添加，responseText不存在代表通过props添加
+      const urlList = photo.filter(x => !x.responseText)
+      const textList = photo.filter(x => x.responseText).map(x => {
+        const result = x.responseText as XMLHttpRequest['responseText'] as unknown as responseText
+        const { data } = JSON.parse(result.data)
+        return createFileItem({ url: data.url, uid: data.id, name: data.url })
+      })
+      const data = [...urlList, ...textList].map((x) => ({ url: x.url ?? '', id: x.uid }))
       console.log(data)
       props?.onNext?.({ type: 'UPLOAD', data })
     }
@@ -78,25 +77,25 @@ const UploadImg: React.FC<UploadImgProps> = (props) => {
     setInit(index + 1)
   }, [])
 
-  // useEffect(() => {
-  //   if (props.value) {
-  //     const list = props.value
-  //     setPhoto((v) => ([...v, ...list]))
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (props.value?.length) {
+      const list = props.value.map((x, i) => createFileItem({ name: x, url: x, uid: i + new Date().getTime().toString() }))
+      setPhoto(list)
+    }
+  }, [props.value])
 
   return (
     <View className="px-3 pb-6 flex-1 flex flex-col">
       <View className="flex-1">
         <View className="font-bold text-[14px] pb-3">上传图片（最多27张）</View>
         <Uploader
-          value={photoRef.current}
+          value={photo}
           url={`${process.env.TARO_APP_API}/upload/v1/minio/fileUpload`}
           headers={{ 'Content-Type': 'multipart/form-data', ...config.headers }}
           onDelete={handelOnDelete}
           multiple
-          onSuccess={handelOnSuccess}
           onFailure={handleOnFailure}
+          onChange={handleOnChange}
           maxCount={27}
           onFileItemClick={handleOnFileItemClick}
         />
