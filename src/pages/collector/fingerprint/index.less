@@ -1,0 +1,140 @@
+.camera-index {
+    position: relative;
+}
+.camera-main {
+    width: 100%;
+    height: calc(100vh - 310rpx);
+    position: relative;
+}
+.camera-view {
+    width: 100%;
+    height: 100%;
+}
+.camera-mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    .camera-mask-img {
+        width: 100%;        
+        height: 100%;
+    }
+    .camera-mask-tip {
+        color: #FFFFFF;
+        font-size: 24rpx;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        text-align: center;
+        transform: translate(-50%, -50%);
+        opacity: 0.8;
+    }
+}
+
+.camera-controller {
+    height: 310rpx;
+    background-color: #000;
+}
+
+.camera-controller-tip {
+    color: #fff;
+    font-size: 24rpx;
+    padding: 25rpx 20rpx;
+    text-align: center;
+}
+
+.camera-btn-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 90rpx;
+    margin-top: 40rpx;
+}
+
+.camera-btn {
+    width: 96rpx;
+    height: 96rpx;
+    .torch-img, .album-img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.camera-btn-big {
+    width: 138rpx;
+    height: 138rpx;
+    border: 8rpx solid #fff;
+    border-radius: 50%;
+    padding: 2rpx;
+    box-sizing: border-box;
+    &-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #fff; 
+    }
+}
+
+.example-pos {
+    position: absolute;
+    right: 30rpx;
+    top: 30rpx;
+    width: 111rpx;
+    height: 57rpx;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10rpx 10rpx 10rpx 10rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23rpx;
+    color: #fff;
+    .example-icon {
+        width: 34rpx;
+        height: 34rpx;
+        margin-right: 6rpx;
+    }
+}
+
+.camera-example-model {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.camera-example {
+    background: #FFFFFF;
+    border-radius: 15rpx 15rpx 15rpx 15rpx;
+    padding: 50rpx;
+    width: 683rpx;
+    box-sizing: border-box;
+    .camera-example-title {
+        font-size: 31rpx;
+        color: #333;
+        text-align: center;
+        margin-bottom: 65rpx;
+    }
+    .camera-example-content {
+        display: flex;
+        justify-content: space-between;
+    }
+    .camera-example-item-value {
+        width: 260rpx;
+        height: 374rpx;
+    }
+    .camera-example-item-desc {
+        font-size: 27rpx;
+        color: #666666;
+        line-height: 38rpx;
+        margin-top: 20rpx;
+        text-align: center;
+    }
+}

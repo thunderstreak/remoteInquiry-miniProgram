@@ -75,3 +75,11 @@ export const hiddenLoadingCatch = <T>(err: T) => {
   Taro.hideLoading()
   return err
 }
+
+export const showOcrCatchToast = (params?: Parameters<typeof Taro.showModal>[0]) => Taro.showModal({
+  title: '',
+  content: '请重新拍摄或上传',
+  confirmText: '确定',
+  showCancel: false,
+  ...params
+})

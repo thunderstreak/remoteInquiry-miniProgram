@@ -11,7 +11,6 @@ import { useSetting } from '@/hooks/useSetting'
 import config from '@/config'
 import HomeApi from '@/api/home'
 import CommonApi from '@/api/common'
-import { hiddenLoadingCatch } from '@/utils'
 import './index.less'
 
 export default function Index() {
@@ -108,36 +107,38 @@ export default function Index() {
   const handleUploadFinger = useCallback(async (x: Res.RoomQueryRoomList) => {
     const { fingerUrl, isShowFinger, lawPeopleRecordNumId } = x
     if (isShowFinger && !fingerUrl) {
-      // Taro.navigateTo({ url: '/pages/' })
-      Taro.showLoading()
-      const { tempFiles } = await Taro.chooseMessageFile({
-        count: 1,
-        type: 'image'
-      }).catch(hiddenLoadingCatch<ReturnType<typeof Taro.chooseMessageFile>>)
-      if (!tempFiles) {
-        return
-      }
-      const { data } = await CommonApi.fileUpload(tempFiles[0].path).catch(
-        hiddenLoadingCatch<ReturnType<typeof CommonApi.fileUpload>>
-      )
-      if (!data || !data.url) {
-        return
-      }
-      const { data: updateUrl } = await CommonApi.fingerPrint({
-        fingerUrl: data.url
-      }).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.fingerPrint>>)
-      if (!updateUrl) {
-        return
-      }
-      if (updateUrl) {
-        await CommonApi.updateFingerUrl({
-          lawPeopleRecordNumId,
-          fingerUrl: updateUrl
-        }).catch(
-          hiddenLoadingCatch<ReturnType<typeof CommonApi.updateFingerUrl>>
-        )
-      }
-      Taro.hideLoading()
+      await Taro.navigateTo({
+        url: `/pages/collector/fingerprint/index?lawPeopleRecordNumId=${lawPeopleRecordNumId}`
+      })
+      // Taro.showLoading()
+      // const { tempFiles } = await Taro.chooseMessageFile({
+      //   count: 1,
+      //   type: 'image'
+      // }).catch(hiddenLoadingCatch<ReturnType<typeof Taro.chooseMessageFile>>)
+      // if (!tempFiles) {
+      //   return
+      // }
+      // const { data } = await CommonApi.fileUpload(tempFiles[0].path).catch(
+      //   hiddenLoadingCatch<ReturnType<typeof CommonApi.fileUpload>>
+      // )
+      // if (!data || !data.url) {
+      //   return
+      // }
+      // const { data: updateUrl } = await CommonApi.fingerPrint({
+      //   fingerUrl: data.url
+      // }).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.fingerPrint>>)
+      // if (!updateUrl) {
+      //   return
+      // }
+      // if (updateUrl) {
+      //   await CommonApi.updateFingerUrl({
+      //     lawPeopleRecordNumId,
+      //     fingerUrl: updateUrl
+      //   }).catch(
+      //     hiddenLoadingCatch<ReturnType<typeof CommonApi.updateFingerUrl>>
+      //   )
+      // }
+      // Taro.hideLoading()
     }
   }, [])
 
@@ -157,6 +158,12 @@ export default function Index() {
 
   useEffect(() => {
     handleGetAllInfo()
+
+    Taro.eventCenter.on('ON_OCR_FINGER', (res: Res.CardOcr) => {
+      console.log(res)
+      // setForm(v => ({ ...v, cardNo: res.idNumber, userName: res.name }))
+      // formInstance.setFieldsValue({ cardNo: res.idNumber, userName: res.name })
+    })
   }, [handleGetAllInfo])
 
   return (

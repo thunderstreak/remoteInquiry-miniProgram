@@ -20,11 +20,9 @@ import { Checked, CheckNormal, Close } from '@nutui/icons-react-taro'
 import { useDispatch } from 'react-redux'
 import { userActions } from '@/store/slice/user'
 import LoginApi from '@/api/login'
-import CommonApi from '@/api/common'
 import config, { lightTheme } from '@/config'
 import { FormData, LoginState } from '@/pages/login/type'
 import type * as Res from '@/@type/response'
-import { hiddenLoadingCatch } from '@/utils'
 import Video from './component/Video/index'
 import './index.less'
 
@@ -117,23 +115,23 @@ export default function Index() {
   }, [])
 
   const handleVerifyId = useCallback(async () => {
-    // Taro.navigateTo({ url: '/pages/' })
-    Taro.showLoading()
-    const { tempFiles } = await Taro.chooseMessageFile({ count: 1, type: 'image' }).catch(hiddenLoadingCatch<ReturnType<typeof Taro.chooseMessageFile>>)
-    if (!tempFiles) {
-      return
-    }
-    const { data } = await CommonApi.fileUpload(tempFiles[0].path).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.fileUpload>>)
-    if (!data || !data.url) {
-      return
-    }
-    await CommonApi.cardOcr({ cardUrl: 'https://img.alicdn.com/tfs/TB1q5IeXAvoK1RjSZFNXXcxMVXa-483-307.jpg' }).then((res) => {
-      const { data: result } = res
-      if (result) {
-        Taro.eventCenter.trigger('ON_OCR_CARD', { ...result })
-      }
-    }).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.cardOcr>>)
-    Taro.hideLoading()
+    Taro.navigateTo({ url: '/pages/collector/card/index' })
+    // Taro.showLoading()
+    // const { tempFiles } = await Taro.chooseImage({ count: 1 }).catch(hiddenLoadingCatch<ReturnType<typeof Taro.chooseImage>>)
+    // if (!tempFiles) {
+    //   return
+    // }
+    // const { data } = await CommonApi.fileUpload(tempFiles[0].path).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.fileUpload>>)
+    // if (!data || !data.url) {
+    //   return
+    // }
+    // await CommonApi.cardOcr({ cardUrl: 'https://img.alicdn.com/tfs/TB1q5IeXAvoK1RjSZFNXXcxMVXa-483-307.jpg' }).then((res) => {
+    //   const { data: result } = res
+    //   if (result) {
+    //     Taro.eventCenter.trigger('ON_OCR_CARD', { ...result })
+    //   }
+    // }).catch(hiddenLoadingCatch<ReturnType<typeof CommonApi.cardOcr>>)
+    // Taro.hideLoading()
   }, [])
 
   useEffect(() => {
@@ -143,6 +141,7 @@ export default function Index() {
     console.log(router.params)
 
     Taro.eventCenter.on('ON_OCR_CARD', (res: Res.CardOcr) => {
+      console.log(res)
       setForm(v => ({ ...v, cardNo: res.idNumber, userName: res.name }))
       // formInstance.setFieldsValue({ cardNo: res.idNumber, userName: res.name })
     })
