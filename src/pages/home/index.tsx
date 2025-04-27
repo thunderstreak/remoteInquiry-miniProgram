@@ -95,8 +95,8 @@ export default function Index() {
     })
   }, [userInfo.cardNo, userInfo.userName])
 
-  const handleGetSignTemplate = useCallback(() => {
-    CommonApi.getSaasInfo().then((res) => {
+  const handleGetSignTemplate = useCallback(async () => {
+    return CommonApi.getSaasInfo().then((res) => {
       const { data } = res
       if (data) {
         Taro.setStorageSync('REMARK_TEMPLATE', data.xwtzs_remark)
@@ -144,11 +144,12 @@ export default function Index() {
 
   const handleGetAllInfo = useCallback(() => {
     handleGetRoomList().catch(console.log)
-    handleGetSignTemplate()
+    handleGetSignTemplate().catch(console.log)
   }, [handleGetRoomList, handleGetSignTemplate])
 
   usePullDownRefresh(async () => {
     await handleGetRoomList()
+    await handleGetSignTemplate()
     Taro.stopPullDownRefresh()
   })
 
