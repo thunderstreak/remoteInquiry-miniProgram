@@ -60,6 +60,7 @@ export default function Index() {
         const { data: result } = res
         if (result) {
           Taro.eventCenter.trigger('ON_OCR_CARD', { ...result })
+          Taro.navigateBack()
         }
       })
       .catch(async (err) => {
@@ -69,7 +70,6 @@ export default function Index() {
         await showOcrCatchToast({ title: '未能识别到身份证' })
         return hiddenLoadingCatch<ReturnType<typeof CommonApi.cardOcr>>(err)
       })
-    Taro.hideLoading()
   }, [])
 
   const handlerTakePhoto = useCallback(() => {

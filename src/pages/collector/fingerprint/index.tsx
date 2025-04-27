@@ -25,21 +25,18 @@ export default function Index() {
     Taro.showModal({
       title: '需要摄像头授权',
       content: '请允许应用使用你的摄像头，一键识别身份证信息',
-      confirmText: '去设置',
-      success: (res) => {
-        if (res.confirm) {
-          Taro.openSetting({
-            success: (res) => {
-              // 授权后重新更新camera组件
-              if (res.authSetting['scope.camera']) {
-                setState((v) => ({
-                  ...v,
-                  cameraUid: (+v.cameraUid + 1).toString()
-                }))
-              }
-            }
-          })
-        }
+      confirmText: '去设置'
+    }).then((res) => {
+      if (res.confirm) {
+        Taro.openSetting().then((result) => {
+          // 授权后重新更新camera组件
+          if (result.authSetting['scope.camera']) {
+            setState((v) => ({
+              ...v,
+              cameraUid: (+v.cameraUid + 1).toString()
+            }))
+          }
+        })
       }
     })
   }, [])
@@ -82,7 +79,6 @@ export default function Index() {
             hiddenLoadingCatch<ReturnType<typeof CommonApi.updateFingerUrl>>
           )
       }
-      Taro.hideLoading()
     },
     [router.params.lawPeopleRecordNumId]
   )
