@@ -73,7 +73,10 @@ export default function Index() {
           fingerUrl: updateUrl
         })
           .then(() => {
-            Taro.navigateBack()
+            Taro.showToast({ title: '指纹捺印上传成功', icon: 'none' })
+            setTimeout(() => {
+              Taro.navigateBack()
+            }, 1500)
           })
           .catch(
             hiddenLoadingCatch<ReturnType<typeof CommonApi.updateFingerUrl>>
