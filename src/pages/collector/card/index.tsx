@@ -60,6 +60,7 @@ export default function Index() {
         const { data: result } = res
         if (result) {
           Taro.eventCenter.trigger('ON_OCR_CARD', { ...result })
+          Taro.navigateBack()
         }
       })
       .catch(async (err) => {
