@@ -70,7 +70,6 @@ export default function Index() {
         await showOcrCatchToast({ title: '未能识别到身份证' })
         return hiddenLoadingCatch<ReturnType<typeof CommonApi.cardOcr>>(err)
       })
-    Taro.hideLoading()
   }, [])
 
   const handlerTakePhoto = useCallback(() => {
