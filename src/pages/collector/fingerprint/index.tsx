@@ -49,8 +49,8 @@ export default function Index() {
     async (fileUrl: string) => {
       await Taro.showLoading({ title: '识别处理中', mask: true })
 
-      const { data } = await CommonApi.fileUpload(fileUrl).catch(
-        hiddenLoadingCatch<ReturnType<typeof CommonApi.fileUpload>>
+      const { data } = await CommonApi.ossFileUpload(fileUrl).catch(
+        hiddenLoadingCatch<ReturnType<typeof CommonApi.ossFileUpload>>
       )
       if (!data || !data.url) {
         return
