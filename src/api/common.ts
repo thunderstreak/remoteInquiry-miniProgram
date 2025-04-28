@@ -51,6 +51,24 @@ class CommonApi {
         })
         .catch(reject)
     })
+
+  /*
+   * oss图片上传
+   * */
+  ossFileUpload = (tempFilePath: string) =>
+    new Promise((resolve: (data: { data: UploadResponse }) => void, reject) => {
+      Taro.uploadFile({
+        url: `${process.env.TARO_APP_API}/upload/v1/oss/fileUpload`,
+        filePath: tempFilePath,
+        name: 'file',
+        header: { 'Content-Type': 'multipart/form-data', ...config.headers }
+      })
+        .then((res) => {
+          const { data } = JSON.parse(res.data) as { data: UploadResponse }
+          resolve({ data })
+        })
+        .catch(reject)
+    })
 }
 
 export default new CommonApi()
