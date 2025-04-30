@@ -235,7 +235,7 @@ export default function Index() {
                 </View>
               </View>
               <Divider style={{ borderColor: '#E9E9E9', margin: '10px 0' }} />
-              {x.isShowFinger ? (
+              {x.isFinger ? (
                 <View className="flex flex-col px-3">
                   <View className="pb-[10px] text-[12px] text-[#6C6C6C]">
                     根据取证要求，进入取证室需要完成：
@@ -275,8 +275,10 @@ export default function Index() {
                 <Button
                   block
                   type="primary"
-                  disabled={!x.fingerUrl}
-                  color={x.fingerUrl ? '#3777E1' : '#9BBBF0'}
+                  disabled={x.isFinger === 1 && !x.fingerUrl}
+                  color={
+                    x.isFinger === 1 && !x.fingerUrl ? '#9BBBF0' : '#3777E1'
+                  }
                   className="!h-[52px] !rounded-[10px] border-0"
                   onClick={() => handleEntry(x)}
                 >
