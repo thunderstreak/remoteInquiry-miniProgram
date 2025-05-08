@@ -38,7 +38,7 @@ export default function Index() {
   const [formInstance] = Form.useForm()
   const [form, setForm] = useState(createFormData())
   const [state, setState] = useState<LoginState>({
-    controlled: true,
+    controlled: false,
     loading: false,
     videoShow: false,
     successShow: false,
