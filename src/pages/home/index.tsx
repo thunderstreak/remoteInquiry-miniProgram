@@ -288,7 +288,7 @@ export default function Index() {
             </View>
           ))}
         </View>
-        <View className="flex-shrink-0 text-[12px] text-[#999999] font-medium flex-center pb-[40px]">
+        <View className="flex-shrink-0 text-[12px] text-[#999999] font-medium flex-center py-5">
           {userInfo.orgName}
         </View>
       </View>
