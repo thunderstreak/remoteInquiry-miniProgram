@@ -66,11 +66,11 @@ const Index: React.FC = () => {
       // case 'SIGN_MARK': // 签备注
       case 'ON_SIGN_MARK': // 签备注
         if (data?.templateName === '行政案件快速办理程序告知书') {
-          return null
+          return <View className="flex-1 h-full flex-center text-[32px]">
+            <View className="w-full h-full flex-center text-[#CECECE] text-center">{Taro.getStorageSync<string>('REMARK_TEMPLATE')}</View>
+          </View>
         }
-        return <View className="flex-1 h-full flex-center text-[32px]">
-          <View className="w-full h-full flex-center text-[#CECECE] text-center">{Taro.getStorageSync<string>('REMARK_TEMPLATE')}</View>
-        </View>
+        return null
     }
   }, [router.params.type, userInfo.userName])
 
