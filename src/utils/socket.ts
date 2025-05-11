@@ -64,7 +64,7 @@ export const useSocket = () => {
             clearInterval(inter.current)
           }
           inter.current = setInterval(() => {
-            handleSend({ type: 'ON_HEART_BEAT', data: Date.now() })
+            handleSend({ type: 'ON_HEART_BEAT', data: { time: Date.now() } })
           }, 15000)
           resolve(task)
         })

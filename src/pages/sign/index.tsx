@@ -4,6 +4,7 @@ import { Button, View } from '@tarojs/components'
 import { WaterMark } from '@nutui/nutui-react-taro'
 import NavHeader from '@/components/NavHeader'
 // import config from '@/config/index'
+import { OnNoticeData } from '@/@type/response'
 import { useSelector } from 'react-redux'
 import { selectUserInfo } from '@/store/slice/user'
 import { useSocket } from '@/utils/socket'
@@ -42,6 +43,7 @@ const Index: React.FC = () => {
 
   const signTemplate = useMemo(() => {
     const type = router.params.type
+    const { data } = Taro.getStorageSync<OnNoticeData>('NOTICE_SIGN_MARK')
     switch (type) {
       case 'SIGN_NAME': // 签名
       case 'ON_SIGN_NAME': // 签名
@@ -63,6 +65,9 @@ const Index: React.FC = () => {
         </View>
       // case 'SIGN_MARK': // 签备注
       case 'ON_SIGN_MARK': // 签备注
+        if (data?.templateName === '行政案件快速办理程序告知书') {
+          return null
+        }
         return <View className="flex-1 h-full flex-center text-[32px]">
           <View className="w-full h-full flex-center text-[#CECECE] text-center">{Taro.getStorageSync<string>('REMARK_TEMPLATE')}</View>
         </View>
@@ -108,7 +113,7 @@ const Index: React.FC = () => {
 
   const onClear = useCallback(() => {
     signRef.current?.handleClear()
-    handleSend({ type: 'ON_SIGN_CLEAR', data: Date.now() })
+    handleSend({ type: 'ON_SIGN_CLEAR', data: { time: Date.now() } })
   }, [handleSend])
 
   // const onCancel = useCallback(() => {
@@ -145,7 +150,7 @@ const Index: React.FC = () => {
 
   // 返回通知
   const handleBack = useCallback(() => {
-    handleSend({ type: 'ON_SIGN_BACK', data: Date.now() })
+    handleSend({ type: 'ON_SIGN_BACK', data: { time: Date.now() } })
     Taro.navigateBack()
   }, [handleSend])
 

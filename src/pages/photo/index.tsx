@@ -53,7 +53,7 @@ export default function Index() {
       if (state.step < 4) {
         setState((v) => ({ ...v, step: state.step + 1 }))
       } else {
-        handleSend({ type: 'ON_UPLOAD_END', data: `${Date.now()}` })
+        handleSend({ type: 'ON_UPLOAD_END', data: { time: Date.now() } })
         Taro.navigateBack({ delta: 1 })
       }
     },
