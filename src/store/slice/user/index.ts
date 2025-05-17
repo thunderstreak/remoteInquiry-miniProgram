@@ -1,20 +1,22 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { UserState } from '@/store/slice/user/type'
 import { RootState } from '@/store'
+import Taro from '@tarojs/taro'
 
-const createInitialState = (): UserState => ({
-  id: '',
-  tenantCode: '',
-  orgCode: '',
-  orgName: '',
-  cardNo: '',
-  userName: '',
-  roomCode: '',
-  roomPassword: '',
-  isExpire: false,
-  token: '',
-  refreshToken: ''
-})
+const createInitialState = (): UserState =>
+  Taro.getStorageSync<UserState>('userInfo') || {
+    id: '',
+    tenantCode: '',
+    orgCode: '',
+    orgName: '',
+    cardNo: '',
+    userName: '',
+    roomCode: '',
+    roomPassword: '',
+    isExpire: false,
+    token: '',
+    refreshToken: ''
+  }
 export const userSlice = createSlice({
   name: 'user',
   initialState: createInitialState(),

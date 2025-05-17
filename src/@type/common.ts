@@ -25,3 +25,7 @@ export interface ResponseError {
   sysTime: number;
   data?: null;
 }
+export interface UploadResponse {
+  id: string
+  url: string
+}

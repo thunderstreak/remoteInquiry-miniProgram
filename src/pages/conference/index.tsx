@@ -355,6 +355,7 @@ export default function Index() {
           case 'NOTICE_SIGN_NAME': // 通知签名
           case 'NOTICE_SIGN_TIME': // 通知签日期
           case 'NOTICE_SIGN_MARK': // 通知签备注
+            Taro.setStorageSync(type, data)
             const suffix = type.replace('NOTICE', 'ON')
             Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}` })
             break
