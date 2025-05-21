@@ -6,6 +6,8 @@ import { PhotoState } from '@/pages/photo/type'
 import NavHeader from '@/components/NavHeader'
 import { useSocket } from '@/utils/socket'
 import { UploadResponse } from '@/@type/common'
+import { NextParams as UploadNextParams } from '@/pages/photo/component/UploadImg/type'
+import { NextParams as SignNextParams } from '@/pages/photo/component/Sign/type'
 import UploadImg from './component/UploadImg'
 import Sign from './component/Sign'
 // import './index.less'
@@ -41,7 +43,7 @@ export default function Index() {
   }, [handleSend, state.markUrl, state.nameUrl, state.photo, state.timeUrl])
 
   const handleNext = useCallback(
-    (res) => {
+    (res: UploadNextParams & SignNextParams) => {
       const { type, data } = res
       switch (type) {
         case 'UPLOAD':
