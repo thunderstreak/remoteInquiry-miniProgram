@@ -233,3 +233,33 @@ export interface CardOcr{
   sex: string
   validPeriod: string | null
 }
+export interface OnNoticeData {
+  time: number
+  data?: Template
+}
+export interface Template {
+  content: string
+  contentInput: string
+  createBy: string
+  createName: string
+  createTime: string
+  dictCode: string
+  dictName: string
+  documentTypeName: string
+  fingerUrl: string
+  id: string
+  isDelete: number
+  isPut: string
+  orgCode: string
+  remark: string
+  roomCode: string
+  state: number
+  templateCode: string
+  templateName: string
+  templateType: string
+  templateTypeName: string
+  tenantCode: string
+  updateBy: string
+  updateName: string
+  updateTime: string
+}

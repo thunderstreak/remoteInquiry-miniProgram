@@ -4,6 +4,7 @@ import { Button, View } from '@tarojs/components'
 import { WaterMark } from '@nutui/nutui-react-taro'
 import NavHeader from '@/components/NavHeader'
 // import config from '@/config/index'
+import { OnNoticeData } from '@/@type/response'
 import { useSelector } from 'react-redux'
 import { selectUserInfo } from '@/store/slice/user'
 import { useSocket } from '@/utils/socket'
@@ -42,7 +43,9 @@ const Index: React.FC = () => {
 
   const signTemplate = useMemo(() => {
     const type = router.params.type
+    const { data } = Taro.getStorageSync<OnNoticeData>('NOTICE_SIGN_MARK')
     switch (type) {
+      case 'SIGN_NAME': // 签名
       case 'ON_SIGN_NAME': // 签名
         const name = userInfo.userName.split('') || []
         if (name.length > 4) {
@@ -55,14 +58,19 @@ const Index: React.FC = () => {
           <View className="absolute w-full h-[1px] top-[calc(50%+1px)] bg-[#CECECE]" />
           <View className="absolute top-0 left-0 right-0 bottom-0 m-auto w-full h-full flex-center text-[#CECECE]">{x}</View>
         </View>)
+      case 'SIGN_TIME': // 签日期
       case 'ON_SIGN_TIME': // 签日期
         return <View className="flex-1 h-full flex-center text-[52px] bg-[#efefef]">
           <View className="w-full h-full flex-center text-[#CECECE]">{dayjs().format('YYYY.MM.DD')}</View>
         </View>
+      // case 'SIGN_MARK': // 签备注
       case 'ON_SIGN_MARK': // 签备注
-        return <View className="flex-1 h-full flex-center text-[32px]">
-          <View className="w-full h-full flex-center text-[#CECECE] text-center">{Taro.getStorageSync<string>('REMARK_TEMPLATE')}</View>
-        </View>
+        if (data?.templateName === '询问笔录') {
+          return <View className="flex-1 h-full flex-center text-[32px]">
+            <View className="w-full h-full flex-center text-[#CECECE] text-center">{Taro.getStorageSync<string>('REMARK_TEMPLATE')}</View>
+          </View>
+        }
+        return null
     }
   }, [router.params.type, userInfo.userName])
 
@@ -105,7 +113,7 @@ const Index: React.FC = () => {
 
   const onClear = useCallback(() => {
     signRef.current?.handleClear()
-    handleSend({ type: 'ON_SIGN_CLEAR', data: Date.now() })
+    handleSend({ type: 'ON_SIGN_CLEAR', data: { time: Date.now() } })
   }, [handleSend])
 
   // const onCancel = useCallback(() => {
@@ -142,7 +150,7 @@ const Index: React.FC = () => {
 
   // 返回通知
   const handleBack = useCallback(() => {
-    handleSend({ type: 'ON_SIGN_BACK', data: Date.now() })
+    handleSend({ type: 'ON_SIGN_BACK', data: { time: Date.now() } })
     Taro.navigateBack()
   }, [handleSend])
 
