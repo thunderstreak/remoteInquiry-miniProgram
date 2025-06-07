@@ -5,7 +5,8 @@ import {
   HOME_PAGE_URL,
   LOGIN_PAGE_URL,
   PHOTO_PAGE_URL,
-  SIGN_PAGE_URL
+  SIGN_PAGE_URL,
+  ENFORCEMENT_LIST_PAGE_URL,
 } from '@/constants'
 
 export default defineAppConfig({
@@ -16,7 +17,8 @@ export default defineAppConfig({
     SIGN_PAGE_URL,
     CONFERENCE_PAGE_URL,
     COLLECTOR_CARD_PAGE_URL,
-    COLLECTOR_FINGERPRINT_PAGE_URL
+    COLLECTOR_FINGERPRINT_PAGE_URL,
+    ENFORCEMENT_LIST_PAGE_URL
   ],
   subPackages: [
     {

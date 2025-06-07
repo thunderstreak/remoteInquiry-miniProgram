@@ -7,12 +7,14 @@ import './app.less'
 const App = ({ children }: PropsWithChildren<any>): ReactNode => {
   useLaunch(async () => {
     console.log('App launched.')
-    await Taro.setVisualEffectOnCapture({
-      visualEffect: 'hidden',
-      success: () => {
-        // Taro.showToast({ title: '禁止截屏', icon: 'none' }).catch(console.log)
-      }
-    })
+    if (process.env.TARO_ENV === 'weapp') {
+      await Taro.setVisualEffectOnCapture({
+        visualEffect: 'hidden',
+        success: () => {
+          // Taro.showToast({ title: '禁止截屏', icon: 'none' }).catch(console.log)
+        }
+      })
+    }
 
     const res = Taro.getDeviceInfo()
     if (res.platform === 'ios') {
