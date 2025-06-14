@@ -7,6 +7,7 @@ import {
   PHOTO_PAGE_URL,
   SIGN_PAGE_URL,
   ENFORCEMENT_LIST_PAGE_URL,
+  ENFORCEMENT_APPLY_PAGE_URL,
 } from '@/constants'
 
 export default defineAppConfig({
@@ -18,7 +19,8 @@ export default defineAppConfig({
     CONFERENCE_PAGE_URL,
     COLLECTOR_CARD_PAGE_URL,
     COLLECTOR_FINGERPRINT_PAGE_URL,
-    ENFORCEMENT_LIST_PAGE_URL
+    ENFORCEMENT_LIST_PAGE_URL,
+    ENFORCEMENT_APPLY_PAGE_URL,
   ],
   subPackages: [
     {
@@ -63,5 +65,8 @@ export default defineAppConfig({
     navigationBarTitleText: 'WeChat',
     navigationBarTextStyle: 'black'
   },
-  lazyCodeLoading: 'requiredComponents'
+  lazyCodeLoading: 'requiredComponents',
+  requiredPrivateInfos: [
+    'chooseLocation'
+  ]
 })

@@ -263,3 +263,11 @@ export interface Template {
   updateName: string
   updateTime: string
 }
+
+/**
+ * 字典返回数据
+ */
+export interface DictOption {
+  key: string
+  value: string
+}

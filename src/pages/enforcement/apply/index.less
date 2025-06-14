@@ -1,0 +1,67 @@
+.page-linear {
+  background: linear-gradient(180deg, #D2D8F1 0%, #FFFFFF 100%);
+  .nut-form-footer {
+    padding: 0;
+  }
+  .nut-form-item {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .nut-form-item-label {
+    padding-right: 0;
+    position: relative;
+  }
+  .nut-cell-divider {
+    left: 0;
+    right: 0;
+  }
+  .submit-btn {
+    height: 52px;
+    border-radius: 10px 10px 10px 10px;
+    font-size: 20px;
+  }
+  .item-textarea {
+    .nut-form-item-body {
+      width: 100%;
+      position: relative;
+    }
+    .nut-textarea-textarea {
+      background: #F8F8F8;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      height: 98px;
+    }
+    .nut-textarea-limit {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+    }
+    .nut-form-item-label {
+      width: 100%;
+      padding-left: 10px;
+      justify-content: flex-start;
+    }
+  }
+  .no-bottom-driver {
+    .nut-cell-divider {
+      display: none;
+    }
+  }
+  --nutui-cell-group-background-color: rgba(255, 255, 255, 0);
+  --nutui-form-item-label-width: 80px;
+  --nutui-form-item-label-font-size: 16px;
+  --nutui-form-item-body-font-size: 16px;
+  --nutui-divider-margin: 0;
+}
+
+.form-group-title {
+  &::before {
+    content: " ";
+    width: 4px;
+    height: 18px;
+    background: #0F40F5;
+    border-radius: 2px 2px 2px 2px;
+    margin-right: 8px;
+  }
+}

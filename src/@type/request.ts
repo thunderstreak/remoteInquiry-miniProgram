@@ -20,3 +20,11 @@ export interface UpdateFingerUrl extends FingerPrint{
 export interface CardOcr{
   cardUrl: string
 }
+
+/**
+ * 字典类型
+ * @type {string}
+ */
+export interface Dict {
+  type: string;
+}
