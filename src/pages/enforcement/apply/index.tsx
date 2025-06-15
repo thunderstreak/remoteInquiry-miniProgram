@@ -7,6 +7,8 @@ import type * as Res from '@/@type/response'
 import Taro, { useLoad, useRouter } from "@tarojs/taro";
 import CommonApi from '@/api/common'
 import "./index.less";
+import MultiplePopup from "../components/MultiplePopup";
+import { GetUserListRes } from "@/@type/response";
 
 const createFormData = (): FormData => ({
   /** 案由 */
@@ -31,8 +33,8 @@ const createFormData = (): FormData => ({
   partiesCard: '',
   /** 当事人电话 */
   partiesPhone: '',
-  roomCode: "9000347172",
-  roomPassword: "200187",
+  roomCode: "",
+  roomPassword: "",
   /** 违法时间 */
   lawDate: '',
 })
@@ -45,6 +47,7 @@ export default function Index() {
   const [showLawBehavior, setShowLawBehavior] = useState(false)
   const [lawTypeList, setLawTypeList] = useState<PickerOption[]>([])
   const [lawBehaviorList, setLawBehaviorList] = useState<PickerOption[]>([])
+  const [showMultiplePopup, setShowMultiplePopup] = useState(false)
 
   const router = useRouter()
 
@@ -66,6 +69,7 @@ export default function Index() {
   const handleSetFromValue = useCallback(
     (value: string, field: string) => {
       setForm((v) => ({ ...v, [field]: value }))
+      formInstance.setFieldValue(field, value)
     },
     [setForm]
   )
@@ -79,6 +83,7 @@ export default function Index() {
         `${[year, month, day].join('-')} ${[hour, minute].join(':')}`,
         'lawDate'
       )
+      // formInstance.resetFields(['lawDate'])
     },
     [form]
   )
@@ -136,9 +141,10 @@ export default function Index() {
   }, [form, loading])
 
   // 提交表单失败回调
-  const handleSubmitFailed = useCallback((e: any) => {
-    console.log('表单提交失败', e)
-  }, [])
+  const handleSubmitFailed = useCallback(
+    (e: any, errors: any) => {
+    console.log('表单提交失败', e, errors)
+  }, [form])
 
   const getLawTypeList = useCallback(async () => {
     return CommonApi.getDictList({type: '11'}).then((res) => {
@@ -172,10 +178,15 @@ export default function Index() {
     if (roomPassword) {
       handleSetFromValue(roomPassword, 'roomPassword')
     }
-
+    /** 身份证识别回调 */
     Taro.eventCenter.on('ON_OCR_CARD', (res: Res.CardOcr) => {
       console.log(res)
       setForm(v => ({ ...v, partiesCard: res.idNumber, partiesName: res.name }))
+    })
+    /** 选择协辅警回调 */
+    Taro.eventCenter.on('SELECT_USER', (res: { values: string[]; options: GetUserListRes[] }) => {
+      console.log(res)
+      setForm(v => ({ ...v, joinPeople: res.values.join(',') }))
     })
   }, [router.params])
 
@@ -184,11 +195,11 @@ export default function Index() {
       <View className="flex-1 flex flex-col px-[15px] py-[16px] border-box overflow-y-auto">
         <Form
           form={formInstance}
+          initialValues={form}
           starPosition="left"
           divider
-          initialValues={form}
           onFinish={handleSubmitSucceed}
-          onFinishFailed={handleSubmitFailed}
+          onFinishFailed={(values, errors) => handleSubmitFailed(values, errors)}
           footer={
             <Button
               className="submit-btn w-full rounded-lg text-[20px]"
@@ -207,29 +218,27 @@ export default function Index() {
                 <Text>案   由</Text>
               }
               name="title"
-              align="flex-end"
+              align="flex-start"
               rules={[
                 { required: true, message: '请输入案由' },
               ]}
             >
-              <View className="flex-center gap-2">
-                <Input
-                  className="nut-input-text flex-1"
-                  placeholder="请输入案由"
-                  type="text"
-                  value={form.title}
-                  maxLength={50}
-                  cursorSpacing={20}
-                  onChange={(value) => handleSetFromValue(value, 'title')}
-                />
-              </View>
+              <Input
+                className="nut-input-text flex-1"
+                placeholder="请输入案由"
+                type="text"
+                value={form.title}
+                maxLength={50}
+                cursorSpacing={20}
+                onChange={(value) => handleSetFromValue(value, 'title')}
+              />
             </Form.Item>
             <Form.Item
               label='违法时间'
               name="lawDate"
-              align="flex-end"
+              align="flex-start"
               rules={[
-                { required: true, message: '请点击选择时间' },
+                { required: true, message: '请点击选择时间', trigger: 'onChange' },
               ]}
             >
               <View className="flex-center gap-2" onClick={() => setPickerShow(true)}>
@@ -249,7 +258,7 @@ export default function Index() {
             <Form.Item
               label='违法地点'
               name="lawAddress"
-              align="flex-end"
+              align="flex-start"
               rules={[
                 { required: true, message: '请点击选择地点' },
               ]}
@@ -271,7 +280,7 @@ export default function Index() {
             <Form.Item
               label='违法类型'
               name="lawType"
-              align="flex-end"
+              align="flex-start"
               rules={[
                 { required: true, message: '请选择违法类型' },
               ]}
@@ -293,7 +302,7 @@ export default function Index() {
             <Form.Item
               label='违法行为'
               name="lawBehavior"
-              align="flex-end"
+              align="flex-start"
               rules={[
                 { required: true, message: '请选择违法行为' },
               ]}
@@ -316,8 +325,7 @@ export default function Index() {
               label={
                 <Text>发 起 人</Text>
               }
-              name="lawAddress"
-              align="flex-end"
+              align="flex-start"
             >
               <Input
                 className="nut-input-text flex-1"
@@ -330,15 +338,15 @@ export default function Index() {
               label={
                 <Text>协 辅 警</Text>
               }
-              name="lawBehavior"
-              align="flex-end"
+              name="joinPeople"
+              align="flex-start"
             >
-              <View className="flex-center gap-2">
+              <View className="flex-center gap-2" onClick={() => setShowMultiplePopup(true)}>
                 <Input
                   className="nut-input-text flex-1"
                   placeholder="请点击选择警员"
                   type="text"
-                  value={form.lawBehavior}
+                  value={form.joinPeople}
                   readOnly
                 />
                 <Image
@@ -376,27 +384,25 @@ export default function Index() {
                 <Text>姓 名</Text>
               }
               name="partiesName"
-              align="flex-end"
+              align="flex-start"
               rules={[
                 { required: true, message: '请输入当事人姓名' },
               ]}
             >
-              <View className="flex-center gap-2">
-                <Input
-                  className="nut-input-text flex-1"
-                  placeholder="请输入当事人姓名"
-                  type="text"
-                  value={form.partiesName}
-                  maxLength={50}
-                  cursorSpacing={20}
-                  onChange={(value) => handleSetFromValue(value, 'partiesName')}
-                />
-              </View>
+              <Input
+                className="nut-input-text flex-1"
+                placeholder="请输入当事人姓名"
+                type="text"
+                value={form.partiesName}
+                maxLength={50}
+                cursorSpacing={20}
+                onChange={(value) => handleSetFromValue(value, 'partiesName')}
+              />
             </Form.Item>
             <Form.Item
               label='身份证号'
               name="partiesCard"
-              align="flex-end"
+              align="flex-start"
               rules={[
                 { pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: '请输入正确的身份证号' },
               ]}
@@ -421,13 +427,13 @@ export default function Index() {
             <Form.Item
               label='联系方式'
               name="partiesPhone"
-              align="flex-end"
+              align="flex-start"
               className="no-bottom-driver"
               rules={[
                 { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的电话号码' },
               ]}
             >
-              <View className="flex-center gap-2">
+              {/* <View className="flex-center gap-2"> */}
                 <Input
                   className="nut-input-text flex-1"
                   placeholder="请输入电话号码"
@@ -437,7 +443,7 @@ export default function Index() {
                   cursorSpacing={20}
                   onChange={(value) => handleSetFromValue(value, 'partiesPhone')}
                 />
-              </View>
+              {/* </View> */}
             </Form.Item>
           </View>
         </Form>
@@ -462,6 +468,7 @@ export default function Index() {
           onClose={() => setShowLawBehavior(false)}
           onConfirm={handleLawBehaviorConfirm}
           />
+        <MultiplePopup visible={showMultiplePopup} setVisible={setShowMultiplePopup} />
       </View>
       <Description />
   </View>

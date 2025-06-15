@@ -182,6 +182,12 @@ export interface Login {
   isExpire: boolean;
   token: string;
   refreshToken: string | null;
+  /** 警号？ */
+  loginCode: string;
+  /** 所属执法队变化 --- 交警执法 */
+  departmentName: string;
+  /** 所属执法队 --- 交警执法 */
+  departmentCode: string;
 }
 
 export interface UserInfo extends Login {}
@@ -270,4 +276,69 @@ export interface Template {
 export interface DictOption {
   key: string
   value: string
+}
+
+/**
+ * 用户信息
+ */
+export interface GetUserListRes extends Login {
+
+}
+
+/**
+ * 执法室列表响应数据
+ */
+export interface GetRoomListRes {
+
+}
+
+export interface GetEnforcementStatusRes {
+  /** 案由 */
+  title: string;
+  /** 违法地点 */
+  lawAddress: string;
+  /** 经度 */
+  longitude: string;
+  /** 纬度 */
+  latitude: string;
+  /** 违法类型 */
+  lawType: string;
+  /** 违法行为 */
+  lawBehavior: string;
+  /** 参与人（协辅警），多个以逗号隔开 */
+  joinPeople: string;
+  /** 备注 */
+  remark: string;
+  /** 当事人姓名 */
+  partiesName: string;
+  /** 当事人身份证号 */
+  partiesCard: string;
+  /** 当事人电话 */
+  partiesPhone: string;
+  /** 呼叫的房间号 */
+  roomCode: string;
+  /** 房间密码 */
+  roomPassword: string;
+  /** 案件状态：0-准备、1-呼叫中、2-已接听、3-办结（结束案件/录屏）、4-未接听（小程序3分钟内未接听）、9-拒绝 */
+  isPut: number;
+  /** 开始录制时间 */
+  startTime: string;
+  /** 结束录制时间 */
+  endTime: string;
+  /** 小鱼录制的seesion */
+  sessionId: string;
+  /** 录制状态 */
+  recordState: string;
+  /** 违法时间 */
+  lawDate: string;
+  /** 管理端操作人员id */
+  pcAdmin: string;
+  /** 管理端操作人员名称 */
+  pcAdminName: string;
+  /** 管理端操作人员操作时间 */
+  pcAdminDate: string;
+  /** 创建人编码 */
+  createBy: string;
+  /** 创建人名称 */
+  createName: string;
 }

@@ -8,6 +8,7 @@ import {
   SIGN_PAGE_URL,
   ENFORCEMENT_LIST_PAGE_URL,
   ENFORCEMENT_APPLY_PAGE_URL,
+  ENFORCEMENT_RECORD_PAGE_URL,
 } from '@/constants'
 
 export default defineAppConfig({
@@ -21,6 +22,7 @@ export default defineAppConfig({
     COLLECTOR_FINGERPRINT_PAGE_URL,
     ENFORCEMENT_LIST_PAGE_URL,
     ENFORCEMENT_APPLY_PAGE_URL,
+    ENFORCEMENT_RECORD_PAGE_URL,
   ],
   subPackages: [
     {

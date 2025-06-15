@@ -10,6 +10,8 @@ export interface IConfig {
   DEFAULT_SERVER: string;
 }
 
+console.log(process.env.TARO_APP_ORGCODE, ' process.env.TARO_APP_ORGCODE')
+
 const config: IConfig = {
   baseURL: process.env.TARO_APP_API, // api地址
   headers: { tenantCode: 'ZY001', orgCode: 'Z01' },

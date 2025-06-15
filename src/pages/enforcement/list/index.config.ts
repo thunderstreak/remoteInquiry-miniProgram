@@ -3,4 +3,5 @@ export default definePageConfig({
   navigationBarTitleText: '千名千探',
   navigationBarBackgroundColor: '#1F3FBA',
   navigationBarTextStyle: 'white',
+  enablePullDownRefresh: true
 })

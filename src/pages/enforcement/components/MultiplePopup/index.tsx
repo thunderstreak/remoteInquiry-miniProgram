@@ -1,0 +1,125 @@
+import { Popup, SearchBar } from "@nutui/nutui-react-taro";
+import { View, Image, Text } from "@tarojs/components";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import EnforceMentApi from '@/api/enforcement'
+import './index.less';
+import { GetUserListRes } from "@/@type/response";
+import Taro from "@tarojs/taro";
+
+export default function Index({ visible, setVisible }) {
+  const [keywords, setKeywords] = useState<string>('')
+  const [userList, setUserList] = useState<GetUserListRes[]>([])
+  const [checkList, setCheckList] = useState<string[]>([])
+
+  const checkedOptions = useMemo(() => {
+    return userList.filter(item => checkList.some(x => x === item.loginCode))
+  }, [userList, checkList])
+
+  const handlerSearch = useCallback(() => {
+    console.log('搜索')
+    setCheckList([])
+    getUserList()
+  }, [keywords])
+
+  const handlerCheck = useCallback((item: GetUserListRes) => {
+    const checkedIndex = checkList.findIndex(x => x === item.loginCode)
+    const values = [...checkList]
+    if (checkedIndex !== -1) {
+      values.splice(checkedIndex, 1)
+    } else {
+      values.push(item.loginCode)
+    }
+    setCheckList(values)
+  }, [checkList, userList])
+
+  const handlerConfirm = useCallback(() => {
+    console.log('确定', checkList)
+    Taro.eventCenter.trigger('SELECT_USER', { values: checkList, options: checkedOptions })
+    setVisible(false)
+  }, [checkList, userList])
+
+  const getUserList = useCallback(() => {
+    EnforceMentApi.getUserList({ userName: keywords }).then((res) => {
+      console.log('get userlist ', res)
+      setUserList(res || [])
+    })
+  }, [keywords, handlerSearch])
+
+  useEffect(() => {
+    console.log('visible', visible)
+    getUserList()
+  }, [])
+
+  return (
+    <Popup
+        visible={visible}
+        position="bottom"
+        onClose={() => {
+          setVisible(false)
+        }}
+      >
+      <View className="flex-col gap-2 popup-content">
+        <View className="flex justify-between text-base px-4 py-[18px]">
+          <View onClick={() => setVisible(false)}>取消</View>
+          <View className="text-center flex-1 font-medium text-xl">选择协辅警</View>
+          <View className="text-[#4d79f2]" onClick={handlerConfirm}>确定</View>
+        </View>
+        <View className="px-4 mt-1 pb-8">
+            <SearchBar
+              value={keywords}
+              className="h-8 rounded-2xl"
+              placeholder="请输入姓名搜索"
+              onChange={(value: string) => setKeywords(value)}
+              onSearch={handlerSearch}
+              leftIn=''
+              right={
+                <Image className="w-4 h-4" src={require('@/assets/images/enforcement/icon_search.png')}></Image>
+              }
+            />
+          {/* <View className="flex items-center px-4 h-8 rounded-2xl bg-[#F8F8F8]">
+            <Input
+              className="nut-input-text flex-1 bg-transparent h-8"
+              placeholder="请输入姓名搜索"
+              type="text"
+              value={keywords}
+              onChange={(value: string) => setKeywords(value)}
+            />
+            <Image className="w-4 h-4 ml-3" src={require('@/assets/images/enforcement/icon_search.png')}></Image>
+          </View> */}
+          <View className="rounded-lg mt-4 bg-[#F8F8F8] px-3 py-3 flex flex-wrap gap-2">
+            <View className="flex items-center justify-center w-[100px] h-9 rounded-sm bg-white box-border">
+              <Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_fj_text.png')}></Image>
+              <Text>张三</Text>
+            </View>
+            {
+              userList.map(item => (
+                <View
+                  className={`flex items-center justify-center w-[100px] h-9 rounded-sm bg-white box-border relative ${checkList.includes(item.loginCode) ? 'border border-solid border-[#4D79F2] text-[#4D79F2]' : ''}`}
+                  onClick={() => handlerCheck(item)}
+                >
+                  <Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_fj_text_ac.png')}></Image>
+                  <Text>{item.userName}</Text>
+                  { checkList.includes(item.loginCode) &&
+                    (<Image className="w-[14px] h-[14px] absolute -right-px -bottom-px" src={require('@/assets/images/enforcement/icon_checked.png')}></Image>)
+                  }
+                </View>
+              ))
+            }
+          </View>
+          {
+            checkedOptions.length ? (
+              <View className="leading-lg mt-4">
+                <Text className="text-[#999999] mr-2">已选择</Text>
+                {
+                  checkedOptions.map((item, index) => (
+                    <Text className={ index !== 0 ? 'ml-2' : ''}>{item.userName || ''}</Text>
+                  ))
+                }
+              </View>
+            ) : ''
+          }
+        </View>
+      </View>
+    </Popup>
+  )
+}
