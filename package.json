@@ -22,6 +22,8 @@
     "build:harmony-hybrid": "taro build --type harmony-hybrid",
     "prod:build:weapp": "taro build --type weapp --mode prod",
     "test:build:weapp": "taro build --type weapp --mode test",
+    "prod:build:weapp-enforce": "cross-env TARO_APP_PLATFORM=ENFORCE taro build --type weapp --mode prod",
+    "test:build:weapp-enforce": "cross-env TARO_APP_PLATFORM=ENFORCE taro build --type weapp --mode test",
     "dev:build:weapp": "taro build --type weapp --mode dev",
     "dev:weapp": "npm run dev:build:weapp -- --watch",
     "dev:weapp-enforce": "cross-env TARO_APP_PLATFORM=ENFORCE npm run dev:build:weapp -- --watch",
