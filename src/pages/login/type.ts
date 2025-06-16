@@ -10,8 +10,3 @@ export interface LoginState {
 }
 
 export interface FormData extends Login {}
-
-export enum PlatformTypes {
-  '远程取证' = 'evidence',
-  '交警云执法' = 'enforece'
-}

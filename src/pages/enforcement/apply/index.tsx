@@ -2,41 +2,56 @@ import { View, Text, Image } from "@tarojs/components";
 import { Button, DatePicker, Divider, Form, Input, Picker, PickerOption, TextArea } from '@nutui/nutui-react-taro';
 import Description from "../components/Description";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FormData } from "./type";
 import type * as Res from '@/@type/response'
 import Taro, { useLoad, useRouter } from "@tarojs/taro";
 import CommonApi from '@/api/common'
-import "./index.less";
+import EnforcementApi from '@/api/enforcement'
 import MultiplePopup from "../components/MultiplePopup";
 import { GetUserListRes } from "@/@type/response";
+import { InsertLawPoliceReq } from "@/@type/request";
+import "./index.less";
 
-const createFormData = (): FormData => ({
-  /** 案由 */
-  title: '',
-  /** 违法地点 */
-  lawAddress: '',
-  /** 经度 */
-  longitude: '',
-  /** 纬度 */
-  latitude: '',
-  /** 违法类型 */
-  lawType: '',
-  /** 违法行为 */
-  lawBehavior: '',
-  /** 参与人（协辅警），多个以逗号隔开 */
-  joinPeople: '',
-  /** 备注 */
-  remark: '',
-  /** 当事人姓名 */
-  partiesName: '',
-  /** 当事人身份证号 */
-  partiesCard: '',
-  /** 当事人电话 */
-  partiesPhone: '',
-  roomCode: "",
-  roomPassword: "",
-  /** 违法时间 */
-  lawDate: '',
+const createFormData = (): InsertLawPoliceReq => ({
+  // /** 案由 */
+  // title: '',
+  // /** 违法地点 */
+  // lawAddress: '',
+  // /** 经度 */
+  // longitude: '',
+  // /** 纬度 */
+  // latitude: '',
+  // /** 违法类型 */
+  // lawType: '',
+  // /** 违法行为 */
+  // lawBehavior: '',
+  // /** 参与人（协辅警），多个以逗号隔开 */
+  // joinPeople: '',
+  // /** 备注 */
+  // remark: '',
+  // /** 当事人姓名 */
+  // partiesName: '',
+  // /** 当事人身份证号 */
+  // partiesCard: '',
+  // /** 当事人电话 */
+  // partiesPhone: '',
+  // roomCode: "",
+  // roomPassword: "",
+  // /** 违法时间 */
+  // lawDate: '',
+  joinPeople: "张三",
+  latitude: "28.103472",
+  lawAddress: "湖南省长沙市雨花区植物园路111号",
+  lawBehavior: "1",
+  lawDate: "2025-06-16 23:54:00",
+  lawType: "0",
+  longitude: "113.032171",
+  partiesCard: "430981199910197231",
+  partiesName: "刘抢西",
+  partiesPhone: "13988828128",
+  remark: "备注信息",
+  roomCode: "9000347172",
+  roomPassword: "200187",
+  title: "酒驾",
 })
 export default function Index() {
   const [formInstance] = Form.useForm()
@@ -135,9 +150,22 @@ export default function Index() {
   const handleSubmitSucceed = useCallback(async (e) => {
     setLoading(true)
     console.log(e)
-    setTimeout(() => {
+    try {
+      const res = await EnforcementApi.insertLawPolice(form)
+      console.log('判断是否可用 可用-直接进入取证室，不可用-重新选择取证室', res)
+      Taro.showToast({
+        title: '发起执法成功',
+        icon: 'success'
+      })
+    } catch (error) {
+      console.log(error)
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      })
+    } finally {
       setLoading(false)
-    }, 1000);
+    }
   }, [form, loading])
 
   // 提交表单失败回调
@@ -186,7 +214,7 @@ export default function Index() {
     /** 选择协辅警回调 */
     Taro.eventCenter.on('SELECT_USER', (res: { values: string[]; options: GetUserListRes[] }) => {
       console.log(res)
-      setForm(v => ({ ...v, joinPeople: res.values.join(',') }))
+      setForm(v => ({ ...v, joinPeople: res.options.map(item => item.userName).join(',') }))
     })
   }, [router.params])
 

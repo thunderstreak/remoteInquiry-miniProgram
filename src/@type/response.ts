@@ -281,8 +281,154 @@ export interface DictOption {
 /**
  * 用户信息
  */
+// private Integer isPut;//是否启用
+// private String thirdId = "-1";//第三方id(为空，默认值-1)
+// private String loginCode = "-1";//登录账号(为空，默认值-1)
+// private String salt;//盐
+// private String password;//密码
+// private String openId = "-1";//微信唯一open_id(为空，默认值-1)
+// private String chatOpenId = "-1";//微信小程序(为空，默认值-1)
+// private String phone;//手机号（个人中心维护，不作为用户登录手机号）
+// private String userName;//真实姓名
+// private String ip;//ip
+// private String nickname;//昵称
+// private String headerImg;//头像
+// private String description;//签名
+// private Integer sex;//性别 0-女 1-男 2-未知
+// private Integer age;//年龄
+// private LocalDate birthday;//出生年月日
+// private String type;//用户类型
+// private String invitationCode;//邀请码
+// private Integer allowFind;//是否允许被其他用户查找 0-否 1-是
+// private Integer isReal;//是否实名认证 0-未认证 1-已认证
+// private String areaCode;//用户地址code 省市区
+// private String areaName;//用户地址名
+// private String country;//国家
+// private String province;//省
+// private String city;//市
+// private String county;//区
+// private String address;//详细地址
+// private String hobby;//兴趣爱好
+// private String profession;//职业
+// private Integer points;//积分
+// private String realPositive;//[身份证]_正面信息
+// private String realBack;//[身份证]_反面信息
+// private String realName;//[身份证]_真实姓名
+// private Integer realSex;//[身份证]_性别 0-女 1-男 2-未知
+// private String realIdCard;//[身份证]_身份证号
+// private LocalDate realBirthday;//[身份证]出生年月日
+// private String realNationality;//[身份证]_民族
+// private String realIssue;//[身份证]_签发机关
+// @JSONField(format="yyyy-MM-dd HH:mm:ss")
+// @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+// @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+// @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+// @JsonSerialize(using = LocalDateTimeSerializer.class)
+// private LocalDate realCardStartTime;//[身份证]_开始时间
+// @JSONField(format="yyyy-MM-dd HH:mm:ss")
+// @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+// @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+// @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+// @JsonSerialize(using = LocalDateTimeSerializer.class)
+// private LocalDate realCardEndTime;//[身份证]_结束时间
+// @JSONField(format="yyyy-MM-dd HH:mm:ss")
+// @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+// @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+// @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+// @JsonSerialize(using = LocalDateTimeSerializer.class)
+// private LocalDateTime lastLoginTime;//最后登录时间
+// private Integer isSuccess = 0;//是否登录成功
+// private String departmentCode;//部门编码
+// private String departmentName;//部门名称
 export interface GetUserListRes extends Login {
-
+  /** 是否启用 */
+  isPut: 0 | 1;
+  /** 第三方id(为空，默认值-1) */
+  thirdId: string;
+  /** 登录账号(为空，默认值-1) */
+  loginCode: string;
+  /** 盐 */
+  salt: string;
+  /** 密码 */
+  password: string;
+  /** 微信唯一open_id(为空，默认值-1) */
+  openId: string;
+  /** 微信小程序(为空，默认值-1) */
+  chatOpenId: string;
+  /** 手机号（个人中心维护，不作为用户登录手机号） */
+  phone: string;
+  /** 真实姓名 */
+  userName: string;
+  /** ip */
+  ip: string;
+  /** 昵称 */
+  nickname: string;
+  /** 头像 */
+  headerImg: string;
+  /** 签名 */
+  description: string;
+  /** 性别 */
+  sex: number;
+  /** 年龄 */
+  age: number;
+  /** 出生年月日 */
+  birthday: string;
+  /** 用户类型 2:民警 1:辅警 */
+  type: string;
+  /** 邀请码 */
+  invitationCode: string;
+  /** 是否允许被其他用户查找 0-否 1-是 */
+  allowFind: number;
+  /** 是否实名认证 0-未认证 1-已认证 */
+  isReal: number;
+  /** 用户地址code 省市区 */
+  areaCode: string;
+  /** 用户地址名 */
+  areaName: string;
+  /** 国家 */
+  country: string;
+  /** 省 */
+  province: string;
+  /** 市 */
+  city: string;
+  /** 区 */
+  county: string;
+  /** 详细地址 */
+  address: string;
+  /** 兴趣爱好 */
+  hobby: string;
+  /** 职业 */
+  profession: string;
+  /** 积分 */
+  points: number;
+  /** [身份证]_正面信息 */
+  realPositive: string;
+  /** [身份证]_反面信息 */
+  realBack: string;
+  /** [身份证]_真实姓名 */
+  realName: string;
+  /** [身份证]_性别 0-女 1-男 2-未知 */
+  realSex: number;
+  /** [身份证]_身份证号 */
+  realIdCard: string;
+  /** [身份证]出生年月日 */
+  realBirthday: string;
+  /** [身份证]_民族 */
+  realNationality: string;
+  /** [身份证]_签发机关 */
+  realIssue: string;
+  /** [身份证]_开始时间 */
+  realCardStartTime: string;
+  /** [身份证]_结束时间 */
+  realCardEndTime: string;
+  /** 最后登录时间 */
+  lastLoginTime: string;
+  /** 是否登录成功 */
+  isSuccess: number;
+  /** 部门编码 */
+  departmentCode: string;
+  /** 部门名称 */
+  departmentName: string;
 }
 
 /**

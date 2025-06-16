@@ -3,8 +3,8 @@ export enum EnforcementStatusEnum {
   WAITING = 9,
   /** 执法中 */
   PROCESSING = 2,
-  /** 已离线 */
-  BREAK = 0,
   /** 休息中 */
-  OFF = 3,
+  BREAK = 3,
+  /** 已离线 */
+  OFF = 0,
 }

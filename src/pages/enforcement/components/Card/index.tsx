@@ -1,11 +1,12 @@
 import { View, Image, Text } from "@tarojs/components";
 import './index.less'
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { EnforcementStatusEnum } from "./type";
 import Taro from "@tarojs/taro";
 
 export default function Index({ info, disabled }) {
-  const status = EnforcementStatusEnum.WAITING
+  const [useName, setUseName] = useState(info.useAdminName)
+  const [phone, setPhone] = useState('')
 
   const logoImg = useMemo(() => {
     const imgMap = {
@@ -38,26 +39,42 @@ export default function Index({ info, disabled }) {
     })
   }, [info, disabled])
 
-  const handlerToCall = useCallback(() => {
+  const handlerToCall = useCallback((phone: string) => {
     console.log('拨打电话')
     Taro.makePhoneCall({
-      phoneNumber: '18569501321'
+      phoneNumber: phone
     })
   }, [])
 
+  useEffect(() => {
+    if (info.useAdminName) {
+      const [name, phone] = info.useAdminName.split('(')
+      if (name) {
+        setUseName(name)
+      }
+      if (phone) {
+        setPhone(phone.replace(')', ''))
+      }
+    }
+  }, [info])
+
   return (
-    <View className="card text-base flex px-4 py-5 bg-white mb-2 rounded-lg relative leading-[19px]">
+    <View className="card min-h-[70px] text-base flex px-4 py-5 bg-white mb-2 rounded-lg relative leading-[19px]">
       <Image className="card-logo mr-2 w-10 h-10" src={logoImg}></Image>
-      <View className="card-content">
+      <View className="card-content flex-1">
         <View className="text-[20px] leading-[22px] text-[#333] font-medium">{info.roomName}</View>
         <View className="mt-[6px] font-medium">
-          <Text>{info.nowPeople}</Text>
           {
-            true &&
-            <Text onClick={handlerToCall}>（<Text className="text-[#0F40F5]">18569501321</Text>）</Text>
+            info.isPut === EnforcementStatusEnum.PROCESSING
+             ? (<Text>{info.nowPeople}</Text>)
+             : (<Text>{useName || ''}</Text>)
+          }
+          {
+            phone &&
+            <Text onClick={() => handlerToCall(phone)}>（<Text className="text-[#0F40F5]">{phone}</Text>）</Text>
           }
         </View>
-        <View className="text-[#6c6c6c] mt-2">
+        <View className="text-[#6c6c6c] mt-3">
           <Text>已办</Text>
           <Text className="ml-[8px]">{info.finishNum || 0}</Text>
         </View>

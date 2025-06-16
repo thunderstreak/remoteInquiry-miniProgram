@@ -4,7 +4,7 @@ import type * as Req from '@/@type/request'
 import type * as Com from '@/@type/common'
 
 class EnforcementApi {
-  getUserList =wrapperPost<Req.GetUserListReq, Res.GetUserListRes[]>(
+  getUserList =wrapperPost<Req.GetUserListReq, Com.ResponseList<Res.GetUserListRes>>(
     "/api/v1/user/getUserList"
   );
 
@@ -20,6 +20,13 @@ class EnforcementApi {
    */
   queryLawPoliceNotColse = wrapperPost<null, Com.ResponseData<Res.GetEnforcementStatusRes>>(
     "/api/v1/lawPolice/queryLawPoliceNotColse"
+  );
+
+  /**
+   * 录入案件
+   */
+  insertLawPolice = wrapperPost<Req.InsertLawPoliceReq, Com.ResponseData<any>>(
+    "/api/v1/lawPolice/insert"
   );
 }
 

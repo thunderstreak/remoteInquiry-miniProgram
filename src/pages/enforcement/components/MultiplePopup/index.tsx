@@ -12,8 +12,13 @@ export default function Index({ visible, setVisible }) {
   const [checkList, setCheckList] = useState<string[]>([])
 
   const checkedOptions = useMemo(() => {
-    return userList.filter(item => checkList.some(x => x === item.loginCode))
+    return userList.filter(item => checkList.some(x => x === item.id))
   }, [userList, checkList])
+
+  const handlerClear = useCallback(() => {
+    setKeywords('')
+    getUserList()
+  }, [])
 
   const handlerSearch = useCallback(() => {
     console.log('搜索')
@@ -22,12 +27,12 @@ export default function Index({ visible, setVisible }) {
   }, [keywords])
 
   const handlerCheck = useCallback((item: GetUserListRes) => {
-    const checkedIndex = checkList.findIndex(x => x === item.loginCode)
+    const checkedIndex = checkList.findIndex(x => x === item.id)
     const values = [...checkList]
     if (checkedIndex !== -1) {
       values.splice(checkedIndex, 1)
     } else {
-      values.push(item.loginCode)
+      values.push(item.id)
     }
     setCheckList(values)
   }, [checkList, userList])
@@ -41,12 +46,11 @@ export default function Index({ visible, setVisible }) {
   const getUserList = useCallback(() => {
     EnforceMentApi.getUserList({ userName: keywords }).then((res) => {
       console.log('get userlist ', res)
-      setUserList(res || [])
+      setUserList(res?.data ?? [])
     })
-  }, [keywords, handlerSearch])
+  }, [keywords, handlerSearch, handlerClear])
 
   useEffect(() => {
-    console.log('visible', visible)
     getUserList()
   }, [])
 
@@ -69,41 +73,51 @@ export default function Index({ visible, setVisible }) {
               value={keywords}
               className="h-8 rounded-2xl"
               placeholder="请输入姓名搜索"
-              onChange={(value: string) => setKeywords(value)}
-              onSearch={handlerSearch}
               leftIn=''
               right={
-                <Image className="w-4 h-4" src={require('@/assets/images/enforcement/icon_search.png')}></Image>
+                <Image className="w-4 h-4" onClick={() => handlerSearch()} src={require('@/assets/images/enforcement/icon_search.png')}></Image>
               }
-            />
-          {/* <View className="flex items-center px-4 h-8 rounded-2xl bg-[#F8F8F8]">
-            <Input
-              className="nut-input-text flex-1 bg-transparent h-8"
-              placeholder="请输入姓名搜索"
-              type="text"
-              value={keywords}
               onChange={(value: string) => setKeywords(value)}
+              onSearch={handlerSearch}
+              onClear={handlerClear}
             />
-            <Image className="w-4 h-4 ml-3" src={require('@/assets/images/enforcement/icon_search.png')}></Image>
-          </View> */}
           <View className="rounded-lg mt-4 bg-[#F8F8F8] px-3 py-3 flex flex-wrap gap-2">
-            <View className="flex items-center justify-center w-[100px] h-9 rounded-sm bg-white box-border">
+            {/* <View className="flex items-center justify-center w-[100px] h-9 rounded-sm bg-white box-border">
               <Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_fj_text.png')}></Image>
               <Text>张三</Text>
-            </View>
+            </View> */}
             {
               userList.map(item => (
                 <View
-                  className={`flex items-center justify-center w-[100px] h-9 rounded-sm bg-white box-border relative ${checkList.includes(item.loginCode) ? 'border border-solid border-[#4D79F2] text-[#4D79F2]' : ''}`}
+                  className={`flex items-center justify-center w-[100px] h-9 rounded-sm bg-white box-border relative ${checkList.includes(item.id) ? 'border border-solid border-[#4D79F2] text-[#4D79F2]' : ''}`}
                   onClick={() => handlerCheck(item)}
                 >
-                  <Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_fj_text_ac.png')}></Image>
+                  {
+                    item.type === '2'
+                     ? (
+                      checkList.includes(item.id)
+                        ? (<Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_plc_ac.png')}></Image>)
+                        : (<Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_plc.png')}></Image>)
+                      )
+                     : (
+                      checkList.includes(item.id)
+                       ? (<Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_fj_text_ac.png')}></Image>)
+                       : (<Image className="w-4 h-4 mr-2" src={require('@/assets/images/enforcement/icon_fj_text.png')}></Image>)
+                     )
+                  }
                   <Text>{item.userName}</Text>
-                  { checkList.includes(item.loginCode) &&
+                  { checkList.includes(item.id) &&
                     (<Image className="w-[14px] h-[14px] absolute -right-px -bottom-px" src={require('@/assets/images/enforcement/icon_checked.png')}></Image>)
                   }
                 </View>
               ))
+            }
+            {
+              !userList.length && (
+                <View className="w-full flex items-center justify-center h-[100px] text-[#999]">
+                  <Text>暂无数据</Text>
+                </View>
+              )
             }
           </View>
           {

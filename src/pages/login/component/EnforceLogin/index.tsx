@@ -239,7 +239,7 @@ export default function Index() {
               <Input
                 className="nut-input-text"
                 placeholder="请输入密码"
-                type="idcard"
+                type="password"
                 value={form.cardNo}
                 cursorSpacing={20}
                 onChange={(value) => handleSetFromValue(value, 'cardNo')}

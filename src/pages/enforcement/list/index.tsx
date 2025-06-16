@@ -104,6 +104,21 @@ export default function Index() {
           {
             roomList.map(item => (<Card info={item} disabled={listDisabled} />))
           }
+          {
+            roomList.length && (
+              <View className="h-[50px] flex items-center justify-center">
+                <Text className="text-[16px] text-[#999]">没有更多了</Text>
+              </View>
+            )
+          }
+          {
+            roomList.length === 0 && (
+              <View className="flex flex-1 flex-col items-center justify-center">
+                <Image className="w-[120px] h-[120px]" src={require('@/assets/images/enforcement/empty_01.png')}></Image>
+                <Text className="text-[16px] text-[#999]">暂无数据</Text>
+              </View>
+            )
+          }
         </View>
         <Image className="w-[72px] h-[64px] fixed bottom-20 right-0" src={require('@/assets/images/enforcement/record_img.png')} onClick={handlerToRecord}></Image>
         <Description />
