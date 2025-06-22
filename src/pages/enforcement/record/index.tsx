@@ -35,8 +35,8 @@ export default function Index() {
                   }
                   description={
                     <View className="flex flex-col relative text-xs text-[#666] pb-4">
-                      <View className={'h-6 leading-6 text-xs rounded-se-md rounded-es-md absolute right-0 top-0 px-[10px] ' + (item.recordState === 'end' ? `bg-[#AFE2C7] text-[#009846]` : 'bg-[#ECB9B9] text-[#CB0000]')}>
-                        {item.recordState === 'end' ? '已完成' : '未完成'}
+                      <View className={'h-6 leading-6 text-xs rounded-se-md rounded-es-md absolute right-0 top-0 px-[10px] ' + ([0,1,2].includes(item.isPut) ? 'bg-[#ECB9B9] text-[#CB0000]' : `bg-[#AFE2C7] text-[#009846]`)}>
+                        {[0,1,2].includes(item.isPut) ? '未完成' : '已完成'}
                       </View>
                       <View className="px-4 pt-4 pb-2 bg-white rounded-t-md">
                         <View className="text-lg font-medium text-[#333] leading-[24px] mb-2">{item.title || ''}</View>
@@ -65,7 +65,7 @@ export default function Index() {
                           <Text >{item.joinPeople || ''}</Text>
                         </View>
                       </View>
-                      <View className={'px-4 py-2 rounded-b-md ' + (item.recordState === 'end' ? 'status-column' : 'status-column-error')}>
+                      <View className={'px-4 py-2 rounded-b-md ' + ([0,1,2].includes(item.isPut) ? 'status-column-error' : 'status-column')}>
                         <View className="leading-[16px]">
                           <Text className="font-medium text-[#333]">当 事 人：</Text>
                           <Text className="text-[11px]">{item.partiesName || ''}/{item.partiesCard || ''}/{item.partiesPhone || ''}</Text>

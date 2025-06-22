@@ -5,13 +5,17 @@ import { useCallback, useEffect, useState } from "react"
 import enforcementApi from "@/api/enforcement"
 import { EnforcementStatusEnum } from "../../list/type"
 import './index.less'
-export default function RoomPopup({ visible, setVisible }) {
+export default function RoomPopup({ visible, setVisible, onConfirm }) {
   const DOWN_NUMBER = 60
   const [loading, setLoading] = useState<boolean>(false)
   const [roomList, setRoomList] = useState<GetRoomListRes[]>([])
   const [downCount, setDownCount] = useState<number>(DOWN_NUMBER)
   let downTimer: NodeJS.Timeout | undefined
 
+  const handleConfirm = useCallback((item: GetRoomListRes) => {
+    setVisible(false)
+    onConfirm(item)
+  }, [setVisible])
 
   const queryPoliceRoomList = useCallback(async () => {
     try {
@@ -106,7 +110,10 @@ export default function RoomPopup({ visible, setVisible }) {
                       <Text className="text-[#333] text-base ml-2">{item.nowPeople || ''}</Text>
                     </View>
                   </View>
-                  <Button className="h-[34px] leading-[34px] px-3 text-base text-white text-center bg-[#4D79F2] rounded-[17px]" >进入执法室</Button>
+                  <Button
+                    className="h-[34px] leading-[34px] px-3 text-base text-white text-center bg-[#4D79F2] rounded-[17px]"
+                    onClick={() => handleConfirm(item)}
+                    >进入执法室</Button>
                 </View>
               ))
             }

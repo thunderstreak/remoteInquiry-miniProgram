@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { View, Image, Text } from "@tarojs/components"
 import { useDidShow, usePullDownRefresh } from "@tarojs/taro"
 import Card from '../components/Card'
@@ -10,9 +10,15 @@ import { GetEnforcementStatusRes, GetRoomListRes } from "@/@type/response"
 import './index.less'
 import Taro from "@tarojs/taro"
 import Empty from "@/components/Empty"
+import { useSetting } from "@/hooks/useSetting"
+import XYRTC from "@xylink/xy-mp-sdk"
+import config from "@/config"
+import useCreateClient from "../hooks/useCreateClient"
 
 export default function Index() {
+  const { handleSetting } = useSetting()
   const userInfo = useSelector(selectUserInfo)
+  const { createClient } = useCreateClient()
   const [roomList, setRoomList] = useState<GetRoomListRes[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [processingInfo, setProcessingInfo] = useState<GetEnforcementStatusRes | null>(null)
@@ -21,9 +27,13 @@ export default function Index() {
     return processingInfo !== null
   }, [processingInfo])
 
-  const handlerAgain = () => {
-    console.log('再次进入')
-  }
+  const handlerAgain = useCallback(async () => {
+    if (!processingInfo) {
+      return
+    }
+    const { roomCode, roomPassword, id } = processingInfo || {}
+    await createClient({ roomCode, roomPassword, id }, 'navigateTo')
+  }, [processingInfo])
 
   const handlerToRecord = () => {
     console.log('进入执法记录')

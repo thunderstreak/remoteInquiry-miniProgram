@@ -7,54 +7,59 @@ import Taro, { useRouter } from "@tarojs/taro";
 import CommonApi from '@/api/common'
 import EnforcementApi from '@/api/enforcement'
 import MultiplePopup from "../components/MultiplePopup";
-import { GetUserListRes } from "@/@type/response";
+import { GetRoomListRes, GetUserListRes } from "@/@type/response";
 import { InsertLawPoliceReq } from "@/@type/request";
 import "./index.less";
 import RoomPopup from "../components/RoomPopup";
+import { useSelector } from "react-redux";
+import { selectUserInfo } from "@/store/slice/user";
+import useCreateClient from "../hooks/useCreateClient";
 
 const createFormData = (): InsertLawPoliceReq => ({
-  // /** 案由 */
-  // title: '',
-  // /** 违法地点 */
-  // lawAddress: '',
-  // /** 经度 */
-  // longitude: '',
-  // /** 纬度 */
-  // latitude: '',
-  // /** 违法类型 */
-  // lawType: '',
-  // /** 违法行为 */
-  // lawBehavior: '',
-  // /** 参与人（协辅警），多个以逗号隔开 */
-  // joinPeople: '',
-  // /** 备注 */
-  // remark: '',
-  // /** 当事人姓名 */
-  // partiesName: '',
-  // /** 当事人身份证号 */
-  // partiesCard: '',
-  // /** 当事人电话 */
-  // partiesPhone: '',
-  // roomCode: "",
-  // roomPassword: "",
-  // /** 违法时间 */
-  // lawDate: '',
-  joinPeople: "张三",
-  latitude: "28.103472",
-  lawAddress: "湖南省长沙市雨花区植物园路111号",
-  lawBehavior: "1",
-  lawDate: "2025-06-16 23:54:00",
-  lawType: "0",
-  longitude: "113.032171",
-  partiesCard: "430981199910197231",
-  partiesName: "刘抢西",
-  partiesPhone: "13988828128",
-  remark: "备注信息",
-  roomCode: "9000347172",
-  roomPassword: "200187",
-  title: "酒驾",
+  /** 案由 */
+  title: '',
+  /** 违法地点 */
+  lawAddress: '',
+  /** 经度 */
+  longitude: '',
+  /** 纬度 */
+  latitude: '',
+  /** 违法类型 */
+  lawType: '',
+  /** 违法行为 */
+  lawBehavior: '',
+  /** 参与人（协辅警），多个以逗号隔开 */
+  joinPeople: '',
+  /** 备注 */
+  remark: '',
+  /** 当事人姓名 */
+  partiesName: '',
+  /** 当事人身份证号 */
+  partiesCard: '',
+  /** 当事人电话 */
+  partiesPhone: '',
+  roomCode: "",
+  roomPassword: "",
+  /** 违法时间 */
+  lawDate: '',
+  // joinPeople: "张三",
+  // latitude: "28.103472",
+  // lawAddress: "湖南省长沙市雨花区植物园路111号",
+  // lawBehavior: "1",
+  // lawDate: "2025-06-16 23:54:00",
+  // lawType: "0",
+  // longitude: "113.032171",
+  // partiesCard: "430981199910197231",
+  // partiesName: "刘抢西",
+  // partiesPhone: "13988828128",
+  // remark: "备注信息",
+  // roomCode: "9000347172",
+  // roomPassword: "200187",
+  // title: "酒驾",
 })
 export default function Index() {
+  const userInfo = useSelector(selectUserInfo)
+  const { createClient } = useCreateClient()
   const [formInstance] = Form.useForm()
   const [form, setForm] = useState(createFormData())
   const [showPicker, setPickerShow] = useState(false)
@@ -99,7 +104,7 @@ export default function Index() {
       const [year, month, day, hour, minute] = values
       setPickerShow(false)
       handleSetFromValue(
-        `${[year, month, day].join('-')} ${[hour, minute].join(':')}`,
+        `${[year, month, day].join('-')} ${[hour, minute, '00'].join(':')}`,
         'lawDate'
       )
     },
@@ -150,9 +155,8 @@ export default function Index() {
     Taro.navigateTo({ url: '/pages/collector/card/index' })
   }, [])
 
-  const handleSubmitSucceed = useCallback(async (e) => {
+  const handleSubmitSucceed = useCallback(async () => {
     setLoading(true)
-    console.log(e)
     try {
       const res = await EnforcementApi.insertLawPolice(form)
       console.log('判断是否可用 可用-直接进入取证室，不可用-重新选择取证室', res)
@@ -160,17 +164,32 @@ export default function Index() {
         title: '发起执法成功',
         icon: 'success'
       })
+      const { roomCode, roomPassword, id } = res.data || {};
+      setTimeout(() => {
+        console.log('发起执法成功，1秒后进入取证室 ', res)
+        createClient({
+          roomCode: roomCode as string,
+          roomPassword: roomPassword as string,
+          id: id as string
+        }, 'redirectTo')
+      }, 1000);
     } catch (error) {
       console.log(error)
-      //
-      Taro.showToast({
-        title: '唤起选择执法室弹窗',
-        icon: 'none'
-      })
+      setShowRoomPopup(true)
     } finally {
       setLoading(false)
     }
-  }, [form, loading])
+  }, [form, loading, createClient, setShowRoomPopup])
+
+  const handleRoomConfirm = useCallback((item: GetRoomListRes) => {
+    if (item.roomCode) {
+      handleSetFromValue(item.roomCode, 'roomCode')
+    }
+    if (item.roomPassword) {
+      handleSetFromValue(item.roomPassword, 'roomPassword')
+    }
+    handleSubmitSucceed()
+  }, [handleSetFromValue ,handleSubmitSucceed])
 
   // 提交表单失败回调
   const handleSubmitFailed = useCallback(
@@ -354,18 +373,21 @@ export default function Index() {
                 />
               </View>
             </Form.Item>
+
             <Form.Item
               label={
                 <Text>发 起 人</Text>
               }
               align="flex-start"
             >
-              <Input
+              {/* <Input
                 className="nut-input-text flex-1"
                 type="text"
-                value={'当前用户姓名'}
+                placeholder=""
+                value={userInfo.userName}
                 readOnly
-              />
+              /> */}
+              <View className="flex-1">{userInfo.userName}</View>
             </Form.Item>
             <Form.Item
               label={
@@ -502,7 +524,7 @@ export default function Index() {
           onConfirm={handleLawBehaviorConfirm}
           />
         <MultiplePopup visible={showMultiplePopup} setVisible={setShowMultiplePopup} />
-        <RoomPopup visible={showRoomPopup} setVisible={setShowRoomPopup} />
+        <RoomPopup visible={showRoomPopup} setVisible={setShowRoomPopup} onConfirm={handleRoomConfirm} />
       </View>
       <Description />
   </View>

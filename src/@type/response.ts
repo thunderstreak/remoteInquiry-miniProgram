@@ -376,6 +376,7 @@ export interface GetUserListRes extends Login {
  * 执法室列表响应数据
  */
 export interface GetRoomListRes {
+  id: string;
   /** 房间编号 */
   roomCode: string;
   /** 房间名称 */

@@ -8,6 +8,7 @@ import { useTimer } from '@/utils/useTime'
 import { Event } from '@/utils'
 import { useSocket } from '@/utils/socket'
 import './index.less'
+import ProxyView from './components/ProxyView'
 
 export default function Index() {
   const { startStopTimer, formatTime } = useTimer(0)
@@ -28,6 +29,17 @@ export default function Index() {
     layoutMode: LayoutMode.AUTO // 布局模式
   })
   const XYClient = useRef<ReturnType<typeof XYRTC.createClient>>()
+
+  /** 是否代理 --- 接听成功、挂断等状态需额外处理（云执法） */
+  const isProxy = useMemo(() => {
+    const { isProxy = 'false' } = router.params
+    return JSON.parse(isProxy)
+  }, [router.params])
+
+  const caseId = useMemo(() => {
+    const { caseId = '' } = router.params
+    return caseId
+  }, [router.params])
 
   const localAudioImg = useMemo(
     () =>
@@ -181,7 +193,6 @@ export default function Index() {
     (event) => {
       // console.log(event)
       const { type, detail } = event
-
       switch (type) {
         // 入会成功消息
         case 'connected':
@@ -342,45 +353,50 @@ export default function Index() {
 
   useEffect(() => {
     const { lawId } = router.params
-    const wsUrl = `${process.env.TARO_APP_API.replace(
-      'https',
-      'wss'
-    )}/api/ws/${lawId}`
-    console.log(wsUrl)
-    handleCreateSocket({ url: wsUrl }).then(() => {
-      handleOnMessage((res) => {
-        const { type, data } = res
-        // console.log(data)
-        switch (type) {
-          case 'NOTICE_SIGN_NAME': // 通知签名
-          case 'NOTICE_SIGN_TIME': // 通知签日期
-          case 'NOTICE_SIGN_MARK': // 通知签备注
-            Taro.setStorageSync(type, data)
-            const suffix = type.replace('NOTICE', 'ON')
-            Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}` })
-            break
-          case 'NOTICE_UPLOAD': // 通知上传证据
-            Taro.navigateTo({ url: '/pages/photo/index' })
-            break
-          case 'NOTICE_CLOSE': // 关闭询问
-            Taro.showModal({
-              title: '提示',
-              content: '远程取证已结束!',
-              showCancel: false,
-              confirmText: '确定'
-            }).then(({ confirm }) => {
-              if (confirm) {
-                hangup()
-              }
-            })
-            break
-        }
+    if (lawId) {
+      const wsUrl = `${process.env.TARO_APP_API.replace(
+        'https',
+        'wss'
+      )}/api/ws/${lawId}`
+      handleCreateSocket({ url: wsUrl }).then(() => {
+        handleOnMessage((res) => {
+          const { type, data } = res
+          // console.log(data)
+          switch (type) {
+            case 'NOTICE_SIGN_NAME': // 通知签名
+            case 'NOTICE_SIGN_TIME': // 通知签日期
+            case 'NOTICE_SIGN_MARK': // 通知签备注
+              Taro.setStorageSync(type, data)
+              const suffix = type.replace('NOTICE', 'ON')
+              Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}` })
+              break
+            case 'NOTICE_UPLOAD': // 通知上传证据
+              Taro.navigateTo({ url: '/pages/photo/index' })
+              break
+            case 'NOTICE_CLOSE': // 关闭询问
+              Taro.showModal({
+                title: '提示',
+                content: '远程取证已结束!',
+                showCancel: false,
+                confirmText: '确定'
+              }).then(({ confirm }) => {
+                if (confirm) {
+                  hangup()
+                }
+              })
+              break
+          }
+        })
       })
-    })
+    }
   }, [handleCreateSocket, handleOnMessage, hangup, router.params])
 
   return (
     <View className="h-full w-full text-white relative bg-[#1f1f25]">
+      {isProxy && caseId !== '' && (
+          <ProxyView id={caseId} />
+        )
+      }
       {state.loading && (
         <View className="xy__call">
           <View className="xy__call-box">
