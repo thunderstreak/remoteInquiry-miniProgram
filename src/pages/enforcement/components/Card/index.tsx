@@ -1,11 +1,13 @@
 import { View, Image, Text } from "@tarojs/components";
 import './index.less'
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { EnforcementStatusEnum } from "./type";
+import { EnforcementStatusEnum } from "../../list/type";
 import Taro from "@tarojs/taro";
+import { CardProps } from "./type";
 
-export default function Index({ info, disabled }) {
-  const [useName, setUseName] = useState(info.useAdminName)
+export default function Index(props: CardProps) {
+  const { roomInfo, disabled } = props
+  const [useName, setUseName] = useState(roomInfo.useAdminName)
   const [phone, setPhone] = useState('')
 
   const logoImg = useMemo(() => {
@@ -15,8 +17,8 @@ export default function Index({ info, disabled }) {
       [EnforcementStatusEnum.BREAK]: require('@/assets/images/enforcement/logo_break.png'),
       [EnforcementStatusEnum.OFF]: require('@/assets/images/enforcement/logo_off.png'),
     }
-    return imgMap[info.isPut]
-  }, [info])
+    return imgMap[roomInfo.isPut]
+  }, [roomInfo])
 
   const statusImg = useMemo(() => {
     const imgMap = {
@@ -25,19 +27,19 @@ export default function Index({ info, disabled }) {
       [EnforcementStatusEnum.BREAK]: require('@/assets/images/enforcement/status_break.png'),
       [EnforcementStatusEnum.OFF]: require('@/assets/images/enforcement/status_off.png'),
     }
-    return imgMap[info.isPut]
-  }, [info])
+    return imgMap[roomInfo.isPut]
+  }, [roomInfo])
 
   const handlerToJump = useCallback(() => {
     console.log('跳转')
     // 有正在处理中的案件，不能发起新的执法
-    if (disabled || info.isPut !== EnforcementStatusEnum.WAITING) {
+    if (disabled || roomInfo.isPut !== EnforcementStatusEnum.WAITING) {
       return
     }
     Taro.navigateTo({
-      url: `/pages/enforcement/apply/index?roomCode=${info.roomCode}&roomPassword=${info.roomPassword}`
+      url: `/pages/enforcement/apply/index?roomCode=${roomInfo.roomCode}&roomPassword=${roomInfo.roomPassword}`
     })
-  }, [info, disabled])
+  }, [roomInfo, disabled])
 
   const handlerToCall = useCallback((phone: string) => {
     console.log('拨打电话')
@@ -47,8 +49,8 @@ export default function Index({ info, disabled }) {
   }, [])
 
   useEffect(() => {
-    if (info.useAdminName) {
-      const [name, phone] = info.useAdminName.split('(')
+    if (roomInfo.useAdminName) {
+      const [name, phone] = roomInfo.useAdminName.split('(')
       if (name) {
         setUseName(name)
       }
@@ -56,17 +58,17 @@ export default function Index({ info, disabled }) {
         setPhone(phone.replace(')', ''))
       }
     }
-  }, [info])
+  }, [roomInfo])
 
   return (
     <View className="card min-h-[70px] text-base flex px-4 py-5 bg-white mb-2 rounded-lg relative leading-[19px]">
       <Image className="card-logo mr-2 w-10 h-10" src={logoImg}></Image>
       <View className="card-content flex-1">
-        <View className="text-[20px] leading-[22px] text-[#333] font-medium">{info.roomName}</View>
+        <View className="text-[20px] leading-[22px] text-[#333] font-medium">{roomInfo.roomName}</View>
         <View className="mt-[6px] font-medium">
           {
-            info.isPut === EnforcementStatusEnum.PROCESSING
-             ? (<Text>{info.nowPeople}</Text>)
+            roomInfo.isPut === EnforcementStatusEnum.PROCESSING
+             ? (<Text>{roomInfo.nowPeople}</Text>)
              : (<Text>{useName || ''}</Text>)
           }
           {
@@ -76,10 +78,10 @@ export default function Index({ info, disabled }) {
         </View>
         <View className="text-[#6c6c6c] mt-3">
           <Text>已办</Text>
-          <Text className="ml-[8px]">{info.finishNum || 0}</Text>
+          <Text className="ml-[8px]">{roomInfo.finishNum || 0}</Text>
         </View>
       </View>
-      <View className={`text-white h-[34px] leading-[34px] pl-4 pr-4 text-base absolute right-4 bottom-4 rounded-full ${info.isPut === EnforcementStatusEnum.WAITING && !disabled ? 'bg-[#4D79F2]' : 'bg-[#BBBBBB]'}`} onClick={handlerToJump}>发起执法</View>
+      <View className={`text-white h-[34px] leading-[34px] pl-4 pr-4 text-base absolute right-4 bottom-4 rounded-full ${roomInfo.isPut === EnforcementStatusEnum.WAITING && !disabled ? 'bg-[#4D79F2]' : 'bg-[#BBBBBB]'}`} onClick={handlerToJump}>发起执法</View>
       <Image className="w-[50px] h-[50px] absolute right-0 top-0" src={statusImg}></Image>
     </View>
   )

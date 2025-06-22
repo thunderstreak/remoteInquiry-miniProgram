@@ -281,65 +281,6 @@ export interface DictOption {
 /**
  * 用户信息
  */
-// private Integer isPut;//是否启用
-// private String thirdId = "-1";//第三方id(为空，默认值-1)
-// private String loginCode = "-1";//登录账号(为空，默认值-1)
-// private String salt;//盐
-// private String password;//密码
-// private String openId = "-1";//微信唯一open_id(为空，默认值-1)
-// private String chatOpenId = "-1";//微信小程序(为空，默认值-1)
-// private String phone;//手机号（个人中心维护，不作为用户登录手机号）
-// private String userName;//真实姓名
-// private String ip;//ip
-// private String nickname;//昵称
-// private String headerImg;//头像
-// private String description;//签名
-// private Integer sex;//性别 0-女 1-男 2-未知
-// private Integer age;//年龄
-// private LocalDate birthday;//出生年月日
-// private String type;//用户类型
-// private String invitationCode;//邀请码
-// private Integer allowFind;//是否允许被其他用户查找 0-否 1-是
-// private Integer isReal;//是否实名认证 0-未认证 1-已认证
-// private String areaCode;//用户地址code 省市区
-// private String areaName;//用户地址名
-// private String country;//国家
-// private String province;//省
-// private String city;//市
-// private String county;//区
-// private String address;//详细地址
-// private String hobby;//兴趣爱好
-// private String profession;//职业
-// private Integer points;//积分
-// private String realPositive;//[身份证]_正面信息
-// private String realBack;//[身份证]_反面信息
-// private String realName;//[身份证]_真实姓名
-// private Integer realSex;//[身份证]_性别 0-女 1-男 2-未知
-// private String realIdCard;//[身份证]_身份证号
-// private LocalDate realBirthday;//[身份证]出生年月日
-// private String realNationality;//[身份证]_民族
-// private String realIssue;//[身份证]_签发机关
-// @JSONField(format="yyyy-MM-dd HH:mm:ss")
-// @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-// @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-// @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-// @JsonSerialize(using = LocalDateTimeSerializer.class)
-// private LocalDate realCardStartTime;//[身份证]_开始时间
-// @JSONField(format="yyyy-MM-dd HH:mm:ss")
-// @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-// @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-// @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-// @JsonSerialize(using = LocalDateTimeSerializer.class)
-// private LocalDate realCardEndTime;//[身份证]_结束时间
-// @JSONField(format="yyyy-MM-dd HH:mm:ss")
-// @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-// @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-// @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-// @JsonSerialize(using = LocalDateTimeSerializer.class)
-// private LocalDateTime lastLoginTime;//最后登录时间
-// private Integer isSuccess = 0;//是否登录成功
-// private String departmentCode;//部门编码
-// private String departmentName;//部门名称
 export interface GetUserListRes extends Login {
   /** 是否启用 */
   isPut: 0 | 1;
@@ -435,10 +376,36 @@ export interface GetUserListRes extends Login {
  * 执法室列表响应数据
  */
 export interface GetRoomListRes {
-
+  /** 房间编号 */
+  roomCode: string;
+  /** 房间名称 */
+  roomName: string;
+  /** 房间英文名称 */
+  roomEng: string;
+  /** 房间密码 */
+  roomPassword: string;
+  /** 是否自动录像（0：否，1:是） */
+  isTranscribe: number;
+  /** 备注 */
+  remark: string;
+  /** 录制状态 */
+  recordState: string;
+  /** 取证室状态：0已离线(默认)，1休息中，2执法中，9待呼叫 */
+  isPut: number;
+  /** 已办理案件总数 */
+  finishNum: number;
+  /** 当前办理人员，多个以逗号隔开 */
+  nowPeople: string;
+  /** 当前占用人id */
+  useAdmin: string;
+  /** 当前占用人名称及电话 */
+  useAdminName: string;
 }
 
 export interface GetEnforcementStatusRes {
+  id: string;
+  tenantCode: string;
+  orgCode: string;
   /** 案由 */
   title: string;
   /** 违法地点 */
@@ -449,8 +416,10 @@ export interface GetEnforcementStatusRes {
   latitude: string;
   /** 违法类型 */
   lawType: string;
+  lawTypeName: string;
   /** 违法行为 */
   lawBehavior: string;
+  lawBehaviorName: string;
   /** 参与人（协辅警），多个以逗号隔开 */
   joinPeople: string;
   /** 备注 */
@@ -463,6 +432,7 @@ export interface GetEnforcementStatusRes {
   partiesPhone: string;
   /** 呼叫的房间号 */
   roomCode: string;
+  roomName: string;
   /** 房间密码 */
   roomPassword: string;
   /** 案件状态：0-准备、1-呼叫中、2-已接听、3-办结（结束案件/录屏）、4-未接听（小程序3分钟内未接听）、9-拒绝 */
@@ -487,4 +457,6 @@ export interface GetEnforcementStatusRes {
   createBy: string;
   /** 创建人名称 */
   createName: string;
+  /** 创建时间 */
+  createTime: string;
 }

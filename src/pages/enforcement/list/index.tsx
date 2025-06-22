@@ -9,6 +9,7 @@ import enforcementApi from '@/api/enforcement'
 import { GetEnforcementStatusRes, GetRoomListRes } from "@/@type/response"
 import './index.less'
 import Taro from "@tarojs/taro"
+import Empty from "@/components/Empty"
 
 export default function Index() {
   const userInfo = useSelector(selectUserInfo)
@@ -102,10 +103,10 @@ export default function Index() {
             )
           }
           {
-            roomList.map(item => (<Card info={item} disabled={listDisabled} />))
+            roomList.map(item => (<Card roomInfo={item} disabled={listDisabled} />))
           }
           {
-            roomList.length && (
+            roomList.length > 0 && (
               <View className="h-[50px] flex items-center justify-center">
                 <Text className="text-[16px] text-[#999]">没有更多了</Text>
               </View>
@@ -113,10 +114,11 @@ export default function Index() {
           }
           {
             roomList.length === 0 && (
-              <View className="flex flex-1 flex-col items-center justify-center">
-                <Image className="w-[120px] h-[120px]" src={require('@/assets/images/enforcement/empty_01.png')}></Image>
-                <Text className="text-[16px] text-[#999]">暂无数据</Text>
-              </View>
+              // <View className="flex flex-1 flex-col items-center justify-center">
+              //   <Image className="w-[278px] h-[180px]" src={require('@/assets/images/enforcement/empty_01.png')}></Image>
+              //   <Text className="text-[16px] text-[#999]">暂无数据</Text>
+              // </View>
+              <Empty url={require('@/assets/images/enforcement/empty_01.png')} imgClassName="w-[278px] h-[180px]" className="flex-1" />
             )
           }
         </View>

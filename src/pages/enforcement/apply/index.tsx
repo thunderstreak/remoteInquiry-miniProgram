@@ -3,13 +3,14 @@ import { Button, DatePicker, Divider, Form, Input, Picker, PickerOption, TextAre
 import Description from "../components/Description";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type * as Res from '@/@type/response'
-import Taro, { useLoad, useRouter } from "@tarojs/taro";
+import Taro, { useRouter } from "@tarojs/taro";
 import CommonApi from '@/api/common'
 import EnforcementApi from '@/api/enforcement'
 import MultiplePopup from "../components/MultiplePopup";
 import { GetUserListRes } from "@/@type/response";
 import { InsertLawPoliceReq } from "@/@type/request";
 import "./index.less";
+import RoomPopup from "../components/RoomPopup";
 
 const createFormData = (): InsertLawPoliceReq => ({
   // /** 案由 */
@@ -62,7 +63,10 @@ export default function Index() {
   const [showLawBehavior, setShowLawBehavior] = useState(false)
   const [lawTypeList, setLawTypeList] = useState<PickerOption[]>([])
   const [lawBehaviorList, setLawBehaviorList] = useState<PickerOption[]>([])
+  /** 参与人选择弹窗 */
   const [showMultiplePopup, setShowMultiplePopup] = useState(false)
+  /** 执法室选择弹窗 */
+  const [showRoomPopup, setShowRoomPopup] = useState(false)
 
   const router = useRouter()
 
@@ -98,7 +102,6 @@ export default function Index() {
         `${[year, month, day].join('-')} ${[hour, minute].join(':')}`,
         'lawDate'
       )
-      // formInstance.resetFields(['lawDate'])
     },
     [form]
   )
@@ -143,9 +146,9 @@ export default function Index() {
       })
     }, [form])
 
-    const handleVerifyId = useCallback(async () => {
-      Taro.navigateTo({ url: '/pages/collector/card/index' })
-    }, [])
+  const handleVerifyId = useCallback(async () => {
+    Taro.navigateTo({ url: '/pages/collector/card/index' })
+  }, [])
 
   const handleSubmitSucceed = useCallback(async (e) => {
     setLoading(true)
@@ -159,8 +162,9 @@ export default function Index() {
       })
     } catch (error) {
       console.log(error)
+      //
       Taro.showToast({
-        title: error.message,
+        title: '唤起选择执法室弹窗',
         icon: 'none'
       })
     } finally {
@@ -193,10 +197,10 @@ export default function Index() {
     })
   }, [])
 
-  useLoad(() => {
+  useEffect(() => {
     getLawTypeList()
     getLawBehaviorList()
-  })
+  }, [])
 
   useEffect(() => {
     const { roomCode, roomPassword } = router.params
@@ -206,6 +210,7 @@ export default function Index() {
     if (roomPassword) {
       handleSetFromValue(roomPassword, 'roomPassword')
     }
+
     /** 身份证识别回调 */
     Taro.eventCenter.on('ON_OCR_CARD', (res: Res.CardOcr) => {
       console.log(res)
@@ -497,6 +502,7 @@ export default function Index() {
           onConfirm={handleLawBehaviorConfirm}
           />
         <MultiplePopup visible={showMultiplePopup} setVisible={setShowMultiplePopup} />
+        <RoomPopup visible={showRoomPopup} setVisible={setShowRoomPopup} />
       </View>
       <Description />
   </View>

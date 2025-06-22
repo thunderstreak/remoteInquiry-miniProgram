@@ -28,6 +28,14 @@ class EnforcementApi {
   insertLawPolice = wrapperPost<Req.InsertLawPoliceReq, Com.ResponseData<any>>(
     "/api/v1/lawPolice/insert"
   );
+
+  /**
+   * 执法记录列表
+   */
+  queryLawPoliceList = wrapperPost<null, Com.ResponseList<Res.GetEnforcementStatusRes>>(
+    "/api/v1/lawPolice/queryLawPoliceList"
+  );
+
 }
 
 export default new EnforcementApi();

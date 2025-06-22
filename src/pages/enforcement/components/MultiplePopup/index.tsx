@@ -2,11 +2,13 @@ import { Popup, SearchBar } from "@nutui/nutui-react-taro";
 import { View, Image, Text } from "@tarojs/components";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import EnforceMentApi from '@/api/enforcement'
-import './index.less';
 import { GetUserListRes } from "@/@type/response";
 import Taro from "@tarojs/taro";
+import { MultiplePopupProps } from "./type";
+import './index.less';
 
-export default function Index({ visible, setVisible }) {
+export default function Index(props: MultiplePopupProps) {
+  const { visible, setVisible } = props
   const [keywords, setKeywords] = useState<string>('')
   const [userList, setUserList] = useState<GetUserListRes[]>([])
   const [checkList, setCheckList] = useState<string[]>([])
