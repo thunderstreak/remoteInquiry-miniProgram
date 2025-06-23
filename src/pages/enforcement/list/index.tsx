@@ -10,13 +10,9 @@ import { GetEnforcementStatusRes, GetRoomListRes } from "@/@type/response"
 import './index.less'
 import Taro from "@tarojs/taro"
 import Empty from "@/components/Empty"
-import { useSetting } from "@/hooks/useSetting"
-import XYRTC from "@xylink/xy-mp-sdk"
-import config from "@/config"
 import useCreateClient from "../hooks/useCreateClient"
 
 export default function Index() {
-  const { handleSetting } = useSetting()
   const userInfo = useSelector(selectUserInfo)
   const { createClient } = useCreateClient()
   const [roomList, setRoomList] = useState<GetRoomListRes[]>([])
@@ -113,7 +109,7 @@ export default function Index() {
             )
           }
           {
-            roomList.map(item => (<Card roomInfo={item} disabled={listDisabled} />))
+            roomList.map(item => (<Card key={item.id} roomInfo={item} disabled={listDisabled} />))
           }
           {
             roomList.length > 0 && (

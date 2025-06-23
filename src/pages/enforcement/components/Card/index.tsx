@@ -57,6 +57,9 @@ export default function Index(props: CardProps) {
       if (phone) {
         setPhone(phone.replace(')', ''))
       }
+    } else {
+      setUseName('')
+      setPhone('')
     }
   }, [roomInfo])
 
@@ -66,11 +69,7 @@ export default function Index(props: CardProps) {
       <View className="card-content flex-1">
         <View className="text-[20px] leading-[22px] text-[#333] font-medium">{roomInfo.roomName}</View>
         <View className="mt-[6px] font-medium">
-          {
-            roomInfo.isPut === EnforcementStatusEnum.PROCESSING
-             ? (<Text>{roomInfo.nowPeople}</Text>)
-             : (<Text>{useName || ''}</Text>)
-          }
+          <Text>{useName || ''}</Text>
           {
             phone &&
             <Text onClick={() => handlerToCall(phone)}>（<Text className="text-[#0F40F5]">{phone}</Text>）</Text>

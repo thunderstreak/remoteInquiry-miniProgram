@@ -295,7 +295,10 @@ export default function Index() {
     XYClient.current = XYRTC.createClient({
       // 目的是排除底部40px空间，显示操作条
       container: { offset: [40, 40, 0, 0] },
-      report: true
+      report: true,
+      // 设置竖屏显示
+      // orientation: 'PORTRAIT'
+      orientation: 'VERTICAL'
     })
     // 设置布局模式
     XYClient.current?.setLayoutMode(state.layoutMode)

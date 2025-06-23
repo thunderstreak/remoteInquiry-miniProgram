@@ -1,10 +1,12 @@
-import { View, Text, Image } from "@tarojs/components";
+import { View, Text } from "@tarojs/components";
 import { Step, Steps } from "@nutui/nutui-react-taro";
 import Description from "../components/Description";
 import Empty from "@/components/Empty";
 import { useEffect, useState } from "react";
 import { GetEnforcementStatusRes } from "@/@type/response";
 import enforcementApi from "@/api/enforcement";
+import { usePullDownRefresh } from "@tarojs/taro";
+import Taro from "@tarojs/taro";
 import './index.less';
 
 export default function Index() {
@@ -17,9 +19,16 @@ export default function Index() {
     }
   }
 
+  // 下拉刷新
+  usePullDownRefresh(async () => {
+    await getRecordList()
+    Taro.stopPullDownRefresh()
+  })
+
   useEffect(() => {
     getRecordList();
   },[])
+
   return (
     <View className="linear-bg h-full w-full flex flex-col">
       {
@@ -44,36 +53,46 @@ export default function Index() {
                           <Text className="font-medium text-[#333]">执法室：</Text>
                           <Text >{item.roomName || ''}</Text>
                         </View>
-                        <View className="leading-[16px]">
+                        <View className="leading-[18px] mt-1">
                           <Text className="font-medium text-[#333]">违法时间：</Text>
                           <Text >{item.lawDate || ''}</Text>
                         </View>
-                        <View className="leading-[16px]">
+                        <View className="leading-[18px] mt-1">
                           <Text className="font-medium text-[#333]">违法地点：</Text>
                           <Text >{item.lawAddress || ''}</Text>
                         </View>
-                        <View className="leading-[16px]">
+                        <View className="leading-[18px] mt-1">
                           <Text className="font-medium text-[#333]">违法类型：</Text>
                           <Text >{item.lawTypeName || ''}</Text>
                         </View>
-                        <View className="leading-[16px]">
+                        <View className="leading-[18px] mt-1">
                           <Text className="font-medium text-[#333]">违法行为：</Text>
                           <Text >{item.lawBehaviorName || ''}</Text>
                         </View>
-                        <View className="leading-[16px]">
-                          <Text className="font-medium text-[#333]">协 辅 警：</Text>
-                          <Text >{item.joinPeople || ''}</Text>
-                        </View>
+                        {
+                          item.joinPeople !== '' && (
+                            <View className="leading-[18px] mt-1">
+                              <Text className="font-medium text-[#333]">协 辅 警：</Text>
+                              <Text >{item.joinPeople || ''}</Text>
+                            </View>
+                          )
+                        }
                       </View>
                       <View className={'px-4 py-2 rounded-b-md ' + ([0,1,2].includes(item.isPut) ? 'status-column-error' : 'status-column')}>
-                        <View className="leading-[16px]">
+                        <View className="leading-[18px] mt-1">
                           <Text className="font-medium text-[#333]">当 事 人：</Text>
-                          <Text className="text-[11px]">{item.partiesName || ''}/{item.partiesCard || ''}/{item.partiesPhone || ''}</Text>
+                          <Text className="text-[11px]">{
+                            [item.partiesName, item.partiesCard, item.partiesPhone].filter(x => !!x).join('/')
+                          }</Text>
                         </View>
-                        <View className="leading-[16px]">
-                          <Text className="font-medium text-[#333]">备 注：</Text>
-                          <Text >{item.remark || ''}</Text>
-                        </View>
+                        {
+                          item.remark !== '' && (
+                            <View className="leading-[18px] mt-1">
+                              <Text className="font-medium text-[#333]">备 注：</Text>
+                              <Text >{item.remark || ''}</Text>
+                            </View>
+                          )
+                        }
                       </View>
 
                     </View>

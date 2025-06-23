@@ -42,20 +42,6 @@ const createFormData = (): InsertLawPoliceReq => ({
   roomPassword: "",
   /** 违法时间 */
   lawDate: '',
-  // joinPeople: "张三",
-  // latitude: "28.103472",
-  // lawAddress: "湖南省长沙市雨花区植物园路111号",
-  // lawBehavior: "1",
-  // lawDate: "2025-06-16 23:54:00",
-  // lawType: "0",
-  // longitude: "113.032171",
-  // partiesCard: "430981199910197231",
-  // partiesName: "刘抢西",
-  // partiesPhone: "13988828128",
-  // remark: "备注信息",
-  // roomCode: "9000347172",
-  // roomPassword: "200187",
-  // title: "酒驾",
 })
 export default function Index() {
   const userInfo = useSelector(selectUserInfo)
@@ -95,7 +81,7 @@ export default function Index() {
       setForm((v) => ({ ...v, [field]: value }))
       formInstance.setFieldValue(field, value)
     },
-    [setForm]
+    [setForm, form]
   )
 
   const hanlerPickerConfirm = useCallback(
@@ -155,10 +141,10 @@ export default function Index() {
     Taro.navigateTo({ url: '/pages/collector/card/index' })
   }, [])
 
-  const handleSubmitSucceed = useCallback(async () => {
+  const handleSubmitSucceed = useCallback(async (formData: InsertLawPoliceReq) => {
     setLoading(true)
     try {
-      const res = await EnforcementApi.insertLawPolice(form)
+      const res = await EnforcementApi.insertLawPolice(formData)
       console.log('判断是否可用 可用-直接进入取证室，不可用-重新选择取证室', res)
       Taro.showToast({
         title: '发起执法成功',
@@ -182,14 +168,12 @@ export default function Index() {
   }, [form, loading, createClient, setShowRoomPopup])
 
   const handleRoomConfirm = useCallback((item: GetRoomListRes) => {
-    if (item.roomCode) {
-      handleSetFromValue(item.roomCode, 'roomCode')
-    }
-    if (item.roomPassword) {
-      handleSetFromValue(item.roomPassword, 'roomPassword')
-    }
-    handleSubmitSucceed()
-  }, [handleSetFromValue ,handleSubmitSucceed])
+    handleSubmitSucceed({
+      ...form,
+      roomCode: item.roomCode,
+      roomPassword: item.roomPassword
+    })
+  }, [form, handleSubmitSucceed])
 
   // 提交表单失败回调
   const handleSubmitFailed = useCallback(
@@ -215,6 +199,12 @@ export default function Index() {
       }
     })
   }, [])
+
+  // useEffect(() => {
+  //   if (form.roomCode) {
+  //     handleSubmitSucceed()
+  //   }
+  // }, [handleRoomConfirm])
 
   useEffect(() => {
     getLawTypeList()
@@ -505,7 +495,7 @@ export default function Index() {
         <DatePicker
           title="时间选择"
           type="datetime"
-          defaultValue={new Date(`${form.lawDate}`)}
+          defaultValue={new Date(`${form.lawDate && form.lawDate.replace(/-/g, '/')}`)}
           startDate={new Date()}
           visible={showPicker}
           onClose={() => setPickerShow(false)}

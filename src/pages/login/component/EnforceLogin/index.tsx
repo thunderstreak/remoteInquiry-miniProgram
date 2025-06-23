@@ -3,14 +3,12 @@ import Taro, { useRouter } from '@tarojs/taro'
 import {
   BaseEventOrig,
   Image,
-  ScrollView,
   Text,
   View
 } from '@tarojs/components'
 import {
   Button,
   Checkbox,
-  ConfigProvider,
   Dialog,
   Form,
   Input,
@@ -25,6 +23,7 @@ import { FormData, LoginState } from '@/pages/login/type'
 import type * as Res from '@/@type/response'
 import Video from '../Video/index'
 import '../../index.less'
+import TipDialog from '../TipDialog'
 
 const createFormData = (): FormData => ({
   // userName: '王小',
@@ -37,8 +36,8 @@ const createFormData = (): FormData => ({
   loginType: 1
 })
 export default function Index() {
+  const HOME_PATH = '/pages/enforcement/list/index'
   const dispatch = useDispatch()
-  const [timeLeft, setTimeLeft] = useState(8)
   const [formInstance] = Form.useForm()
   const [form, setForm] = useState(createFormData())
   const [state, setState] = useState<LoginState>({
@@ -70,7 +69,7 @@ export default function Index() {
 
   const handleNavigateTo = useCallback(() => {
     handleSetDialog(false, 'successShow')
-    Taro.navigateTo({ url: `/pages/enforcement/list/index` }).catch(console.log)
+    Taro.navigateTo({ url: HOME_PATH }).catch(console.log)
   }, [handleSetDialog])
 
   const handleSubmitSucceed = useCallback(
@@ -118,20 +117,6 @@ export default function Index() {
     })
   }, [router.params])
 
-  useEffect(() => {
-    if (timeLeft > 0 && state.successShow) {
-      const intervalId = setInterval(() => {
-        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1)
-      }, 1000)
-      return () => clearInterval(intervalId)
-    }
-  }, [state.successShow, timeLeft])
-
-  useEffect(() => {
-    if (timeLeft === 0) {
-      Taro.navigateTo({ url: '/pages/enforcement/list/index' }).catch(console.log)
-     }
-  }, [timeLeft])
   return (
     <View className="enforce-login h-full flex flex-col justify-between bg-color">
       <View className="flex-shrink-0">
@@ -274,50 +259,7 @@ export default function Index() {
         </View>
       </View>
       <Dialog id="dialog" />
-      <Dialog
-        title={
-          <View className="flex justify-center items-center gap-2">
-            <Image
-              className="w-5 h-5"
-              src={require('@/assets/img/icon_waring.png')}
-            />
-            <Text>警方提示</Text>
-          </View>
-        }
-        visible={state.successShow}
-        hideCancelButton
-        onConfirm={handleNavigateTo}
-        confirmText={<View>继续({timeLeft ?? ''}s)</View>}
-      >
-        <ScrollView scrollY style={{ height: '300px' }}>
-          <View className="flex flex-col gap-3 text-[14px] font-medium my-6">
-            <View className="flex">
-              <View className="w-2 h-2 rounded-full bg-[#3777E1] ml-1 mt-2 mr-2 flex-shrink-0" />
-              <Text>
-                任何情况下执法人员都不会让被询问人转账到指定账户，不会要求提供任何账号密码。
-              </Text>
-            </View>
-            <View className="flex">
-              <View className="w-2 h-2 rounded-full bg-[#3777E1] ml-1 mt-2 mr-2 flex-shrink-0" />
-              <Text>
-                询问时请选择安静、整洁的环境，并保证手机电量充足，网路畅通，条件允许请优先选择稳定的WiFi上网。为保障询问过程不掉线，请在询问过程中拒接任何来电。
-              </Text>
-            </View>
-            <View className="flex">
-              <View className="w-2 h-2 rounded-full bg-[#3777E1] ml-1 mt-2 mr-2 flex-shrink-0" />
-              <Text>
-                进入视频时，请特手机环视一周，确保没有其他人员在场或可能被干扰。同时将手机固定并保持一定距离，确保人员一直在视频画面中。
-              </Text>
-            </View>
-            <View className="flex">
-              <View className="w-2 h-2 rounded-full bg-[#3777E1] ml-1 mt-2 mr-2 flex-shrink-0" />
-              <Text>
-                询问过程中若不慎退出，请重新从公众号或小程序点击进入。
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-      </Dialog>
+      <TipDialog visible={state.successShow} homePath={HOME_PATH} handleNavigateTo={handleNavigateTo} />
 
       <Overlay visible={state.videoShow}>
         <View className="h-full flex-col-center gap-4">

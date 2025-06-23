@@ -72,7 +72,13 @@ export default function ProxyView(props: ProxyViewProps) {
         // 取消返回  否则什么都不做
         if (!res.confirm) {
           enforcementApi.cancelCall({id: id})
-          Taro.navigateBack()
+          Taro.showToast({
+            title: '已取消呼叫,即将退出',
+            icon: 'none'
+          })
+          setTimeout(() => {
+            Taro.navigateBack()
+          }, 1000);
         }
       },
     })

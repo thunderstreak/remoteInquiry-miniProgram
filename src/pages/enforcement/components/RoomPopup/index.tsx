@@ -15,7 +15,7 @@ export default function RoomPopup({ visible, setVisible, onConfirm }) {
   const handleConfirm = useCallback((item: GetRoomListRes) => {
     setVisible(false)
     onConfirm(item)
-  }, [setVisible])
+  }, [setVisible, onConfirm])
 
   const queryPoliceRoomList = useCallback(async () => {
     try {
