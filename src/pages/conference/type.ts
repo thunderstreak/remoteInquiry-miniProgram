@@ -43,3 +43,6 @@ export interface ConferenceRouterParams {
   videoMute: boolean;
   audioMute: boolean;
 }
+
+/** 全屏角色 pusher本地  remote远程 */
+export type FullRole = 'remote' | 'pusher'

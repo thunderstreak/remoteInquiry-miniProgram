@@ -90,8 +90,13 @@ export default function ProxyView(props: ProxyViewProps) {
       const res = await enforcementApi.queryCallStatus({
         id: id,
       })
-      const { isPut } = res.data || {}
+      const { isPut, roomName } = res.data || {}
       console.log('查询呼叫状态', res)
+      if (roomName) {
+        Taro.setNavigationBarTitle({
+          title: roomName,
+        })
+      }
       const status = isPut as CallStatus
       setCallStatus(status)
       // 根据状态判断是否开始执法  是否中断
@@ -164,10 +169,10 @@ export default function ProxyView(props: ProxyViewProps) {
       {
         showCallOut && (
           <View className="w-full h-full flex flex-col items-center justify-center text-white fixed z-[9999] bg-[#1C2D3C]">
-          <View className="text-[10px] font-medium">正在呼叫</View>
-          <View className="text-[8px] mt-1">{time}s</View>
+          <View className="text-[24px] font-medium">正在呼叫</View>
+          <View className="text-[18px] mt-2">{time}s</View>
           <Button
-            className="w-8 h-8 leading-8 mt-5 text-[8px] border border-white border-solid text-white rounded-full bg-transparent"
+            className="w-20 h-20 leading-[72px] mt-[72px] text-[20px] border border-white border-solid text-white rounded-full bg-transparent"
           onClick={handleCancel}
           >取消</Button>
         </View>
