@@ -257,7 +257,10 @@ export default function Index() {
             <Divider/>
             <Form.Item
               label={
-                <Text>案   由</Text>
+                <Text>
+                  <Text>案</Text>
+                  <Text className="ml-8">由</Text>
+                </Text>
               }
               name="title"
               align="flex-start"
@@ -366,7 +369,11 @@ export default function Index() {
 
             <Form.Item
               label={
-                <Text>发 起 人</Text>
+                <Text>
+                  <Text>发</Text>
+                  <Text className="ml-2">起</Text>
+                  <Text className="ml-2">人</Text>
+                </Text>
               }
               align="flex-start"
             >
@@ -381,7 +388,11 @@ export default function Index() {
             </Form.Item>
             <Form.Item
               label={
-                <Text>协 辅 警</Text>
+                <Text>
+                  <Text>协</Text>
+                  <Text className="ml-2">辅</Text>
+                  <Text className="ml-2">警</Text>
+                </Text>
               }
               name="joinPeople"
               align="flex-start"
@@ -402,7 +413,10 @@ export default function Index() {
             </Form.Item>
             <Form.Item
               label={
-                <Text>备 注</Text>
+                <Text>
+                  <Text>备</Text>
+                  <Text className="ml-8">注</Text>
+                </Text>
               }
               name="remark"
               align="flex-start"
@@ -426,7 +440,10 @@ export default function Index() {
             <Divider/>
             <Form.Item
               label={
-                <Text>姓 名</Text>
+                <Text>
+                  <Text>姓</Text>
+                  <Text className="ml-8">名</Text>
+                </Text>
               }
               name="partiesName"
               align="flex-start"

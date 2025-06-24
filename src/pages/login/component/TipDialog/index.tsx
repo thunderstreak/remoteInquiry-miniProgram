@@ -6,7 +6,7 @@ import { TipDialogProps } from "./type";
 import './index.less'
 
 export default function TipDialog(props: TipDialogProps) {
-  const { visible, handleNavigateTo, homePath } = props;
+  const { visible, handleNavigateTo } = props;
   const [timeLeft, setTimeLeft] = useState(8);
 
   useEffect(() => {
@@ -15,12 +15,14 @@ export default function TipDialog(props: TipDialogProps) {
         setTimeLeft((prevTimeLeft) => prevTimeLeft - 1)
       }, 1000)
       return () => clearInterval(intervalId)
+    } else if (visible === false) {
+      setTimeLeft(8)
     }
   }, [visible, timeLeft])
 
   useEffect(() => {
     if (timeLeft === 0) {
-      Taro.navigateTo({ url: homePath }).catch(console.log)
+      handleNavigateTo()
      }
   }, [timeLeft])
 
