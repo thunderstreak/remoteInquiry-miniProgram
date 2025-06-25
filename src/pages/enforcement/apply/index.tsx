@@ -512,8 +512,7 @@ export default function Index() {
         <DatePicker
           title="时间选择"
           type="datetime"
-          defaultValue={new Date(`${form.lawDate && form.lawDate.replace(/-/g, '/')}`)}
-          startDate={new Date()}
+          defaultValue={form.lawDate && new Date(`${form.lawDate.replace(/-/g, '/')}`) || new Date()}
           visible={showPicker}
           onClose={() => setPickerShow(false)}
           onConfirm={(options, values) => hanlerPickerConfirm(options, values)}
