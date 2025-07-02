@@ -122,16 +122,16 @@ export default function Index() {
       <View className="flex-shrink-0">
         {/* <NavHeader title="千名千探" back={false} />*/}
         <View className="relative mt-[35px]">
-          <View className="absolute left-0 right-0 top-4 mx-auto font-bold text-[20px] text-center text-white">
-            交警5G云执法
+          <View className="absolute left-0 right-0 top-4 mx-auto font-bold text-[28px] text-center text-white">
+            智云易办
           </View>
           <Image
             className="w-[374px] h-[286px] block mx-auto"
-            src={require('@/assets/img/icon_cen1.png')}
+            src={require('@/assets/img/icon_cen2.png')}
           />
         </View>
-        <View className="flex-center text-[14px] font-medium pb-4 text-white pt-2">
-          随时随地 · 安全高效
+        <View className="flex-center text-[18px] font-medium pb-4 text-white pt-2">
+          平安守护 · 安全你我
         </View>
       </View>
       <View className="flex-1 rounded-t-xl px-6 bg-form-color">
