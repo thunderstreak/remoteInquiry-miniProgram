@@ -85,7 +85,7 @@ export default function Index() {
         if (data) {
           Taro.setStorageSync('userInfo', data)
           dispatch(userActions.setUserInfo(data))
-          setState((v) => ({ ...v, successShow: true }))
+          setState((v) => ({ ...v, successShow: true, loading: false }))
           Taro.showToast({ title: '请仔细阅读以下注意事项', icon: 'none' }).catch(console.log)
         }
       }).finally(() => {
@@ -123,7 +123,7 @@ export default function Index() {
         {/* <NavHeader title="千名千探" back={false} />*/}
         <View className="relative mt-[35px]">
           <View className="absolute left-0 right-0 top-4 mx-auto font-bold text-[28px] text-center text-white">
-            智云易办
+            远程快办
           </View>
           <Image
             className="w-[374px] h-[286px] block mx-auto"
