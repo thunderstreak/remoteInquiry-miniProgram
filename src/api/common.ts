@@ -14,6 +14,12 @@ class CommonApi {
     '/api/v1/saas/getSaasInfo'
   )
   /*
+   * 获取字典数据
+   * */
+  getDictList = wrapperPost<Req.Dict, Com.ResponseList<Res.DictOption>>(
+    '/api/v1/dict/queryCodeList'
+  )
+  /*
    * 提取的指纹图片
    * */
   fingerPrint = wrapperPost<Req.FingerPrint, Com.ResponseData<string>>(

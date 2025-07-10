@@ -2,14 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Taro, { useRouter } from '@tarojs/taro'
 import { Image, LivePlayer, LivePusher, View } from '@tarojs/components'
 import XYRTC, { LayoutInfo, LayoutMode } from '@xylink/xy-mp-sdk'
-import { ConferenceStates } from '@/pages/conference/type'
+import { ConferenceStates, FullRole } from '@/pages/conference/type'
 import { getDeviceAvatar, getNetworkLevelImage } from '@/utils/meeting'
 import { useTimer } from '@/utils/useTime'
 import { Event } from '@/utils'
 import { useSocket } from '@/utils/socket'
 import './index.less'
+import ProxyView from './components/ProxyView'
+import { useStatusHeight } from '@/hooks/useStatusHeight'
 
 export default function Index() {
+  const sysInfo = useStatusHeight()
   const { startStopTimer, formatTime } = useTimer(0)
   const router = useRouter()
   const { handleCreateSocket, handleOnMessage, handleClose } = useSocket()
@@ -28,6 +31,38 @@ export default function Index() {
     layoutMode: LayoutMode.AUTO // 布局模式
   })
   const XYClient = useRef<ReturnType<typeof XYRTC.createClient>>()
+
+  const leftMinStyle = {
+    width: '138px',
+    height: '184px',
+    left: 0,
+    top: 0, //`${sysInfo.statusBarHeight}px`,
+    zIndex: 10,
+  }
+
+  const fullStyle = {
+    width: '100%',
+    height: `calc(100% - 124px)`,
+    left: 0,
+    top: 0, // `${sysInfo.statusBarHeight}px`,
+    zIndex: 9,
+  }
+
+  const [pusherStyle, setPusherStyle] = useState(leftMinStyle)
+  const [remoteStyle, setRemoteStyle] = useState(fullStyle)
+  const [fullRole, setFullRole] = useState<FullRole>('remote')
+
+
+  /** 是否代理 --- 接听成功、挂断等状态需额外处理（云执法） */
+  const isProxy = useMemo(() => {
+    const { isProxy = 'false' } = router.params
+    return JSON.parse(isProxy)
+  }, [router.params])
+
+  const caseId = useMemo(() => {
+    const { caseId = '' } = router.params
+    return caseId
+  }, [router.params])
 
   const localAudioImg = useMemo(
     () =>
@@ -145,9 +180,23 @@ export default function Index() {
    */
   const handleFullScreenContent = useCallback((data, e) => {
     Event.click(e, () => {
-      XYClient.current?.handleFullScreen(data)
+      if (isProxy) {
+        // 代理模式 --- 竖屏 仅小窗口可点击切换大窗口
+        if (data.isPusher && fullRole === 'remote') {
+          setPusherStyle(fullStyle)
+          setRemoteStyle(leftMinStyle)
+          setFullRole('pusher')
+        } else if (!data.isPusher && fullRole === 'pusher') {
+          setRemoteStyle(fullStyle)
+          setPusherStyle(leftMinStyle)
+          setFullRole('remote')
+        }
+      } else {
+        XYClient.current?.handleFullScreen(data)
+      }
     })
-  }, [])
+  }, [isProxy, fullRole, setPusherStyle, setRemoteStyle])
+
 
   // 挂断会议
   const hangup = useCallback(() => {
@@ -181,7 +230,6 @@ export default function Index() {
     (event) => {
       // console.log(event)
       const { type, detail } = event
-
       switch (type) {
         // 入会成功消息
         case 'connected':
@@ -284,7 +332,10 @@ export default function Index() {
     XYClient.current = XYRTC.createClient({
       // 目的是排除底部40px空间，显示操作条
       container: { offset: [40, 40, 0, 0] },
-      report: true
+      report: true,
+      // 设置竖屏显示
+      // orientation: 'PORTRAIT'
+      orientation: 'VERTICAL'
     })
     // 设置布局模式
     XYClient.current?.setLayoutMode(state.layoutMode)
@@ -342,45 +393,50 @@ export default function Index() {
 
   useEffect(() => {
     const { lawId } = router.params
-    const wsUrl = `${process.env.TARO_APP_API.replace(
-      'https',
-      'wss'
-    )}/api/ws/${lawId}`
-    console.log(wsUrl)
-    handleCreateSocket({ url: wsUrl }).then(() => {
-      handleOnMessage((res) => {
-        const { type, data } = res
-        // console.log(data)
-        switch (type) {
-          case 'NOTICE_SIGN_NAME': // 通知签名
-          case 'NOTICE_SIGN_TIME': // 通知签日期
-          case 'NOTICE_SIGN_MARK': // 通知签备注
-            Taro.setStorageSync(type, data)
-            const suffix = type.replace('NOTICE', 'ON')
-            Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}` })
-            break
-          case 'NOTICE_UPLOAD': // 通知上传证据
-            Taro.navigateTo({ url: '/pages/photo/index' })
-            break
-          case 'NOTICE_CLOSE': // 关闭询问
-            Taro.showModal({
-              title: '提示',
-              content: '远程取证已结束!',
-              showCancel: false,
-              confirmText: '确定'
-            }).then(({ confirm }) => {
-              if (confirm) {
-                hangup()
-              }
-            })
-            break
-        }
+    if (lawId) {
+      const wsUrl = `${process.env.TARO_APP_API.replace(
+        'https',
+        'wss'
+      )}/api/ws/${lawId}`
+      handleCreateSocket({ url: wsUrl }).then(() => {
+        handleOnMessage((res) => {
+          const { type, data } = res
+          // console.log(data)
+          switch (type) {
+            case 'NOTICE_SIGN_NAME': // 通知签名
+            case 'NOTICE_SIGN_TIME': // 通知签日期
+            case 'NOTICE_SIGN_MARK': // 通知签备注
+              Taro.setStorageSync(type, data)
+              const suffix = type.replace('NOTICE', 'ON')
+              Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}` })
+              break
+            case 'NOTICE_UPLOAD': // 通知上传证据
+              Taro.navigateTo({ url: '/pages/photo/index' })
+              break
+            case 'NOTICE_CLOSE': // 关闭询问
+              Taro.showModal({
+                title: '提示',
+                content: '远程取证已结束!',
+                showCancel: false,
+                confirmText: '确定'
+              }).then(({ confirm }) => {
+                if (confirm) {
+                  hangup()
+                }
+              })
+              break
+          }
+        })
       })
-    })
+    }
   }, [handleCreateSocket, handleOnMessage, hangup, router.params])
 
   return (
-    <View className="h-full w-full text-white relative bg-[#1f1f25]">
+    <View className={`h-full w-full text-white relative bg-[#1f1f25] ${isProxy ? 'vertical-layout' : ''}`}>
+      {isProxy && caseId !== '' && (
+          <ProxyView id={caseId} />
+        )
+      }
       {state.loading && (
         <View className="xy__call">
           <View className="xy__call-box">
@@ -406,7 +462,7 @@ export default function Index() {
           {x.isPusher ? (
             <View
               className="video"
-              style={x.style}
+              style={isProxy ? pusherStyle : x.style}
               onClick={(e) => handleFullScreenContent(x, e)}
             >
               {state.pushUrl && (
@@ -451,7 +507,7 @@ export default function Index() {
           ) : (
             <View
               className="video"
-              style={x.style}
+              style={isProxy ? remoteStyle : x.style}
               onClick={(e) => handleFullScreenContent(x, e)}
             >
               {x.playUrl && (
@@ -517,7 +573,7 @@ export default function Index() {
       {!state.loading && !state.onHold && (
         <View className="xy__operate-container">
           {/* 下部的操作条 */}
-          <View className="xy__operate xy__operate-left">
+          <View className="xy__operate xy__operate-left" style={`padding-bottom: ${isProxy ? sysInfo.safeHeight : 0}px;${isProxy ? 'height: 124px' : ''}`}>
             <View
               className={`xy__operate-btn ${
                 state.videoMute ? 'xy__operate-btn-disabled' : ''
@@ -544,9 +600,20 @@ export default function Index() {
                 {state.videoMute ? '开启视频' : '关闭视频'}
               </View>
             </View>
-            <View className="xy__operate-end" onClick={hangup}>
-              挂断
-            </View>
+            {
+              isProxy ? (
+                <View className="xy__operate-btn" onClick={hangup}>
+                  <Image className="icon other-icon" src={require('../../assets/images/action_hangup.png')} />
+                  <View className="xy__operate-font">
+                    挂断
+                  </View>
+                </View>
+              ) : (
+                <View className="xy__operate-end" onClick={hangup}>
+                  挂断
+                </View>
+              )
+            }
           </View>
           {/* 上部操作条*/}
           <View className="xy__operate xy__operate-right">
