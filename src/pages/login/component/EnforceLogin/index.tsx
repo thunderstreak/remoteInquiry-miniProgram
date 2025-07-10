@@ -263,7 +263,7 @@ export default function Index() {
 
       <Overlay visible={state.videoShow}>
         <View className="h-full flex-col-center gap-4">
-          <Video />
+          <Video src="https://www.zjhzkjyx.com/file/qianming/video/video_0002.mp4" />
           <View className="w-[25px] h-[25px] rounded-full border-[0.5px] border-solid border-[#fff] text-white flex-center" onClick={() => handleSetDialog(false, 'videoShow')}>
             <Close width="10px" height="10px" />
           </View>
