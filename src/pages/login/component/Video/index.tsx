@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react'
 import { Video } from '@nutui/nutui-react-taro'
+import { VideoProps } from './type'
 
 const options = {
   autoplay: true,
@@ -7,9 +8,9 @@ const options = {
   controls: true
 }
 
-const Index: React.FC = () => {
+const Index: React.FC<VideoProps> = ({ src }) => {
   const [source, setSource] = useState({
-    src: 'https://www.zjhzkjyx.com/file/qianming/video/video_0001.mp4',
+    src: src,
     type: 'video/mp4'
   })
 

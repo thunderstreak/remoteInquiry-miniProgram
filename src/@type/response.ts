@@ -182,6 +182,12 @@ export interface Login {
   isExpire: boolean;
   token: string;
   refreshToken: string | null;
+  /** 警号？ */
+  loginCode: string;
+  /** 所属执法队变化 --- 交警执法 */
+  departmentName: string;
+  /** 所属执法队 --- 交警执法 */
+  departmentCode: string;
 }
 
 export interface UserInfo extends Login {}
@@ -262,4 +268,196 @@ export interface Template {
   updateBy: string
   updateName: string
   updateTime: string
+}
+
+/**
+ * 字典返回数据
+ */
+export interface DictOption {
+  key: string
+  value: string
+}
+
+/**
+ * 用户信息
+ */
+export interface GetUserListRes extends Login {
+  /** 是否启用 */
+  isPut: 0 | 1;
+  /** 第三方id(为空，默认值-1) */
+  thirdId: string;
+  /** 登录账号(为空，默认值-1) */
+  loginCode: string;
+  /** 盐 */
+  salt: string;
+  /** 密码 */
+  password: string;
+  /** 微信唯一open_id(为空，默认值-1) */
+  openId: string;
+  /** 微信小程序(为空，默认值-1) */
+  chatOpenId: string;
+  /** 手机号（个人中心维护，不作为用户登录手机号） */
+  phone: string;
+  /** 真实姓名 */
+  userName: string;
+  /** ip */
+  ip: string;
+  /** 昵称 */
+  nickname: string;
+  /** 头像 */
+  headerImg: string;
+  /** 签名 */
+  description: string;
+  /** 性别 */
+  sex: number;
+  /** 年龄 */
+  age: number;
+  /** 出生年月日 */
+  birthday: string;
+  /** 用户类型 2:民警 1:辅警 */
+  type: string;
+  /** 邀请码 */
+  invitationCode: string;
+  /** 是否允许被其他用户查找 0-否 1-是 */
+  allowFind: number;
+  /** 是否实名认证 0-未认证 1-已认证 */
+  isReal: number;
+  /** 用户地址code 省市区 */
+  areaCode: string;
+  /** 用户地址名 */
+  areaName: string;
+  /** 国家 */
+  country: string;
+  /** 省 */
+  province: string;
+  /** 市 */
+  city: string;
+  /** 区 */
+  county: string;
+  /** 详细地址 */
+  address: string;
+  /** 兴趣爱好 */
+  hobby: string;
+  /** 职业 */
+  profession: string;
+  /** 积分 */
+  points: number;
+  /** [身份证]_正面信息 */
+  realPositive: string;
+  /** [身份证]_反面信息 */
+  realBack: string;
+  /** [身份证]_真实姓名 */
+  realName: string;
+  /** [身份证]_性别 0-女 1-男 2-未知 */
+  realSex: number;
+  /** [身份证]_身份证号 */
+  realIdCard: string;
+  /** [身份证]出生年月日 */
+  realBirthday: string;
+  /** [身份证]_民族 */
+  realNationality: string;
+  /** [身份证]_签发机关 */
+  realIssue: string;
+  /** [身份证]_开始时间 */
+  realCardStartTime: string;
+  /** [身份证]_结束时间 */
+  realCardEndTime: string;
+  /** 最后登录时间 */
+  lastLoginTime: string;
+  /** 是否登录成功 */
+  isSuccess: number;
+  /** 部门编码 */
+  departmentCode: string;
+  /** 部门名称 */
+  departmentName: string;
+}
+
+/**
+ * 执法室列表响应数据
+ */
+export interface GetRoomListRes {
+  id: string;
+  /** 房间编号 */
+  roomCode: string;
+  /** 房间名称 */
+  roomName: string;
+  /** 房间英文名称 */
+  roomEng: string;
+  /** 房间密码 */
+  roomPassword: string;
+  /** 是否自动录像（0：否，1:是） */
+  isTranscribe: number;
+  /** 备注 */
+  remark: string;
+  /** 录制状态 */
+  recordState: string;
+  /** 取证室状态：0已离线(默认)，1休息中，2执法中，9待呼叫 */
+  isPut: number;
+  /** 已办理案件总数 */
+  finishNum: number;
+  /** 当前办理人员，多个以逗号隔开 */
+  nowPeople: string;
+  /** 当前占用人id */
+  useAdmin: string;
+  /** 当前占用人名称及电话 */
+  useAdminName: string;
+}
+
+export interface GetEnforcementStatusRes {
+  id: string;
+  tenantCode: string;
+  orgCode: string;
+  /** 案由 */
+  title: string;
+  /** 违法地点 */
+  lawAddress: string;
+  /** 经度 */
+  longitude: string;
+  /** 纬度 */
+  latitude: string;
+  /** 违法类型 */
+  lawType: string;
+  lawTypeName: string;
+  /** 违法行为 */
+  lawBehavior: string;
+  lawBehaviorName: string;
+  /** 参与人（协辅警），多个以逗号隔开 */
+  joinPeople: string;
+  /** 备注 */
+  remark: string;
+  /** 当事人姓名 */
+  partiesName: string;
+  /** 当事人身份证号 */
+  partiesCard: string;
+  /** 当事人电话 */
+  partiesPhone: string;
+  /** 呼叫的房间号 */
+  roomCode: string;
+  roomName: string;
+  /** 房间密码 */
+  roomPassword: string;
+  /** 案件状态：0-准备、1-呼叫中、2-已接听、3-办结（结束案件/录屏）、4-未接听（小程序3分钟内未接听）、9-拒绝 */
+  isPut: number;
+  /** 开始录制时间 */
+  startTime: string;
+  /** 结束录制时间 */
+  endTime: string;
+  /** 小鱼录制的seesion */
+  sessionId: string;
+  /** 录制状态 */
+  recordState: string;
+  /** 违法时间 */
+  lawDate: string;
+  /** 管理端操作人员id */
+  pcAdmin: string;
+  /** 管理端操作人员名称 */
+  pcAdminName: string;
+  /** 管理端操作人员操作时间 */
+  pcAdminDate: string;
+  /** 创建人编码 */
+  createBy: string;
+  /** 创建人名称 */
+  createName: string;
+  /** 创建时间 */
+  createTime: string;
 }
