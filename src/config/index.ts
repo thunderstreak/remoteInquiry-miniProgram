@@ -25,7 +25,7 @@ console.log(process.env.TARO_APP_PLATFORM, ' process.env.TARO_APP_PLATFORM')
  */
 const platform: PlatformTypes = process.env.TARO_APP_PLATFORM as PlatformTypes || PlatformTypes.远程取证
 
-const orgCode = platform === PlatformTypes.交警云执法 ? 'Z02' : 'Z01'
+const orgCode = platform === PlatformTypes.交警云执法 ? 'Z02' : 'Hbp5J1'
 
 const config: IConfig = {
   baseURL: process.env.TARO_APP_API, // api地址
