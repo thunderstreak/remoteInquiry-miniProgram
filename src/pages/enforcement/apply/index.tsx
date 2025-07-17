@@ -79,7 +79,8 @@ export default function Index() {
   const handleSetFromValue = useCallback(
     (value: string, field: string) => {
       setForm((v) => ({ ...v, [field]: value }))
-      formInstance.setFieldValue(field, value)
+      // formInstance.setFieldsValue(field, value)
+      formInstance.setFieldsValue({ [field]: value })
     },
     [setForm, form]
   )
@@ -263,7 +264,6 @@ export default function Index() {
                 </Text>
               }
               name="title"
-              align="flex-start"
               rules={[
                 { required: true, message: '请输入案由' },
               ]}
@@ -281,7 +281,6 @@ export default function Index() {
             <Form.Item
               label='违法时间'
               name="lawDate"
-              align="flex-start"
               rules={[
                 { required: true, message: '请点击选择时间', trigger: 'onChange' },
               ]}
@@ -303,7 +302,6 @@ export default function Index() {
             <Form.Item
               label='违法地点'
               name="lawAddress"
-              align="flex-start"
               rules={[
                 { required: true, message: '请点击选择地点' },
               ]}
@@ -325,7 +323,6 @@ export default function Index() {
             <Form.Item
               label='违法类型'
               name="lawType"
-              align="flex-start"
               rules={[
                 { required: true, message: '请选择违法类型' },
               ]}
@@ -347,7 +344,6 @@ export default function Index() {
             <Form.Item
               label='违法行为'
               name="lawBehavior"
-              align="flex-start"
               rules={[
                 { required: true, message: '请选择违法行为' },
               ]}
@@ -375,7 +371,6 @@ export default function Index() {
                   <Text className="ml-2">人</Text>
                 </Text>
               }
-              align="flex-start"
             >
               {/* <Input
                 className="nut-input-text flex-1"
@@ -395,7 +390,6 @@ export default function Index() {
                 </Text>
               }
               name="joinPeople"
-              align="flex-start"
             >
               <View className="flex-center gap-2" onClick={() => setShowMultiplePopup(true)}>
                 <Input
@@ -413,13 +407,12 @@ export default function Index() {
             </Form.Item>
             <Form.Item
               label={
-                <Text>
+                <View className="text-left">
                   <Text>备</Text>
                   <Text className="ml-8">注</Text>
-                </Text>
+                </View>
               }
               name="remark"
-              align="flex-start"
               className="item-textarea no-bottom-driver flex-col items-start"
               rules={[
                 { message: '请填写备注信息' },
@@ -446,7 +439,6 @@ export default function Index() {
                 </Text>
               }
               name="partiesName"
-              align="flex-start"
               rules={[
                 { required: true, message: '请输入当事人姓名' },
               ]}
@@ -464,7 +456,6 @@ export default function Index() {
             <Form.Item
               label='身份证号'
               name="partiesCard"
-              align="flex-start"
               rules={[
                 { pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: '请输入正确的身份证号' },
               ]}
@@ -489,7 +480,6 @@ export default function Index() {
             <Form.Item
               label='联系方式'
               name="partiesPhone"
-              align="flex-start"
               className="no-bottom-driver"
               rules={[
                 { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的电话号码' },
