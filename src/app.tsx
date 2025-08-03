@@ -7,7 +7,7 @@ import './app.less'
 const App = ({ children }: PropsWithChildren<any>): ReactNode => {
   useLaunch(async () => {
     console.log('App launched.')
-    if (process.env.TARO_ENV === 'weapp') {
+    if (process.env.TARO_ENV === 'weapp' && process.env.NODE_ENV !== 'development') {
       await Taro.setVisualEffectOnCapture({
         visualEffect: 'hidden',
         success: () => {

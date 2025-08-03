@@ -12,12 +12,17 @@ import config from '@/config'
 import HomeApi from '@/api/home'
 import CommonApi from '@/api/common'
 import './index.less'
+import PreviewFinger from './components/PreviewFinger'
 
 export default function Index() {
   // const router = useRouter()
   const userInfo = useSelector(selectUserInfo)
+  // 是否第一次加载
+  const [isFirstLoad, setIsFirstLoad] = useState(true)
   const [list, setList] = useState<Res.RoomQueryRoomList[]>([])
   const { handleSetting } = useSetting()
+  const [showFinger, setShowFinger] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState('')
   // console.log(router)
   // console.log(userInfo) 9042180858
 
@@ -39,7 +44,7 @@ export default function Index() {
       if (!res) {
         return
       }
-      const { roomCode, roomPassword, userName, id, lawId } = user
+      const { roomCode, roomPassword, userName, id, lawPeopleRecordNumId } = user
       const XYClient = XYRTC.createClient({
         report: true,
         extId: config.DEFAULT_EXTID,
@@ -57,7 +62,7 @@ export default function Index() {
         console.log(cn)
         XYClient.showToast('登录成功')
         await Taro.navigateTo({
-          url: `/pages/conference/index?displayName=${userName}&password=${roomPassword}&number=${roomCode}&videoMute=${false}&audioMute=${false}&lawId=${lawId}`
+          url: `/pages/conference/index?displayName=${userName}&extUserId=${id}&password=${roomPassword}&number=${roomCode}&videoMute=${false}&audioMute=${false}&lawId=${lawPeopleRecordNumId}`
         })
       } else {
         XYClient.showToast('登录失败，请稍后重试')
@@ -139,6 +144,10 @@ export default function Index() {
       //   )
       // }
       // Taro.hideLoading()
+    } else if (fingerUrl) {
+      // 预览指纹信息
+      setPreviewUrl(fingerUrl)
+      setShowFinger(true)
     }
   }, [])
 
@@ -154,10 +163,15 @@ export default function Index() {
   })
 
   useDidShow(() => {
-    handleGetAllInfo()
+    if (!isFirstLoad) {
+      handleGetAllInfo()
+    }
   })
 
   useEffect(() => {
+    if (isFirstLoad) {
+      setIsFirstLoad(false)
+    }
     handleGetAllInfo()
 
     Taro.eventCenter.on('ON_OCR_FINGER', (res: Res.CardOcr) => {
@@ -228,9 +242,13 @@ export default function Index() {
                       {x.lawName}
                     </View>
                     <View className="text-[14px]">
+                      <Text className="text-[#6C6C6C]">询问次数：</Text>
+                      第{x.cs || 0}次
+                    </View>
+                    {/* <View className="text-[14px]">
                       <Text className="text-[#6C6C6C]">预约时间：</Text>
                       {x.createTime}
-                    </View>
+                    </View> */}
                   </View>
                 </View>
               </View>
@@ -250,9 +268,13 @@ export default function Index() {
                         <View className="text-[14px] text-[#333333]">
                           指纹上传
                         </View>
-                        <View className="text-[12px] text-[#6C6C6C]">
+                        {
+                          x.fingerUrl ? (
+                            <Text className="text-[#6C6C6C] text-[12px]">已上传</Text>
+                          ) : (<View className="text-[12px] text-[#6C6C6C]">
                           请上传本人指纹
-                        </View>
+                        </View>)
+                        }
                       </View>
                     </View>
                     <View
@@ -260,7 +282,9 @@ export default function Index() {
                       onClick={() => handleUploadFinger(x)}
                     >
                       {x.fingerUrl ? (
-                        <Text className="text-[#6C6C6C] font-bold">已上传</Text>
+                        <Text className="text-[#0F40F5] font-bold">
+                          查看&gt;
+                        </Text>
                       ) : (
                         <Text className="text-[#0F40F5] font-bold">
                           去采集&gt;
@@ -292,6 +316,8 @@ export default function Index() {
           {userInfo.orgName}
         </View>
       </View>
+
+      <PreviewFinger fingerUrl={previewUrl} visible={showFinger} onClose={setShowFinger} />
     </View>
   )
 }

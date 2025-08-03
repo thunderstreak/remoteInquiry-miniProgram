@@ -197,7 +197,7 @@ export default function Index() {
             <Button
               block
               type="primary"
-              loading={state.loading}
+              loading={state.loading || state.successShow}
               className="!h-[44px] !rounded"
               color={disabled ? '#9BBBF0' : '#3777E1'}
               disabled={disabled}

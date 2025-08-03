@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import Taro, { useRouter } from '@tarojs/taro'
+import Taro, { useDidHide, useDidShow, useRouter } from '@tarojs/taro'
 import { Image, LivePlayer, LivePusher, View } from '@tarojs/components'
 import XYRTC, { LayoutInfo, LayoutMode } from '@xylink/xy-mp-sdk'
 import { ConferenceStates, FullRole } from '@/pages/conference/type'
@@ -10,12 +10,13 @@ import { useSocket } from '@/utils/socket'
 import './index.less'
 import ProxyView from './components/ProxyView'
 import { useStatusHeight } from '@/hooks/useStatusHeight'
+import config from '@/config'
 
 export default function Index() {
   const sysInfo = useStatusHeight()
   const { startStopTimer, formatTime } = useTimer(0)
   const router = useRouter()
-  const { handleCreateSocket, handleOnMessage, handleClose } = useSocket()
+  const { handleCreateSocket, handleOnMessage, handleClose, handlerInjectListener } = useSocket()
   const [state, setState] = useState<ConferenceStates>({
     loading: true,
     pushUrl: '', // 推流地址
@@ -31,6 +32,12 @@ export default function Index() {
     layoutMode: LayoutMode.AUTO // 布局模式
   })
   const XYClient = useRef<ReturnType<typeof XYRTC.createClient>>()
+  // 当前页面是否隐藏
+  const isHide = useRef(false)
+  // 是否需要重连小鱼
+  const isNeedReconnect = useRef(false)
+  // 是否重连socket
+  const isNeedReconnectSocket = useRef(false)
 
   const leftMinStyle = {
     width: '138px',
@@ -62,6 +69,19 @@ export default function Index() {
   const caseId = useMemo(() => {
     const { caseId = '' } = router.params
     return caseId
+  }, [router.params])
+
+  const socketWsUrl = useMemo(() => {
+    const { lawId = '' } = router.params
+    if (lawId) {
+      const wsUrl = `${process.env.TARO_APP_API.replace(
+        'https',
+        'wss'
+      )}/api/ws/${lawId}`
+      return wsUrl
+    } else {
+      return ''
+    }
   }, [router.params])
 
   const localAudioImg = useMemo(
@@ -96,7 +116,6 @@ export default function Index() {
       const networkLevel =
         state.remoteNetworkLevel[item.roster.callUri || ''] || 4
       const networkLevelImage = getNetworkLevelImage(networkLevel)
-
       return {
         ...item,
         audioImg,
@@ -199,11 +218,23 @@ export default function Index() {
 
 
   // 挂断会议
-  const hangup = useCallback(() => {
+  const hangup = useCallback((isExit: boolean = true) => {
     XYClient.current?.hangup()
     XYClient.current?.off('roomEvent')
-    handleClose() // 关闭ws链接
-    Taro.navigateBack({ delta: 1 })
+    if (isExit) {
+      handleClose() // 关闭ws链接
+      Taro.navigateBack({ delta: 1 })
+    } else {
+      setState((v) => ({
+        ...v,
+        connected: false,
+        pushUrl: '',
+        isPushed: false,
+        onHold: false,
+        layout: [],
+        layoutMode: LayoutMode.AUTO
+    }))
+    }
   }, [handleClose])
 
   /**
@@ -218,7 +249,7 @@ export default function Index() {
           showCancel: false, // 是否显示取消按钮,
           confirmText: '退出会议', // 确定按钮的文字，默认为取消，最多 4 个字符,
           confirmColor: '#3876FF' // 确定按钮的文字颜色,
-        }).then(hangup)
+        }).then(() => hangup())
       } else {
         hangup()
       }
@@ -230,23 +261,34 @@ export default function Index() {
     (event) => {
       // console.log(event)
       const { type, detail } = event
+
       switch (type) {
         // 入会成功消息
         case 'connected':
+          console.log('入会成功~~~', type, detail)
           setState((v) => ({ ...v, loading: false, connected: true }))
           startStopTimer()
           break
         // 退出会议消息
         case 'disconnected':
-          const { message } = detail
+          const { message, code } = detail
           setState((v) => ({ ...v, loading: false }))
-
+          console.log('disconnected ~ isHide: ', isHide.current, message, detail)
           if (message) {
             // 存在message消息，则直接提示，默认3s后退会会议界面
             // 注意此处的message可以直接用做展示使用，不需要开发者再进行错误码的匹配
-            XYClient.current?.showToast(message, () => {
-              hangup()
-            })
+            if (code === 'MEETING_KILLED') {
+              XYClient.current?.showToast(message, () => {
+                hangup()
+              })
+            } else {
+              // 新增逻辑 -- 判断当前是否小程序onHide 是则保留在当前页面不退出  等待onShow重连
+              XYClient.current?.showToast(message)
+              if (isHide.current) {
+                isNeedReconnect.current = true
+              }
+              hangup(!isHide.current)
+            }
           } else {
             // 不存在message消息，直接退会
             hangup()
@@ -269,7 +311,7 @@ export default function Index() {
               setState((v) => ({ ...v, isPushed: true }))
             },
             (err: any) => {
-              console.log(err)
+              console.log('推流失败：', err)
             }
           )
 
@@ -327,7 +369,7 @@ export default function Index() {
     [exitRoom, hangup]
   )
 
-  const handleInit = useCallback(async () => {
+  const handleInit = useCallback(async (isReconnect: boolean = false) => {
     // XYRTC.createClient()创建了一个单例对象client，在多个小程序页面之间共享一个实例，可以重复调用获取最新的实例；
     XYClient.current = XYRTC.createClient({
       // 目的是排除底部40px空间，显示操作条
@@ -359,15 +401,14 @@ export default function Index() {
     setState((v) => ({
       ...v,
       loading: true,
-      videoMute: JSON.parse(videoMute),
-      audioMute: JSON.parse(audioMute)
+      videoMute: isReconnect ? state.videoMute : JSON.parse(videoMute),
+      audioMute: isReconnect ? state.audioMute : JSON.parse(audioMute)
     }))
     const response = await XYClient.current.makeCall({
       number: number,
       password: password,
       displayName: displayName
     })
-    // console.log(response)
     const { code, message = '' } = response
 
     // 缓存sdk <xylink-sdk/>组件节点context，为后续调用组件内部方法用
@@ -387,49 +428,109 @@ export default function Index() {
     }
   }, [handleOnRoomEvent, router.params, state.layoutMode])
 
-  useEffect(() => {
-    handleInit()
-  }, [handleInit])
+  const createSocket = useCallback((wsUrl: string) => {
+    console.log('创建socket')
+    handleCreateSocket({ url: wsUrl }).then(() => {
+      isNeedReconnectSocket.current = false
+      handleOnMessage((res) => {
+        const { type, data } = res
+        // console.log(data, type, res)
+        switch (type) {
+          case 'NOTICE_SIGN_NAME': // 通知签名
+          case 'NOTICE_SIGN_TIME': // 通知签日期
+          case 'NOTICE_SIGN_MARK': // 通知签备注
+            Taro.setStorageSync(type, data)
+            const suffix = type.replace('NOTICE', 'ON')
+            const { templateName } = data?.data || {}
+            Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}&name=${templateName || ''}` })
+            break
+          case 'NOTICE_UPLOAD': // 通知上传证据
+            Taro.navigateTo({ url: '/pages/photo/index' })
+            break
+          case 'NOTICE_CLOSE': // 关闭询问
+            Taro.showModal({
+              title: '提示',
+              content: '远程取证已结束!',
+              showCancel: false,
+              confirmText: '确定'
+            }).then(({ confirm }) => {
+              if (confirm) {
+                hangup()
+              }
+            })
+            break
+        }
+      })
+      handlerInjectListener({
+        onClose: (err) => {
+          // if (err.code === 1000) {
+          //   Taro.showToast({ title: '连接被断开，请重新进入取证室', icon: 'none' })
+          // } else {
+          //   // err.reason,
+          //   Taro.showToast({ title: '连接异常，请重新进入取证室',  icon: 'none' })
+          // }
+          console.log('连接断开， 重新连接。。。', err)
+          if (err.code !== 1000 || err.reason !== '结束连接') {
+            isNeedReconnectSocket.current = true
+            createSocket(wsUrl)
+          }
+        }
+      })
+    })
+  }, [handleCreateSocket, handleOnMessage, hangup])
+
+  const reconnectXYRTC = useCallback(async () => {
+    const { displayName, extUserId } = router.params
+      const XYClient = XYRTC.createClient({
+        report: true,
+        extId: config.DEFAULT_EXTID,
+        appId: config.DEFAULT_APPID
+      })
+      // 登陆
+      const response = await XYClient.loginExternalAccount({
+        extUserId: extUserId as string,
+        displayName: displayName as string
+      })
+      const { code } = response || {}
+      // 状态是200时，初始化登录成功
+      if (code === 200 || code === 'XYSDK:980200') {
+        // const cn = data.callNumber
+        XYClient.showToast('重新入会中...')
+        handleInit(true)
+      } else {
+        XYClient.showToast('登录失败，请稍后重试')
+      }
+  }, [router.params, handleInit])
+
+  useDidShow(() => {
+    console.log('onShow ~~~~~~ 是否需要重新连接', isNeedReconnect.current)
+    isHide.current = false
+    if (isNeedReconnect.current) {
+      setState((v) => ({ ...v, loading: true }))
+      setTimeout(() => {
+        // 断网重连需要间隔  否则小鱼抛错
+        reconnectXYRTC()
+      }, 3000);
+      isNeedReconnect.current = false
+    }
+    if (isNeedReconnectSocket.current) {
+      createSocket(socketWsUrl)
+    }
+  })
+
+  useDidHide(() => {
+    isHide.current = true
+  })
 
   useEffect(() => {
-    const { lawId } = router.params
-    if (lawId) {
-      const wsUrl = `${process.env.TARO_APP_API.replace(
-        'https',
-        'wss'
-      )}/api/ws/${lawId}`
-      handleCreateSocket({ url: wsUrl }).then(() => {
-        handleOnMessage((res) => {
-          const { type, data } = res
-          // console.log(data)
-          switch (type) {
-            case 'NOTICE_SIGN_NAME': // 通知签名
-            case 'NOTICE_SIGN_TIME': // 通知签日期
-            case 'NOTICE_SIGN_MARK': // 通知签备注
-              Taro.setStorageSync(type, data)
-              const suffix = type.replace('NOTICE', 'ON')
-              Taro.navigateTo({ url: `/pages/sign/index?type=${suffix}` })
-              break
-            case 'NOTICE_UPLOAD': // 通知上传证据
-              Taro.navigateTo({ url: '/pages/photo/index' })
-              break
-            case 'NOTICE_CLOSE': // 关闭询问
-              Taro.showModal({
-                title: '提示',
-                content: '远程取证已结束!',
-                showCancel: false,
-                confirmText: '确定'
-              }).then(({ confirm }) => {
-                if (confirm) {
-                  hangup()
-                }
-              })
-              break
-          }
-        })
-      })
+    handleInit()
+  }, [])
+
+  useEffect(() => {
+    if (socketWsUrl) {
+      createSocket(socketWsUrl)
     }
-  }, [handleCreateSocket, handleOnMessage, hangup, router.params])
+  }, [socketWsUrl])
 
   return (
     <View className={`h-full w-full text-white relative bg-[#1f1f25] ${isProxy ? 'vertical-layout' : ''}`}>
@@ -445,7 +546,7 @@ export default function Index() {
               src={require('../../assets/images/device/noicon.png')}
             />
             <View className="xy__call-name">呼叫中...</View>
-            <View className="xy__call-end" onClick={hangup}>
+            <View className="xy__call-end" onClick={() => hangup()}>
               <View className="xy__call-wrap-img">
                 <Image
                   src={require('../../assets/images/action_hangup.png')}
@@ -602,14 +703,14 @@ export default function Index() {
             </View>
             {
               isProxy ? (
-                <View className="xy__operate-btn" onClick={hangup}>
+                <View className="xy__operate-btn" onClick={() => hangup()}>
                   <Image className="icon other-icon" src={require('../../assets/images/action_hangup.png')} />
                   <View className="xy__operate-font">
                     挂断
                   </View>
                 </View>
               ) : (
-                <View className="xy__operate-end" onClick={hangup}>
+                <View className="xy__operate-end" onClick={() => hangup()}>
                   挂断
                 </View>
               )

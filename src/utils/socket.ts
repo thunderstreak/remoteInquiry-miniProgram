@@ -7,10 +7,17 @@ export interface WsMessage {
 }
 
 let socketTask: Taro.SocketTask | null = null
+
+export interface InjectOptions {
+  onClose?: (err: Taro.SocketTask.OnCloseCallbackResult) => void;
+  onError?: (err: Taro.SocketTask.OnErrorCallbackResult) => void;
+}
+
 // 'wss://echo.websocket.org'
 export const useSocket = () => {
   // const socketTask = useRef<Taro.SocketTask | null>(null)
   const inter = useRef<any>(null)
+  const injectCallbacks = useRef<InjectOptions>({})
   const handleOnMessage = useCallback((callback: (data: WsMessage) => void) => {
     socketTask?.onMessage<string>((res) => {
       const data = JSON.parse(res.data)
@@ -25,15 +32,23 @@ export const useSocket = () => {
 
   const handleOnError = useCallback(() => {
     socketTask?.onError((err) => {
-        console.log(err)
-        Taro.showToast({ title: err.errMsg, icon: 'none' })
+        console.log('socket error: ', err)
+        if (injectCallbacks.current?.onError) {
+          injectCallbacks.current.onError(err)
+        } else {
+          Taro.showToast({ title: err.errMsg, icon: 'none' })
+        }
       }
     )
   }, [])
   const handleOnClose = useCallback(() => {
     socketTask?.onClose((err) => {
-        console.log(err)
-        Taro.showToast({ title: err.reason, icon: 'none' })
+        console.log('socket close: ', err)
+        if (injectCallbacks.current?.onClose) {
+          injectCallbacks.current.onClose(err)
+        } else {
+          Taro.showToast({ title: err.reason, icon: 'none' })
+        }
       }
     )
   }, [])
@@ -73,6 +88,13 @@ export const useSocket = () => {
     [handleOnClose, handleOnError, handleSend]
   )
 
+  /**
+   * 注入监听事件
+   */
+  const handlerInjectListener = useCallback((callbacks: InjectOptions) => {
+    injectCallbacks.current = callbacks
+  }, [injectCallbacks])
+
   // useEffect(() => {
   //   handleCreateSocket(options[0].url)
   // }, [handleCreateSocket, options])
@@ -83,6 +105,7 @@ export const useSocket = () => {
     handleOnClose,
     handleSend,
     handleOnMessage,
-    handleOnError
+    handleOnError,
+    handlerInjectListener,
   }
 }

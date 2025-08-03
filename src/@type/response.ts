@@ -220,6 +220,7 @@ export interface RoomQueryRoomList {
   fingerUrl: string;// 指纹地址（为空，表示指纹未上传）
   isShowFace: 0 | 1;// 是否调用人脸识别（0不调用，1调用） 根据isShowFace判断是否调用人脸，isShowFinger判断是否显示“去采集”
   isShowFinger: 0 | 1;// 是否显示指纹采集（0不显示，1显示）
+  cs: number; // 咨询次数
 }
 
 export interface GetSaasInfo {

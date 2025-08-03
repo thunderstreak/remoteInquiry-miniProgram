@@ -26,19 +26,27 @@ const Index: React.FC = () => {
 
   const title = useMemo(() => {
     const type = router.params.type
+    // 文书名称
+    const name = router.params.name || ''
+    let str = ''
     switch (type) {
       case 'SIGN_MARK':
       case 'ON_SIGN_MARK':
-        return '通知签备注'
+        str = '通知签备注'
+        break
       case 'SIGN_NAME':
       case 'ON_SIGN_NAME':
-        return '通知签名'
+        str = '通知签名'
+        break
       case 'SIGN_TIME':
       case 'ON_SIGN_TIME':
-        return '通知签日期'
+        str = '通知签日期'
+        break
       default:
-        return '签字'
+        str = '签字'
+        break
     }
+    return name ? `${str}（${name}）` : str
   }, [router.params.type])
 
   const signTemplate = useMemo(() => {
