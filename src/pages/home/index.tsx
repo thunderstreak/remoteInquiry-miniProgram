@@ -220,10 +220,13 @@ export default function Index() {
       <View className="flex-1 flex flex-col rounded-t-[20px] bg-color pt-[25px] px-3">
         <View className="flex-1 flex flex-col gap-2">
           {list.map((x, i) => (
-            <View className="rounded-[8px] bg-white py-3" key={i}>
+            <View className="rounded-[20px] bg-white py-3" key={i}>
               <View className="px-4 flex flex-col gap-2 text-[13px] font-medium">
-                <View className="flex items-center justify-end ">
-                  <View className="text-[#0F40F5] text-[12px] font-medium py-[2px] px-2 rounded bg-[#FCCA00] border-[1px] border-solid border-[#0F40F5]">
+                <View className="flex items-center justify-between">
+                  <View className="text-[#0F40F5] text-[12px] font-medium py-[2px] text-[#FA913A]">
+                    第{x.cs || 0}次询问
+                  </View>
+                  <View className="text-[#0F40F5] text-[12px] font-medium py-[2px]  px-2 rounded bg-[#FCCA00] border-[1px] border-solid border-[#0F40F5]">
                     取证中
                   </View>
                 </View>
@@ -242,13 +245,9 @@ export default function Index() {
                       {x.lawName}
                     </View>
                     <View className="text-[14px]">
-                      <Text className="text-[#6C6C6C]">询问次数：</Text>
-                      第{x.cs || 0}次
-                    </View>
-                    {/* <View className="text-[14px]">
                       <Text className="text-[#6C6C6C]">预约时间：</Text>
                       {x.createTime}
-                    </View> */}
+                    </View>
                   </View>
                 </View>
               </View>

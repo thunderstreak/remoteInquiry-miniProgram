@@ -1,6 +1,6 @@
 import { PreviewFingerProps } from './type'
 import { Popup } from "@nutui/nutui-react-taro"
-import { View, Image, Text, Button } from "@tarojs/components"
+import { View, Image, Button } from "@tarojs/components"
 
 export default function PreviewFinger(props: PreviewFingerProps) {
   const { fingerUrl, visible, onClose } = props
