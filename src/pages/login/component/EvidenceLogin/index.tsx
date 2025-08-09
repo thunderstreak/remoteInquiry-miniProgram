@@ -28,7 +28,9 @@ const createFormData = (): FormData => ({
   // userName: '王小',
   // cardNo: '430522198210010031'
   userName: '',
-  cardNo: ''
+  cardNo: '',
+  busType: 0,
+  loginType: 0,
 })
 export default function Index() {
   const HOME_PATH = '/pages/home/index'
